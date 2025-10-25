@@ -32,6 +32,9 @@ public class SnapshotEntity extends BaseEntity<UUID> {
     @Column(name = "version_no")
     private Integer versionNo;
 
+    @Column(name = "description")
+    private String description;
+
     @ManyToOne
     private TimelineEntity timeline;
 }
