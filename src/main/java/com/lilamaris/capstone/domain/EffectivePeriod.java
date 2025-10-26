@@ -18,8 +18,12 @@ public record EffectivePeriod(
 
     public EffectivePeriod {
         from = Optional.ofNullable(from).orElseGet(EffectivePeriod::now);
-        to = Optional.ofNullable(to).orElse(MAX);
+        to =  Optional.ofNullable(to).orElse(MAX);
         validate(from, to);
+    }
+
+    public static EffectivePeriod from(LocalDateTime from, LocalDateTime to) {
+        return EffectivePeriod.builder().from(from).to(to).build();
     }
 
     public static EffectivePeriod openAt(LocalDateTime at) {

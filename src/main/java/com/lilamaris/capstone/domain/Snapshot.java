@@ -48,6 +48,10 @@ public record Snapshot(
         );
     }
 
+    public static Snapshot initial(Timeline.Id timelineId) {
+        return Snapshot.builder().timelineId(timelineId).build();
+    }
+
     public Transition migrate() {
         var now = EffectivePeriod.now();
         var prevDescription = String.join(
