@@ -20,6 +20,7 @@ public class SnapshotEntityMapper {
                 .id(id)
                 .tx(tx)
                 .valid(valid)
+                .versionNo(entity.getVersionNo())
                 .description(entity.getDescription())
                 .timelineId(timelineId)
                 .build();
@@ -27,7 +28,7 @@ public class SnapshotEntityMapper {
 
     public static SnapshotEntity toEntity(Snapshot domain, EntityManager em) {
         var id = Optional.ofNullable(domain.id()).map(Snapshot.Id::value).orElse(null);
-        var timeline = em.getReference(TimelineEntity.class, domain.timelineId());
+        var timeline = em.getReference(TimelineEntity.class, domain.timelineId().value());
 
         return SnapshotEntity.builder()
                 .id(id)
@@ -35,6 +36,7 @@ public class SnapshotEntityMapper {
                 .txTo(domain.tx().to())
                 .validFrom(domain.valid().from())
                 .validTo(domain.valid().to())
+                .versionNo(domain.versionNo())
                 .description(domain.description())
                 .timeline(timeline)
                 .build();

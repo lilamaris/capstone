@@ -2,9 +2,8 @@ package com.lilamaris.capstone.domain;
 
 import lombok.*;
 
-import java.text.MessageFormat;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Builder(toBuilder = true)
 public record Snapshot(
@@ -15,9 +14,7 @@ public record Snapshot(
         String description,
         Timeline.Id timelineId
 ) {
-    public static final String INITIAL_MESSAGE = "Initialize at {0} [V{1}]";
-    public static final String UPGRADE_MESSAGE = "Tx {0} at {1}";
-    public static final String MIGRATE_MESSAGE = "Valid {0} at {1}";
+    public static final String NAME = "Snapshot";
 
     public record Id(UUID value) {
         public static Id random() {
@@ -33,67 +30,61 @@ public record Snapshot(
     public record Transition(Snapshot prev, Snapshot next) {}
 
     public Snapshot {
-        var now = EffectivePeriod.now();
-
-        tx = Optional.ofNullable(tx).orElse(EffectivePeriod.openAt(now));
-        valid = Optional.ofNullable(valid).orElse(EffectivePeriod.openAt(now));
-        versionNo = Optional.ofNullable(versionNo).orElse(1);
+        tx = Optional.ofNullable(tx).orElseThrow(() -> new IllegalArgumentException("'tx' must be set"));
+        valid = Optional.ofNullable(valid).orElseThrow(() -> new IllegalArgumentException("'valid' must be set"));
         timelineId = Optional.ofNullable(timelineId).orElseThrow(() -> new IllegalArgumentException("'timelineId' must be set"));
-
-        var initialDescription = MessageFormat.format(INITIAL_MESSAGE, now, versionNo);
-        description = String.join(
-                "\n",
-                initialDescription,
-                Optional.ofNullable(description).orElse("")
-        );
+        versionNo = Optional.ofNullable(versionNo).orElse(1);
+        description = Optional.ofNullable(description).orElse("No user description.");
     }
 
-    public static Snapshot initial(Timeline.Id timelineId) {
-        return Snapshot.builder().timelineId(timelineId).build();
+    public static Snapshot initial(Timeline.Id timelineId, LocalDateTime validAt, LocalDateTime now, String description) {
+        var tx = EffectivePeriod.openAt(now);
+        var valid = EffectivePeriod.openAt(validAt);
+
+        return Snapshot.builder()
+                .timelineId(timelineId)
+                .valid(valid)
+                .tx(tx)
+                .description(description)
+                .build();
     }
 
-    public Transition migrate() {
-        var now = EffectivePeriod.now();
-        var prevDescription = String.join(
-                "\n",
-                description,
-                MessageFormat.format(MIGRATE_MESSAGE, "closed", now)
-        );
-        var nextDescription = MessageFormat.format(MIGRATE_MESSAGE, "opened", now);
-
+    public Transition migrate(LocalDateTime validAt) {
+        validateOperation();
         var prev = toBuilder()
-                .valid(valid.closeAt(now))
-                .description(prevDescription)
+                .valid(valid.copyBeforeAt(validAt))
                 .build();
 
         var next = toBuilder()
-                .valid(EffectivePeriod.openAt(now))
-                .versionNo(versionNo + 1)
-                .description(nextDescription)
+                .id(null)
+                .valid(valid.copyAfterAt(validAt))
                 .build();
 
         return new Transition(prev, next);
     }
 
-    public Transition upgrade() {
-        var now = EffectivePeriod.now();
-        var prevDescription = String.join(
-                "\n",
-                description,
-                MessageFormat.format(UPGRADE_MESSAGE, "closed", now)
-        );
-        var nextDescription = MessageFormat.format(UPGRADE_MESSAGE, "opened", now);
+    public Transition upgrade(LocalDateTime txAt) {
+        validateOperation();
 
         var prev = toBuilder()
-                .tx(tx.closeAt(now))
-                .description(prevDescription)
+                .tx(tx.copyBeforeAt(txAt))
                 .build();
 
         var next = toBuilder()
-                .tx(EffectivePeriod.openAt(now))
+                .id(null)
+                .tx(tx.copyAfterAt(txAt))
                 .versionNo(versionNo + 1)
-                .description(nextDescription)
                 .build();
         return new Transition(prev, next);
+    }
+
+    public Snapshot copy() {
+        return toBuilder().build();
+    }
+
+    private void validateOperation() {
+        if (!tx.isOpen()) {
+            throw new IllegalStateException("can only operated to snapshots with open tx");
+        }
     }
 }

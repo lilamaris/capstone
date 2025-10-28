@@ -97,4 +97,14 @@ public class EffectivePeriodTest {
         assertOverlap(ef1, now.plusNanos(1), true);
         assertOverlap(ef1, after3.minusNanos(1), true);
     }
+
+    @Test
+    void should_detect_closed() {
+        var ef1 = EffectivePeriod.openAt(now);
+        assertThat(ef1.to()).isEqualTo(EffectivePeriod.MAX);
+        assertThat(ef1.isOpen()).isEqualTo(true);
+
+        var ef2 = ef1.copyBeforeAt(now.plusDays(1));
+        assertThat(ef2.isOpen()).isEqualTo(false);
+    }
 }

@@ -30,8 +30,12 @@ public record EffectivePeriod(
         return EffectivePeriod.builder().from(at).build();
     }
 
-    public EffectivePeriod closeAt(LocalDateTime at) {
-        return EffectivePeriod.builder().from(from).to(at).build();
+    public EffectivePeriod copyAfterAt(LocalDateTime at) {
+        return toBuilder().from(at).to(to).build();
+    }
+
+    public EffectivePeriod copyBeforeAt(LocalDateTime at) {
+        return toBuilder().from(from).to(at).build();
     }
 
     private void validate(LocalDateTime from, LocalDateTime to) {
@@ -46,5 +50,9 @@ public record EffectivePeriod(
 
     public boolean contains(LocalDateTime time) {
         return from.isBefore(time) && to.isAfter(time);
+    }
+
+    public boolean isOpen() {
+        return to.isEqual(MAX);
     }
 }

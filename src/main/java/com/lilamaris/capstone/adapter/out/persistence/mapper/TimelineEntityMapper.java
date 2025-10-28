@@ -19,15 +19,17 @@ public class TimelineEntityMapper {
 
         return Timeline.builder()
                 .id(id)
+                .description(entity.getDescription())
                 .snapshotIdList(snapshotIdList)
                 .build();
     }
 
     public static TimelineEntity toEntity(Timeline domain, EntityManager em) {
-        var id = Optional.ofNullable(domain.getId()).map(Timeline.Id::value).orElse(null);
+        var id = Optional.ofNullable(domain.id()).map(Timeline.Id::value).orElse(null);
 
         return TimelineEntity.builder()
                 .id(id)
+                .description(domain.description())
                 .build();
     }
 
