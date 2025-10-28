@@ -37,54 +37,51 @@ public record Snapshot(
         description = Optional.ofNullable(description).orElse("No user description.");
     }
 
-    public static Snapshot initial(Timeline.Id timelineId, LocalDateTime validAt, LocalDateTime now, String description) {
-        var tx = EffectivePeriod.openAt(now);
-        var valid = EffectivePeriod.openAt(validAt);
-
+    public static Snapshot create(Timeline.Id timelineId, EffectivePeriod tx, EffectivePeriod valid, Integer versionNo, String description) {
         return Snapshot.builder()
                 .timelineId(timelineId)
-                .valid(valid)
                 .tx(tx)
+                .valid(valid)
+                .versionNo(versionNo)
                 .description(description)
                 .build();
     }
 
+    public static Snapshot create(Timeline.Id timelineId, EffectivePeriod tx, EffectivePeriod valid, Integer versionNo) {
+        return create(timelineId, tx, valid, versionNo, null);
+    }
+
+    public static Snapshot initial(Timeline.Id timelineId, LocalDateTime validAt, LocalDateTime txAt, String description) {
+        var tx = EffectivePeriod.openAt(txAt);
+        var valid = EffectivePeriod.openAt(validAt);
+        return create(timelineId, tx, valid, 1, description);
+    }
+
+    public void validateOperation() {
+        if (!tx.isOpen()) {
+            throw new IllegalStateException("can only operated to snapshots with open tx");
+        }
+    }
+
+    public Snapshot copyWithTx(EffectivePeriod tx, Integer versionNo) {
+        return toBuilder().tx(tx).versionNo(versionNo).build();
+    }
+
+    public Snapshot copyWithValid(EffectivePeriod valid) {
+        return toBuilder().valid(valid).build();
+    }
+
     public Transition migrate(LocalDateTime validAt) {
         validateOperation();
-        var prev = toBuilder()
-                .valid(valid.copyBeforeAt(validAt))
-                .build();
-
-        var next = toBuilder()
-                .id(null)
-                .valid(valid.copyAfterAt(validAt))
-                .build();
-
+        var prev = copyWithValid(valid.copyBeforeAt(validAt));
+        var next = copyWithValid(valid.copyAfterAt(validAt)).toBuilder().id(null).build();
         return new Transition(prev, next);
     }
 
     public Transition upgrade(LocalDateTime txAt) {
         validateOperation();
-
-        var prev = toBuilder()
-                .tx(tx.copyBeforeAt(txAt))
-                .build();
-
-        var next = toBuilder()
-                .id(null)
-                .tx(tx.copyAfterAt(txAt))
-                .versionNo(versionNo + 1)
-                .build();
+        var prev = copyWithTx(tx.copyBeforeAt(txAt), versionNo);
+        var next = copyWithTx(tx.copyAfterAt(txAt), versionNo + 1).toBuilder().id(null).build();
         return new Transition(prev, next);
-    }
-
-    public Snapshot copy() {
-        return toBuilder().build();
-    }
-
-    private void validateOperation() {
-        if (!tx.isOpen()) {
-            throw new IllegalStateException("can only operated to snapshots with open tx");
-        }
     }
 }

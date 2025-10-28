@@ -17,7 +17,7 @@ public class SnapshotService implements SnapshotUseCase {
     public SnapshotResult.Command update(Snapshot.Id id, String description) {
         var target = snapshotPort.getById(id).orElseThrow(EntityNotFoundException::new);
 
-        var updated = target.copy().toBuilder().description(description).build();
+        var updated = target.toBuilder().description(description).build();
         var saved = snapshotPort.save(updated);
         return SnapshotResult.Command.from(saved);
     }

@@ -47,7 +47,7 @@ public class TimelineCommandService implements TimelineCommandUseCase {
 
         if (snapshotPort.isExistsInTimeline(id)) {
             Snapshot sourceSnapshot = snapshotPort.getByValidAt(validAt).getFirst();
-            List<Snapshot> transition = timeline.migrate(sourceSnapshot, validAt);
+            List<Snapshot> transition = timeline.migrate(sourceSnapshot, txAt, validAt);
             var saved = transition.stream().map(snapshotPort::save).toList();
             result = saved.stream().map(SnapshotResult.Command::from).toList();
         } else {
@@ -61,7 +61,15 @@ public class TimelineCommandService implements TimelineCommandUseCase {
 
     @Override
     public List<SnapshotResult.Command> merge(Timeline.Id id, List<Snapshot.Id> targetIds, String description) {
-        return null;
+        var txAt = EffectivePeriod.now();
+        var timeline = timelinePort.getById(id).orElseThrow(EntityNotFoundException::new);
+
+        var targetSnapshots = snapshotPort.getByIds(targetIds);
+
+        var transition = timeline.merge(targetSnapshots, txAt);
+        var saved = transition.stream().map(snapshotPort::save).toList();
+
+        return saved.stream().map(SnapshotResult.Command::from).toList();
     }
 
     @Override
