@@ -3,6 +3,8 @@ package com.lilamaris.capstone.domain;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 
 @Builder(toBuilder = true)
@@ -30,6 +32,10 @@ public record EffectivePeriod(
         return EffectivePeriod.builder().from(at).build();
     }
 
+    public static EffectivePeriod mergeRange(List<EffectivePeriod> periodList) {
+        var sorted = periodList.stream().sorted(Comparator.comparing(EffectivePeriod::from)).toList();
+        return from(sorted.getFirst().from(), sorted.getLast().to());
+    }
     public EffectivePeriod copyAfterAt(LocalDateTime at) {
         return toBuilder().from(at).to(to).build();
     }

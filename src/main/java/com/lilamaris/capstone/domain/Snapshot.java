@@ -71,17 +71,17 @@ public record Snapshot(
         return toBuilder().valid(valid).build();
     }
 
-    public Transition migrate(LocalDateTime validAt) {
+    public Transition migrate(LocalDateTime validAt, String description) {
         validateOperation();
         var prev = copyWithValid(valid.copyBeforeAt(validAt));
-        var next = copyWithValid(valid.copyAfterAt(validAt)).toBuilder().id(null).build();
+        var next = copyWithValid(valid.copyAfterAt(validAt)).toBuilder().id(null).description(description).build();
         return new Transition(prev, next);
     }
 
-    public Transition upgrade(LocalDateTime txAt) {
+    public Transition upgrade(LocalDateTime txAt, String description) {
         validateOperation();
         var prev = copyWithTx(tx.copyBeforeAt(txAt), versionNo);
-        var next = copyWithTx(tx.copyAfterAt(txAt), versionNo + 1).toBuilder().id(null).build();
+        var next = copyWithTx(tx.copyAfterAt(txAt), versionNo + 1).toBuilder().id(null).description(description).build();
         return new Transition(prev, next);
     }
 }
