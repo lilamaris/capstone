@@ -78,6 +78,14 @@ public class TimelineCommandService implements TimelineCommandUseCase {
 
     @Override
     public List<SnapshotResult.Command> rollback(Timeline.Id id, LocalDateTime targetTxAt, String description) {
-        return null;
+        var txAt = EffectivePeriod.now();
+        var timeline = timelinePort.getById(id).orElseThrow(EntityNotFoundException::new);
+
+        var recentSnapshots = snapshotPort.getByTxAt(txAt);
+        var targetSnapshots = snapshotPort.getByTxAt(targetTxAt);
+        var transition = timeline.rollback(targetSnapshots, recentSnapshots, txAt);
+        var saved = transition.stream().map(snapshotPort::save).toList();
+
+        return saved.stream().map(SnapshotResult.Command::from).toList();
     }
 }

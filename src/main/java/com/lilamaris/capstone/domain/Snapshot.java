@@ -63,12 +63,12 @@ public record Snapshot(
         }
     }
 
-    public Snapshot copyWithTx(EffectivePeriod tx, Integer versionNo) {
-        return toBuilder().tx(tx).versionNo(versionNo).build();
+    public Snapshot copyWithTx(EffectivePeriod tx) {
+        return toBuilder().tx(tx).versionNo(versionNo + 1).build();
     }
 
     public Snapshot copyWithValid(EffectivePeriod valid) {
-        return toBuilder().valid(valid).build();
+        return toBuilder().valid(valid).versionNo(versionNo + 1).build();
     }
 
     public Transition migrate(LocalDateTime validAt, String description) {
@@ -80,8 +80,8 @@ public record Snapshot(
 
     public Transition upgrade(LocalDateTime txAt, String description) {
         validateOperation();
-        var prev = copyWithTx(tx.copyBeforeAt(txAt), versionNo);
-        var next = copyWithTx(tx.copyAfterAt(txAt), versionNo + 1).toBuilder().id(null).description(description).build();
+        var prev = copyWithTx(tx.copyBeforeAt(txAt));
+        var next = copyWithTx(tx.copyAfterAt(txAt)).toBuilder().id(null).description(description).build();
         return new Transition(prev, next);
     }
 }

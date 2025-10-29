@@ -36,18 +36,19 @@ public record EffectivePeriod(
         var sorted = periodList.stream().sorted(Comparator.comparing(EffectivePeriod::from)).toList();
         return from(sorted.getFirst().from(), sorted.getLast().to());
     }
+
+    public static void validate(LocalDateTime from, LocalDateTime to) {
+        if (to.isBefore(from)) {
+            throw new IllegalArgumentException("'to' is must be after than 'from'");
+        }
+    }
+
     public EffectivePeriod copyAfterAt(LocalDateTime at) {
         return toBuilder().from(at).to(to).build();
     }
 
     public EffectivePeriod copyBeforeAt(LocalDateTime at) {
         return toBuilder().from(from).to(at).build();
-    }
-
-    private void validate(LocalDateTime from, LocalDateTime to) {
-        if (to.isBefore(from)) {
-            throw new IllegalArgumentException("'to' is must be after than 'from'");
-        }
     }
 
     public boolean isOverlap(EffectivePeriod other) {

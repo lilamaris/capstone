@@ -35,43 +35,47 @@ public record Timeline(
     }
 
     public List<Snapshot> migrate(Snapshot source, LocalDateTime txAt, LocalDateTime validAt, String description) {
-        validateMigrate(source, validAt);
+        EffectivePeriod.validate(source.valid().from(), validAt);
 
         var upgradeTransition = source.upgrade(txAt, description);
         var migrateTransition = upgradeTransition.next().migrate(validAt, description);
         return List.of(upgradeTransition.prev(), migrateTransition.prev(), migrateTransition.next());
     }
 
-    private void validateMigrate(Snapshot source, LocalDateTime validAt) {
-        if (validAt.isBefore(source.valid().from())) {
-            throw new IllegalArgumentException("The 'validAt' must be later than or equal to the source's validFrom.");
-        }
-    }
+    public List<Snapshot> merge(List<Snapshot> targetSnapshotList, LocalDateTime txAt, String description) {
+        validateAllTransactionState(targetSnapshotList, true);
 
-    public List<Snapshot> merge(List<Snapshot> snapshotList, LocalDateTime txAt, String description) {
-        validateMerge(snapshotList);
-
-        var closedSnapshots = snapshotList.stream()
-                .map(s -> s.copyWithTx(s.tx().copyBeforeAt(txAt), s.versionNo()))
+        var closedSnapshots = targetSnapshotList.stream()
+                .map(s -> s.copyWithTx(s.tx().copyBeforeAt(txAt)))
                 .toList();
 
-        var newVersionNo = snapshotList.stream()
+        var newVersionNo = targetSnapshotList.stream()
                 .map(Snapshot::versionNo)
                 .max(Integer::compareTo)
                 .orElseThrow(NoSuchElementException::new);
 
-        var mergedValid = EffectivePeriod.mergeRange(snapshotList.stream().map(Snapshot::valid).toList());
+        var mergedValid = EffectivePeriod.mergeRange(targetSnapshotList.stream().map(Snapshot::valid).toList());
         var mergedSnapshot = Snapshot.create(id, EffectivePeriod.openAt(txAt), mergedValid, newVersionNo + 1, description);
 
         return Stream.concat(closedSnapshots.stream(), Stream.of(mergedSnapshot)).toList();
     }
 
-    private void validateMerge(List<Snapshot> snapshotList) {
+    public List<Snapshot> rollback(List<Snapshot> targetSnapshotList, List<Snapshot> recentSnapshotList, LocalDateTime txAt) {
+        validateAllTransactionState(targetSnapshotList, false);
+        validateAllTransactionState(recentSnapshotList, true);
+
+        var closedSnapshots = recentSnapshotList.stream().map(s -> s.copyWithTx(s.tx().copyBeforeAt(txAt))).toList();
+        var rollbackSnapshot = targetSnapshotList.stream().map(s -> s.copyWithTx(EffectivePeriod.openAt(txAt))).toList();
+
+        return Stream.concat(closedSnapshots.stream(), rollbackSnapshot.stream()).toList();
+    }
+
+    private void validateAllTransactionState(List<Snapshot> snapshotList, boolean except) {
         if (snapshotList.isEmpty()) {
             throw new IllegalArgumentException("No snapshots provided for merge.");
         }
-        if (!snapshotList.stream().allMatch(s -> s.tx().isOpen())) {
-            throw new IllegalStateException("All snapshots to be merged must have an open transaction period.");
+        if (!snapshotList.stream().allMatch(s -> s.tx().isOpen() == except)) {
+           throw new IllegalStateException("Snapshots do not meet the transaction state requirement");
         }
     }
 }
