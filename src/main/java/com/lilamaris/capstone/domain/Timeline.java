@@ -4,9 +4,6 @@ import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Builder(toBuilder = true)
@@ -41,103 +38,70 @@ public record Timeline(
         return toBuilder().snapshotList(snapshotList).build();
     }
 
-    public Timeline copyWithSnapshotListDiff(List<Snapshot> needUpsert) {
-        var part = needUpsert
-                .stream()
-                .collect(Collectors.partitioningBy(s -> s.id() != null));
-        Map<Snapshot.Id, Snapshot> needUpdate = part.get(true).stream().collect(Collectors.toMap(Snapshot::id, Function.identity()));
-        List<Snapshot> needInsert = part.get(false);
-
-        var updated = new ArrayList<>(
-                snapshotList
-                        .stream()
-                        .map(s -> Optional.ofNullable(needUpdate.remove(s.id())).orElse(s))
-                        .toList()
-        );
-        updated.addAll(needInsert);
-
-        return copyWithSnapshotList(updated);
-    }
-
-    private List<Snapshot> getSnapshotValidAtRange(LocalDateTime validFrom, LocalDateTime validTo, Predicate<Snapshot> predicate) {
-        var range = EffectivePeriod.from(validFrom, validTo);
+    private List<Snapshot> getSnapshotTxAt(LocalDateTime txAt) {
         return snapshotList
                 .stream()
-                .filter(s -> s.valid().isOverlap(range))
-                .filter(predicate)
+                .filter(s -> s.isOpenTxAt(txAt))
+                .sorted(Comparator.comparing(s -> s.valid().from()))
                 .toList();
     }
 
-    private List<Snapshot> getSnapshotValidAt(LocalDateTime validAt, Predicate<Snapshot> predicate) {
+    private List<Snapshot> getSnapshotValidAt(LocalDateTime validAt) {
         return snapshotList
                 .stream()
-                .filter(s -> s.valid().contains(validAt))
-                .filter(predicate)
+                .filter(s -> s.isOpenValidAt(validAt))
+                .sorted(Comparator.comparing(s -> s.tx().from()))
                 .toList();
     }
 
-    public Timeline migrate(LocalDateTime txAt, LocalDateTime validAt, String description) {
-        if (snapshotList.isEmpty()) {
-            return copyWithSnapshotList(List.of(Snapshot.create(id, txAt, validAt, description)));
+    public List<Snapshot> migrate(LocalDateTime txAt, LocalDateTime validAt, String description) {
+        var validList = getSnapshotValidAt(validAt);
+        if (validList.isEmpty()) {
+            return List.of(Snapshot.initial(id, txAt, validAt, description));
         }
 
-        var sourceList = getSnapshotValidAt(validAt, s -> s.tx().isOpen());
-        if (sourceList.isEmpty()) {
-            throw new IllegalArgumentException("No snapshot exists at that time.");
-        }
-
-        Snapshot source = sourceList.getFirst();
+        Snapshot source = validList.getLast();
         EffectivePeriod.validate(source.valid().from(), validAt);
 
         var upgradeTransition = source.upgrade(txAt, description);
         var migrateTransition = upgradeTransition.next().migrate(validAt, description);
-
-        var needUpsert = Stream.of(upgradeTransition.prev(), migrateTransition.prev(), migrateTransition.next()).toList();
-        return copyWithSnapshotListDiff(needUpsert);
+        return List.of(upgradeTransition.prev(), migrateTransition.prev(), migrateTransition.next());
     }
 
-    public Timeline merge(LocalDateTime txAt, LocalDateTime validFrom, LocalDateTime validTo, String description) {
-        if (snapshotList.isEmpty()) {
-            throw new IllegalStateException("No snapshot exists in the timeline.");
-        }
+    public List<Snapshot> merge(List<Snapshot> targetSnapshotList, LocalDateTime txAt, String description) {
+        validateAllTransactionState(targetSnapshotList, true);
 
-        var sourceList = getSnapshotValidAtRange(validFrom, validTo, s -> s.tx().isOpen());
-        if (sourceList.isEmpty()) {
-            throw new IllegalArgumentException("No snapshot exists at that time.");
-        }
-
-        var closedSource = sourceList.stream()
+        var closedSnapshots = targetSnapshotList.stream()
                 .map(s -> s.copyWithTx(s.tx().copyBeforeAt(txAt)))
                 .toList();
 
-        var mergedValid = EffectivePeriod.mergeRange(sourceList.stream().map(Snapshot::valid).toList());
-        var mergedSnapshot = Snapshot.create(id, EffectivePeriod.openAt(txAt), mergedValid, description);
+        var newVersionNo = targetSnapshotList.stream()
+                .map(Snapshot::versionNo)
+                .max(Integer::compareTo)
+                .orElseThrow(NoSuchElementException::new);
 
-        var needUpsert = Stream.concat(closedSource.stream(), Stream.of(mergedSnapshot)).toList();
-        return copyWithSnapshotListDiff(needUpsert);
+        var mergedValid = EffectivePeriod.mergeRange(targetSnapshotList.stream().map(Snapshot::valid).toList());
+        var mergedSnapshot = Snapshot.create(id, EffectivePeriod.openAt(txAt), mergedValid, newVersionNo + 1, description);
+
+        return Stream.concat(closedSnapshots.stream(), Stream.of(mergedSnapshot)).toList();
     }
 
-    public List<Snapshot> rollback(LocalDateTime txAt, LocalDateTime targetTxAt) {
-        if (snapshotList.isEmpty()) {
-            throw new IllegalStateException("No snapshot exists in the timeline.");
-        }
+    public List<Snapshot> rollback(List<Snapshot> targetSnapshotList, List<Snapshot> recentSnapshotList, LocalDateTime txAt) {
+        validateAllTransactionState(targetSnapshotList, false);
+        validateAllTransactionState(recentSnapshotList, true);
 
-        var source = snapshotList.stream().collect(
-                Collectors.teeing(
-                        Collectors.filtering(s -> s.tx().contains(targetTxAt), Collectors.toList()),
-                        Collectors.filtering(s -> s.tx().isOpen(), Collectors.toList()),
-                        (containing, open) -> Map.of(
-                                "containing", containing,
-                                "open", open
-                        )
-                )
-        );
-        List<Snapshot> containingTxAt = source.get("containing");
-        List<Snapshot> openTx = source.get("open");
-
-        var closedSnapshots = openTx.stream().map(s -> s.closeTxAt(txAt)).toList();
-        var rollbackSnapshot = containingTxAt.stream().map(s -> s.copyWithTx(EffectivePeriod.openAt(txAt))).toList();
+        var closedSnapshots = recentSnapshotList.stream().map(s -> s.copyWithTx(s.tx().copyBeforeAt(txAt))).toList();
+        var rollbackSnapshot = targetSnapshotList.stream().map(s -> s.copyWithTx(EffectivePeriod.openAt(txAt))).toList();
 
         return Stream.concat(closedSnapshots.stream(), rollbackSnapshot.stream()).toList();
+    }
+
+    private void validateAllTransactionState(List<Snapshot> snapshotList, boolean except) {
+        if (snapshotList.isEmpty()) {
+            throw new IllegalArgumentException("No snapshots provided for merge.");
+        }
+        if (!snapshotList.stream().allMatch(s -> s.tx().isOpen() == except)) {
+           throw new IllegalStateException("Snapshots do not meet the transaction state requirement");
+        }
     }
 }

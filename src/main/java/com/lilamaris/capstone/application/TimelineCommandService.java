@@ -6,6 +6,7 @@ import com.lilamaris.capstone.application.port.in.result.TimelineResult;
 import com.lilamaris.capstone.application.port.out.SnapshotPort;
 import com.lilamaris.capstone.application.port.out.TimelinePort;
 import com.lilamaris.capstone.domain.EffectivePeriod;
+import com.lilamaris.capstone.domain.Snapshot;
 import com.lilamaris.capstone.domain.Timeline;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -42,30 +43,36 @@ public class TimelineCommandService implements TimelineCommandUseCase {
     }
 
     @Override
-    public TimelineResult.Command migrate(Timeline.Id id, LocalDateTime validAt, String description) {
+    public List<SnapshotResult.Command> migrate(Timeline.Id id, LocalDateTime validAt, String description) {
         var txAt = EffectivePeriod.now();
         var timeline = timelinePort.getById(id).orElseThrow(EntityNotFoundException::new);
-        var transition = timeline.migrate(txAt, validAt, description);
-        var saved = timelinePort.save(transition);
 
-        return TimelineResult.Command.from(saved);
+        return timeline.migrate(txAt, validAt, description)
+                .stream()
+                .map(SnapshotResult.Command::from)
+                .toList();
     }
 
     @Override
-    public TimelineResult.Command merge(Timeline.Id id, LocalDateTime validFrom, LocalDateTime validTo, String description) {
+    public List<SnapshotResult.Command> merge(Timeline.Id id, List<Snapshot.Id> targetIds, String description) {
         var txAt = EffectivePeriod.now();
         var timeline = timelinePort.getById(id).orElseThrow(EntityNotFoundException::new);
-        var transition = timeline.merge(txAt, validFrom, validTo, description);
-        var saved = timelinePort.save(transition);
 
-        return TimelineResult.Command.from(saved);
+        var targetSnapshots = snapshotPort.getByIds(targetIds);
+        var transition = timeline.merge(targetSnapshots, txAt, description);
+        var saved = transition.stream().map(snapshotPort::save).toList();
+
+        return saved.stream().map(SnapshotResult.Command::from).toList();
     }
 
     @Override
     public List<SnapshotResult.Command> rollback(Timeline.Id id, LocalDateTime targetTxAt, String description) {
         var txAt = EffectivePeriod.now();
         var timeline = timelinePort.getById(id).orElseThrow(EntityNotFoundException::new);
-        var transition = timeline.rollback(txAt, targetTxAt);
+
+        var recentSnapshots = snapshotPort.getByTxAt(txAt);
+        var targetSnapshots = snapshotPort.getByTxAt(targetTxAt);
+        var transition = timeline.rollback(targetSnapshots, recentSnapshots, txAt);
         var saved = transition.stream().map(snapshotPort::save).toList();
 
         return saved.stream().map(SnapshotResult.Command::from).toList();
