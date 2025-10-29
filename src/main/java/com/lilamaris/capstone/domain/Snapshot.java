@@ -1,9 +1,10 @@
 package com.lilamaris.capstone.domain;
 
-import lombok.*;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Optional;
+import java.util.UUID;
 
 @Builder(toBuilder = true)
 public record Snapshot(
@@ -51,7 +52,7 @@ public record Snapshot(
         return create(timelineId, tx, valid, versionNo, null);
     }
 
-    public static Snapshot initial(Timeline.Id timelineId, LocalDateTime validAt, LocalDateTime txAt, String description) {
+    public static Snapshot initial(Timeline.Id timelineId, LocalDateTime txAt, LocalDateTime validAt, String description) {
         var tx = EffectivePeriod.openAt(txAt);
         var valid = EffectivePeriod.openAt(validAt);
         return create(timelineId, tx, valid, 1, description);
@@ -83,5 +84,13 @@ public record Snapshot(
         var prev = copyWithTx(tx.copyBeforeAt(txAt));
         var next = copyWithTx(tx.copyAfterAt(txAt)).toBuilder().id(null).description(description).build();
         return new Transition(prev, next);
+    }
+
+    public boolean isOpenValidAt(LocalDateTime validAt) {
+        return valid.contains(validAt);
+    }
+
+    public boolean isOpenTxAt(LocalDateTime txAt) {
+        return tx.contains(txAt);
     }
 }

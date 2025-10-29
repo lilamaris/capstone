@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.domain;
 
-import lombok.*;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;

@@ -3,7 +3,6 @@ package com.lilamaris.capstone.adapter.out.persistence;
 import com.lilamaris.capstone.adapter.out.persistence.mapper.SnapshotEntityMapper;
 import com.lilamaris.capstone.adapter.out.persistence.repository.SnapshotRepository;
 import com.lilamaris.capstone.application.port.out.SnapshotPort;
-import com.lilamaris.capstone.domain.EffectivePeriod;
 import com.lilamaris.capstone.domain.Snapshot;
 import com.lilamaris.capstone.domain.Timeline;
 import jakarta.persistence.EntityManager;

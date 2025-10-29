@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.domain;
 
-import lombok.*;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 public record Timeline(
         Id id,
         String description,
-        List<Snapshot.Id> snapshotIdList
+        List<Snapshot> snapshotList
 ) {
     public record Id(UUID value) {
         public static Id random() {
@@ -23,7 +23,7 @@ public record Timeline(
     }
 
     public Timeline {
-        snapshotIdList = Optional.ofNullable(snapshotIdList).orElse(List.of());
+        snapshotList = Optional.ofNullable(snapshotList).orElse(new ArrayList<>());
     }
 
     public static Timeline initial(String description) {
@@ -34,7 +34,33 @@ public record Timeline(
         return builder().id(id).description(description).build();
     }
 
-    public List<Snapshot> migrate(Snapshot source, LocalDateTime txAt, LocalDateTime validAt, String description) {
+    public Timeline copyWithSnapshotList(List<Snapshot> snapshotList) {
+        return toBuilder().snapshotList(snapshotList).build();
+    }
+
+    private List<Snapshot> getSnapshotTxAt(LocalDateTime txAt) {
+        return snapshotList
+                .stream()
+                .filter(s -> s.isOpenTxAt(txAt))
+                .sorted(Comparator.comparing(s -> s.valid().from()))
+                .toList();
+    }
+
+    private List<Snapshot> getSnapshotValidAt(LocalDateTime validAt) {
+        return snapshotList
+                .stream()
+                .filter(s -> s.isOpenValidAt(validAt))
+                .sorted(Comparator.comparing(s -> s.tx().from()))
+                .toList();
+    }
+
+    public List<Snapshot> migrate(LocalDateTime txAt, LocalDateTime validAt, String description) {
+        var validList = getSnapshotValidAt(validAt);
+        if (validList.isEmpty()) {
+            return List.of(Snapshot.initial(id, txAt, validAt, description));
+        }
+
+        Snapshot source = validList.getLast();
         EffectivePeriod.validate(source.valid().from(), validAt);
 
         var upgradeTransition = source.upgrade(txAt, description);

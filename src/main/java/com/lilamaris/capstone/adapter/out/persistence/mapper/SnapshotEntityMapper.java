@@ -41,4 +41,28 @@ public class SnapshotEntityMapper {
                 .timeline(timeline)
                 .build();
     }
+
+    public static SnapshotEntity toEntity(Snapshot domain, TimelineEntity parent) {
+        var id = Optional.ofNullable(domain.id()).map(Snapshot.Id::value).orElse(null);
+
+        return SnapshotEntity.builder()
+                .id(id)
+                .txFrom(domain.tx().from())
+                .txTo(domain.tx().to())
+                .validFrom(domain.valid().from())
+                .validTo(domain.valid().to())
+                .versionNo(domain.versionNo())
+                .description(domain.description())
+                .timeline(parent)
+                .build();
+    }
+
+    public static void updateEntity(SnapshotEntity entity, Snapshot domain) {
+        entity.setTxFrom(domain.tx().from());
+        entity.setTxTo(domain.tx().to());
+        entity.setValidFrom(domain.valid().from());
+        entity.setValidTo(domain.valid().to());
+        entity.setVersionNo(domain.versionNo());
+        entity.setDescription(domain.description());
+    }
 }

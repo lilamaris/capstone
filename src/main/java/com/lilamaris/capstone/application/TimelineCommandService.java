@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
@@ -48,20 +47,10 @@ public class TimelineCommandService implements TimelineCommandUseCase {
         var txAt = EffectivePeriod.now();
         var timeline = timelinePort.getById(id).orElseThrow(EntityNotFoundException::new);
 
-        List<SnapshotResult.Command> result;
-
-        if (snapshotPort.isExistsInTimeline(id)) {
-            Snapshot sourceSnapshot = snapshotPort.getByValidAt(validAt).getFirst();
-            List<Snapshot> transition = timeline.migrate(sourceSnapshot, txAt, validAt, description);
-            var saved = transition.stream().map(snapshotPort::save).toList();
-            result = saved.stream().map(SnapshotResult.Command::from).toList();
-        } else {
-            Snapshot domain = Snapshot.initial(id, validAt, txAt, description);
-            var saved = snapshotPort.save(domain);
-            result = Stream.of(saved).map(SnapshotResult.Command::from).toList();
-        }
-
-        return result;
+        return timeline.migrate(txAt, validAt, description)
+                .stream()
+                .map(SnapshotResult.Command::from)
+                .toList();
     }
 
     @Override
