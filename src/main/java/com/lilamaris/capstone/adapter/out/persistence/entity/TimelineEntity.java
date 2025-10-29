@@ -1,12 +1,10 @@
 package com.lilamaris.capstone.adapter.out.persistence.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,6 +12,7 @@ import java.util.UUID;
 @Table(name = "timeline")
 @SuperBuilder(toBuilder = true)
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class TimelineEntity extends BaseEntity<UUID> {
@@ -21,6 +20,6 @@ public class TimelineEntity extends BaseEntity<UUID> {
     private String description;
 
     @Builder.Default
-    @OneToMany(mappedBy = "timeline")
-    private List<SnapshotEntity> snapshotList = List.of();
+    @OneToMany(mappedBy = "timeline", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SnapshotEntity> snapshotList = new ArrayList<>();
 }

@@ -11,13 +11,21 @@ public class TimelineResult {
     public record Command(
             Timeline.Id id,
             String description,
-            List<Snapshot.Id> snapshotIdList
+            List<SnapshotResult.Command> snapshotList
     ) {
         public static Command from(Timeline domain) {
             return Command.builder()
                     .id(domain.id())
                     .description(domain.description())
-                    .snapshotIdList(domain.snapshotIdList())
+                    .snapshotList(domain.snapshotList().stream().map(SnapshotResult.Command::from).toList())
+                    .build();
+        }
+
+        public static Command from(Timeline domain, List<Snapshot> snapshotList) {
+            return Command.builder()
+                    .id(domain.id())
+                    .description(domain.description())
+                    .snapshotList(snapshotList.stream().map(SnapshotResult.Command::from).toList())
                     .build();
         }
     }
@@ -28,11 +36,11 @@ public class TimelineResult {
             String description,
             List<SnapshotResult.Query> snapshots
     ) {
-        public static Query from(Timeline domain, List<Snapshot> snapshots) {
+        public static Query from(Timeline domain, List<Snapshot> snapshotList) {
             return Query.builder()
                     .id(domain.id())
                     .description(domain.description())
-                    .snapshots(snapshots.stream().map(SnapshotResult.Query::from).toList())
+                    .snapshots(snapshotList.stream().map(SnapshotResult.Query::from).toList())
                     .build();
         }
 

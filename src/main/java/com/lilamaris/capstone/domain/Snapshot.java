@@ -1,9 +1,10 @@
 package com.lilamaris.capstone.domain;
 
-import lombok.*;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Optional;
+import java.util.UUID;
 
 @Builder(toBuilder = true)
 public record Snapshot(
@@ -37,24 +38,19 @@ public record Snapshot(
         description = Optional.ofNullable(description).orElse("No user description.");
     }
 
-    public static Snapshot create(Timeline.Id timelineId, EffectivePeriod tx, EffectivePeriod valid, Integer versionNo, String description) {
+    public static Snapshot create(Timeline.Id timelineId, LocalDateTime txAt, LocalDateTime validAt, String description) {
+        var tx = EffectivePeriod.openAt(txAt);
+        var valid = EffectivePeriod.openAt(validAt);
+        return create(timelineId, tx, valid, description);
+    }
+
+    public static Snapshot create(Timeline.Id timelineId, EffectivePeriod tx, EffectivePeriod valid, String description) {
         return Snapshot.builder()
                 .timelineId(timelineId)
                 .tx(tx)
                 .valid(valid)
-                .versionNo(versionNo)
                 .description(description)
                 .build();
-    }
-
-    public static Snapshot create(Timeline.Id timelineId, EffectivePeriod tx, EffectivePeriod valid, Integer versionNo) {
-        return create(timelineId, tx, valid, versionNo, null);
-    }
-
-    public static Snapshot initial(Timeline.Id timelineId, LocalDateTime validAt, LocalDateTime txAt, String description) {
-        var tx = EffectivePeriod.openAt(txAt);
-        var valid = EffectivePeriod.openAt(validAt);
-        return create(timelineId, tx, valid, 1, description);
     }
 
     public void validateOperation() {
@@ -71,17 +67,35 @@ public record Snapshot(
         return toBuilder().valid(valid).versionNo(versionNo + 1).build();
     }
 
+    public Snapshot closeTxAt(LocalDateTime at) {
+        return copyWithTx(valid.copyBeforeAt(at));
+    }
+
     public Transition migrate(LocalDateTime validAt, String description) {
         validateOperation();
-        var prev = copyWithValid(valid.copyBeforeAt(validAt));
-        var next = copyWithValid(valid.copyAfterAt(validAt)).toBuilder().id(null).description(description).build();
+        var prev = copyWithValid(valid.copyBeforeAt(validAt))
+                .toBuilder()
+                .description(description)
+                .versionNo(1)
+                .build();
+        var next = copyWithValid(valid.copyAfterAt(validAt))
+                .toBuilder()
+                .id(null)
+                .description(description)
+                .versionNo(1)
+                .build();
         return new Transition(prev, next);
     }
 
     public Transition upgrade(LocalDateTime txAt, String description) {
         validateOperation();
         var prev = copyWithTx(tx.copyBeforeAt(txAt));
-        var next = copyWithTx(tx.copyAfterAt(txAt)).toBuilder().id(null).description(description).build();
+        var next = copyWithTx(tx.copyAfterAt(txAt))
+                .toBuilder()
+                .id(null)
+                .description(description)
+                .versionNo(1)
+                .build();
         return new Transition(prev, next);
     }
 }

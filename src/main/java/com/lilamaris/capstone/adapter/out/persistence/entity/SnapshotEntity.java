@@ -14,6 +14,7 @@ import java.util.UUID;
 @Table(name = "snapshot")
 @SuperBuilder(toBuilder = true)
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SnapshotEntity extends BaseEntity<UUID> {

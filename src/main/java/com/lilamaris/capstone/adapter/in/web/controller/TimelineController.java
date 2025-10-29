@@ -3,7 +3,6 @@ package com.lilamaris.capstone.adapter.in.web.controller;
 import com.lilamaris.capstone.adapter.in.web.request.TimelineRequest;
 import com.lilamaris.capstone.application.port.in.TimelineCommandUseCase;
 import com.lilamaris.capstone.application.port.in.result.TimelineResult;
-import com.lilamaris.capstone.domain.Snapshot;
 import com.lilamaris.capstone.domain.Timeline;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +38,7 @@ public class TimelineController {
         @PathVariable("id") UUID id,
         @RequestBody TimelineRequest.Merge body
     ) {
-        var result = timelineCommandUseCase.merge(Timeline.Id.from(id), body.snapshotIds().stream().map(Snapshot.Id::from).toList(), body.description());
+        var result = timelineCommandUseCase.merge(Timeline.Id.from(id), body.validFrom(), body.validTo(), body.description());
         return ResponseEntity.ok(result);
     }
 
