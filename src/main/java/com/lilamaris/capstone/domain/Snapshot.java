@@ -98,4 +98,12 @@ public record Snapshot(
                 .build();
         return new Transition(prev, next);
     }
+
+    public boolean isOpenValidAt(LocalDateTime validAt) {
+        return valid.contains(validAt);
+    }
+
+    public boolean isOpenTxAt(LocalDateTime txAt) {
+        return tx.contains(txAt);
+    }
 }
