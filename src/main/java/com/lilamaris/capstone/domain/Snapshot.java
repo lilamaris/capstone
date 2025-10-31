@@ -9,8 +9,8 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 public record Snapshot(
         Id id,
-        EffectivePeriod tx,
-        EffectivePeriod valid,
+        Effective tx,
+        Effective valid,
         Integer versionNo,
         String description,
         Timeline.Id timelineId
@@ -38,17 +38,11 @@ public record Snapshot(
         description = Optional.ofNullable(description).orElse("No user description.");
     }
 
-    public static Snapshot create(Timeline.Id timelineId, LocalDateTime txAt, LocalDateTime validAt, String description) {
-        var tx = EffectivePeriod.openAt(txAt);
-        var valid = EffectivePeriod.openAt(validAt);
-        return create(timelineId, tx, valid, description);
-    }
-
-    public static Snapshot create(Timeline.Id timelineId, EffectivePeriod tx, EffectivePeriod valid, String description) {
+    public static Snapshot create(Timeline.Id timelineId, EffectiveConvertible tx, EffectiveConvertible valid, String description) {
         return Snapshot.builder()
                 .timelineId(timelineId)
-                .tx(tx)
-                .valid(valid)
+                .tx(tx.convert())
+                .valid(valid.convert())
                 .description(description)
                 .build();
     }
@@ -59,16 +53,20 @@ public record Snapshot(
         }
     }
 
-    public Snapshot copyWithTx(EffectivePeriod tx) {
+    public Snapshot copyWithTx(Effective tx) {
         return toBuilder().tx(tx).versionNo(versionNo + 1).build();
     }
 
-    public Snapshot copyWithValid(EffectivePeriod valid) {
+    public Snapshot copyWithValid(Effective valid) {
         return toBuilder().valid(valid).versionNo(versionNo + 1).build();
     }
 
     public Snapshot closeTxAt(LocalDateTime at) {
-        return copyWithTx(valid.copyBeforeAt(at));
+        return copyWithTx(tx.copyBeforeAt(at));
+    }
+
+    public Snapshot closeValidAt(LocalDateTime at) {
+        return copyWithValid(valid.copyBeforeAt(at));
     }
 
     public Transition migrate(LocalDateTime validAt, String description) {
@@ -97,13 +95,5 @@ public record Snapshot(
                 .versionNo(1)
                 .build();
         return new Transition(prev, next);
-    }
-
-    public boolean isOpenValidAt(LocalDateTime validAt) {
-        return valid.contains(validAt);
-    }
-
-    public boolean isOpenTxAt(LocalDateTime txAt) {
-        return tx.contains(txAt);
     }
 }

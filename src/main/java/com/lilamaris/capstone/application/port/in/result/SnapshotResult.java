@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.application.port.in.result;
 
-import com.lilamaris.capstone.domain.EffectivePeriod;
+import com.lilamaris.capstone.domain.Effective;
 import com.lilamaris.capstone.domain.Snapshot;
 import com.lilamaris.capstone.domain.Timeline;
 import lombok.Builder;
@@ -9,8 +9,8 @@ public class SnapshotResult {
     @Builder
     public record Command(
             Snapshot.Id id,
-            EffectivePeriod tx,
-            EffectivePeriod valid,
+            Effective tx,
+            Effective valid,
             Integer versionNo,
             String description,
             Timeline.Id timelineId
@@ -30,8 +30,8 @@ public class SnapshotResult {
     @Builder
     public record Query(
             Snapshot.Id id,
-            EffectivePeriod tx,
-            EffectivePeriod valid,
+            Effective tx,
+            Effective valid,
             Integer versionNo,
             String description,
             TimelineResult.Query timeline

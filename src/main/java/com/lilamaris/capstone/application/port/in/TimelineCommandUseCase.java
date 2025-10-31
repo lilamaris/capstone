@@ -14,5 +14,5 @@ public interface TimelineCommandUseCase {
 
     TimelineResult.Command migrate(Timeline.Id id, LocalDateTime validAt, String description);
     TimelineResult.Command merge(Timeline.Id id, LocalDateTime validFrom, LocalDateTime validTo, String description);
-    List<SnapshotResult.Command> rollback(Timeline.Id id, LocalDateTime targetTxAt, String description);
+    TimelineResult.Command rollback(Timeline.Id id, LocalDateTime targetTxAt, String description);
 }
