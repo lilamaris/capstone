@@ -9,8 +9,8 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 public record Snapshot(
         Id id,
-        EffectivePeriod tx,
-        EffectivePeriod valid,
+        Effective tx,
+        Effective valid,
         Integer versionNo,
         String description,
         Timeline.Id timelineId
@@ -38,24 +38,13 @@ public record Snapshot(
         description = Optional.ofNullable(description).orElse("No user description.");
     }
 
-    public static Snapshot create(Timeline.Id timelineId, EffectivePeriod tx, EffectivePeriod valid, Integer versionNo, String description) {
+    public static Snapshot create(Timeline.Id timelineId, EffectiveConvertible tx, EffectiveConvertible valid, String description) {
         return Snapshot.builder()
                 .timelineId(timelineId)
-                .tx(tx)
-                .valid(valid)
-                .versionNo(versionNo)
+                .tx(tx.convert())
+                .valid(valid.convert())
                 .description(description)
                 .build();
-    }
-
-    public static Snapshot create(Timeline.Id timelineId, EffectivePeriod tx, EffectivePeriod valid, Integer versionNo) {
-        return create(timelineId, tx, valid, versionNo, null);
-    }
-
-    public static Snapshot initial(Timeline.Id timelineId, LocalDateTime txAt, LocalDateTime validAt, String description) {
-        var tx = EffectivePeriod.openAt(txAt);
-        var valid = EffectivePeriod.openAt(validAt);
-        return create(timelineId, tx, valid, 1, description);
     }
 
     public void validateOperation() {
@@ -64,33 +53,47 @@ public record Snapshot(
         }
     }
 
-    public Snapshot copyWithTx(EffectivePeriod tx) {
+    public Snapshot copyWithTx(Effective tx) {
         return toBuilder().tx(tx).versionNo(versionNo + 1).build();
     }
 
-    public Snapshot copyWithValid(EffectivePeriod valid) {
+    public Snapshot copyWithValid(Effective valid) {
         return toBuilder().valid(valid).versionNo(versionNo + 1).build();
+    }
+
+    public Snapshot closeTxAt(LocalDateTime at) {
+        return copyWithTx(tx.copyBeforeAt(at));
+    }
+
+    public Snapshot closeValidAt(LocalDateTime at) {
+        return copyWithValid(valid.copyBeforeAt(at));
     }
 
     public Transition migrate(LocalDateTime validAt, String description) {
         validateOperation();
-        var prev = copyWithValid(valid.copyBeforeAt(validAt));
-        var next = copyWithValid(valid.copyAfterAt(validAt)).toBuilder().id(null).description(description).build();
+        var prev = copyWithValid(valid.copyBeforeAt(validAt))
+                .toBuilder()
+                .description(description)
+                .versionNo(1)
+                .build();
+        var next = copyWithValid(valid.copyAfterAt(validAt))
+                .toBuilder()
+                .id(null)
+                .description(description)
+                .versionNo(1)
+                .build();
         return new Transition(prev, next);
     }
 
     public Transition upgrade(LocalDateTime txAt, String description) {
         validateOperation();
         var prev = copyWithTx(tx.copyBeforeAt(txAt));
-        var next = copyWithTx(tx.copyAfterAt(txAt)).toBuilder().id(null).description(description).build();
+        var next = copyWithTx(tx.copyAfterAt(txAt))
+                .toBuilder()
+                .id(null)
+                .description(description)
+                .versionNo(1)
+                .build();
         return new Transition(prev, next);
-    }
-
-    public boolean isOpenValidAt(LocalDateTime validAt) {
-        return valid.contains(validAt);
-    }
-
-    public boolean isOpenTxAt(LocalDateTime txAt) {
-        return tx.contains(txAt);
     }
 }

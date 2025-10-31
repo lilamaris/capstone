@@ -9,22 +9,22 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class EffectivePeriodTest {
+public class EffectiveTest {
     private LocalDateTime now;
 
     @BeforeEach
     void setup() {
-        this.now = EffectivePeriod.now();
+        this.now = Effective.now();
     }
 
     @Test
     void should_create() {
-        var ef1 = EffectivePeriod.builder()
+        var ef1 = Effective.builder()
                 .from(now)
                 .build();
         assertThat(ef1.from()).isEqualTo(now);
 
-        var ef2 = EffectivePeriod.builder()
+        var ef2 = Effective.builder()
                 .to(now.plusDays(1))
                 .build();
 
@@ -34,7 +34,7 @@ public class EffectivePeriodTest {
     @Test
     void should_throw_when_create() {
         ThrowableAssert.ThrowingCallable thrown = () -> {
-            EffectivePeriod.builder()
+            Effective.builder()
                     .from(now)
                     .to(now.minusDays(1))
                     .build();
@@ -45,19 +45,19 @@ public class EffectivePeriodTest {
                 .hasMessage("'to' is must be after than 'from'");
     }
 
-    void assertOverlap(EffectivePeriod a, EffectivePeriod b, Boolean expect) {
+    void assertOverlap(Effective a, Effective b, Boolean expect) {
         assertThat(a.isOverlap(b)).isEqualTo(expect);
         assertThat(b.isOverlap(a)).isEqualTo(expect);
     }
 
-    void assertOverlap(EffectivePeriod a, LocalDateTime time, Boolean expect) {
+    void assertOverlap(Effective a, LocalDateTime time, Boolean expect) {
         assertThat(a.contains(time)).isEqualTo(expect);
     }
 
     @Test
     void should_detect_overlap_halfOpen() {
         var after3 = now.plusDays(3);
-        var ef1 = EffectivePeriod.builder()
+        var ef1 = Effective.builder()
                 .from(now)
                 .to(after3)
                 .build();
@@ -100,8 +100,8 @@ public class EffectivePeriodTest {
 
     @Test
     void should_detect_closed() {
-        var ef1 = EffectivePeriod.openAt(now);
-        assertThat(ef1.to()).isEqualTo(EffectivePeriod.MAX);
+        var ef1 = Effective.openAt(now);
+        assertThat(ef1.to()).isEqualTo(Effective.MAX);
         assertThat(ef1.isOpen()).isEqualTo(true);
 
         var ef2 = ef1.copyBeforeAt(now.plusDays(1));
