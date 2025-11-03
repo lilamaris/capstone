@@ -17,14 +17,10 @@ public record Snapshot(
 ) {
     public static final String NAME = "Snapshot";
 
-    public record Id(UUID value) {
-        public static Id random() {
-            return new Id(UUID.randomUUID());
-        }
-
-        public static Id from(UUID value) {
-            return new Id(value);
-        }
+    public record Id(UUID value) implements DomainId {
+        @Override public String getDomainName() { return "Snapshot"; }
+        public static Id random() { return new Id(UUID.randomUUID()); }
+        public static Id from(UUID value) { return new Id(value); }
     }
 
     @Builder
