@@ -1,11 +1,9 @@
 package com.lilamaris.capstone.application.port.in;
 
-import com.lilamaris.capstone.application.port.in.result.SnapshotResult;
 import com.lilamaris.capstone.application.port.in.result.TimelineResult;
 import com.lilamaris.capstone.domain.Timeline;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public interface TimelineCommandUseCase {
     TimelineResult.Command create(String description);
