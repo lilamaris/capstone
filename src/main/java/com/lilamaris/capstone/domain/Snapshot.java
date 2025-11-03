@@ -14,11 +14,8 @@ public record Snapshot(
         Integer versionNo,
         String description,
         Timeline.Id timelineId
-) {
-    public static final String NAME = "Snapshot";
-
-    public record Id(UUID value) implements DomainId {
-        @Override public String getDomainName() { return "Snapshot"; }
+) implements BaseDomain<Snapshot.Id, Snapshot> {
+    public record Id(UUID value) implements BaseDomain.Id<UUID> {
         public static Id random() { return new Id(UUID.randomUUID()); }
         public static Id from(UUID value) { return new Id(value); }
     }

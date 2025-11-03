@@ -2,7 +2,6 @@ package com.lilamaris.capstone.application;
 
 import com.lilamaris.capstone.application.port.in.TimelineCommandUseCase;
 import com.lilamaris.capstone.application.port.in.result.TimelineResult;
-import com.lilamaris.capstone.application.port.out.SnapshotPort;
 import com.lilamaris.capstone.application.port.out.TimelinePort;
 import com.lilamaris.capstone.domain.Effective;
 import com.lilamaris.capstone.domain.Timeline;
@@ -16,7 +15,6 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class TimelineCommandService implements TimelineCommandUseCase {
     private final TimelinePort timelinePort;
-    private final SnapshotPort snapshotPort;
 
     @Override
     public TimelineResult.Command create(String description) {

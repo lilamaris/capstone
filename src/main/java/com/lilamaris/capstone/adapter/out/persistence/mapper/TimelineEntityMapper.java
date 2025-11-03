@@ -2,6 +2,7 @@ package com.lilamaris.capstone.adapter.out.persistence.mapper;
 
 import com.lilamaris.capstone.adapter.out.persistence.entity.SnapshotEntity;
 import com.lilamaris.capstone.adapter.out.persistence.entity.TimelineEntity;
+import com.lilamaris.capstone.domain.Snapshot;
 import com.lilamaris.capstone.domain.Timeline;
 import jakarta.persistence.EntityManager;
 
@@ -26,7 +27,7 @@ public class TimelineEntityMapper {
 
     public static TimelineEntity toEntity(Timeline domain, EntityManager em) {
         TimelineEntity entity = Optional.ofNullable(domain.id())
-                .map(id -> em.find(TimelineEntity.class, id))
+                .map(id -> em.find(TimelineEntity.class, id.value()))
                 .orElseGet(() -> TimelineEntity.builder().build());
 
         updateEntity(entity, domain);
@@ -44,7 +45,7 @@ public class TimelineEntityMapper {
         List<SnapshotEntity> needUpdate = new ArrayList<>();
 
         for (var s : domain.snapshotList()) {
-            var se = Optional.ofNullable(s.id().value()).map(exist::remove).orElse(null);
+            var se = Optional.ofNullable(s.id()).map(Snapshot.Id::value).map(exist::remove).orElse(null);
             if (se == null) {
                 se = SnapshotEntityMapper.toEntity(s, entity);
             } else {
