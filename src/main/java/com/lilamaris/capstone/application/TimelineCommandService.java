@@ -5,11 +5,13 @@ import com.lilamaris.capstone.application.port.in.result.TimelineResult;
 import com.lilamaris.capstone.application.port.out.TimelinePort;
 import com.lilamaris.capstone.domain.Effective;
 import com.lilamaris.capstone.domain.Timeline;
+import com.lilamaris.capstone.domain.TransitionLog;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -44,6 +46,9 @@ public class TimelineCommandService implements TimelineCommandUseCase {
         var preview = timeline.migratePreview(txAt, validAt, description);
         var apply = timeline.applyTransition(preview);
         var saved = timelinePort.save(apply);
+
+        var logCtx = new TransitionLog.Context("Timeline", preview.timelineId().toString(), "Admin", txAt, "Migrate");
+        var logs = TransitionLog.fromTransition(logCtx, List.of(preview));
 
         return TimelineResult.Command.from(saved);
     }
