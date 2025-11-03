@@ -33,12 +33,10 @@ public class EffectiveTest {
 
     @Test
     void should_throw_when_create() {
-        ThrowableAssert.ThrowingCallable thrown = () -> {
-            Effective.builder()
-                    .from(now)
-                    .to(now.minusDays(1))
-                    .build();
-        };
+        ThrowableAssert.ThrowingCallable thrown = () -> Effective.builder()
+                .from(now)
+                .to(now.minusDays(1))
+                .build();
 
         assertThatThrownBy(thrown)
                 .isInstanceOf(IllegalArgumentException.class)
