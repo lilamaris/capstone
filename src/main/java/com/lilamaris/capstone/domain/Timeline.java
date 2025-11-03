@@ -4,6 +4,7 @@ import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -21,10 +22,37 @@ public record Timeline(
     }
 
     @Builder
-    public record SnapshotTransition(Id id, List<Snapshot> before, List<Snapshot> after) {
+    public record SnapshotTransition(
+            Id timelineId,
+            List<Snapshot> before,
+            List<Snapshot> after
+    ) implements Transition<Snapshot> {
         public SnapshotTransition {
             before = Optional.ofNullable(before).orElse(new ArrayList<>());
             after = Optional.ofNullable(after).orElse(new ArrayList<>());
+        }
+
+        @Override
+        public Function<Snapshot, Map<String, Object>> fieldExtractor() {
+            return (s) -> Map.of(
+                    "description", s.description(),
+                    "tx.from", s.tx().from(),
+                    "tx.to", s.tx().to(),
+                    "valid.from", s.valid().from(),
+                    "valid.to", s.valid().to()
+            );
+        }
+
+        @Override
+        public BiFunction<Snapshot, Snapshot, TransitionType> lifeCycleStrategy() {
+            return (before, after) -> {
+                if (after == null)
+                    throw new IllegalStateException("Invalid lifecycle");
+
+                if (!after.tx().isOpen()) return TransitionType.RETIRE;
+                if (after.id() == null) return TransitionType.CREATE;
+                else return TransitionType.UPDATE;
+            };
         }
     }
 
@@ -41,7 +69,7 @@ public record Timeline(
     }
 
     public Timeline applyTransition(SnapshotTransition transition) {
-        if (!transition.id().equals(id)) {
+        if (!transition.timelineId().equals(id)) {
             throw new IllegalStateException("Snapshots managed on other timelines cannot be reflect: The timeline IDs for the transitions are different.");
         }
         var exists = snapshotList.stream().collect(Collectors.toMap(Snapshot::id, Function.identity()));
@@ -64,7 +92,7 @@ public record Timeline(
         var ta = EffectiveConvertible.of(txAt);
 
         if (snapshotList.isEmpty()) {
-            return SnapshotTransition.builder().id(id).after(List.of(Snapshot.create(id, ta, va, description))).build();
+            return SnapshotTransition.builder().timelineId(id).after(List.of(Snapshot.create(id, ta, va, description))).build();
         }
 
         var sourceList = getSnapshotValidAt(validAt, s -> s.tx().isOpen());
@@ -84,7 +112,7 @@ public record Timeline(
         List<Snapshot> before = List.of(source);
         List<Snapshot> after = List.of(closedSource, migratedLeft, migratedRight);
 
-        return SnapshotTransition.builder().id(id).before(before).after(after).build();
+        return SnapshotTransition.builder().timelineId(id).before(before).after(after).build();
     }
 
     public SnapshotTransition mergePreview(LocalDateTime txAt, LocalDateTime validFrom, LocalDateTime validTo, String description) {
@@ -109,7 +137,7 @@ public record Timeline(
         List<Snapshot> before = sourceList.stream().toList();
         List<Snapshot> after = Stream.concat(closedSource.stream(), Stream.of(mergedSnapshot)).toList();
 
-        return SnapshotTransition.builder().id(id).before(before).after(after).build();
+        return SnapshotTransition.builder().timelineId(id).before(before).after(after).build();
     }
 
     public SnapshotTransition rollback(LocalDateTime txAt, LocalDateTime targetTxAt) {
@@ -136,7 +164,7 @@ public record Timeline(
         List<Snapshot> before = openTx.stream().toList();
         List<Snapshot> after = Stream.concat(closedSnapshots.stream(), rollbackSnapshot.stream()).toList();
 
-        return SnapshotTransition.builder().id(id).before(before).after(after).build();
+        return SnapshotTransition.builder().timelineId(id).before(before).after(after).build();
     }
 
     private List<Snapshot> getSnapshotValidAtRange(LocalDateTime validFrom, LocalDateTime validTo, Predicate<Snapshot> predicate) {

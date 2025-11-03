@@ -20,6 +20,6 @@ public sealed interface BaseDomain<
     }
 
     default String getDomainName() {
-        return id().getDomainName();
+        return this.getClass().getSimpleName();
     }
 }
