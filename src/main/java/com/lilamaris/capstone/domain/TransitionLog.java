@@ -18,17 +18,20 @@ public record TransitionLog (
         public static Id from(UUID value) { return new Id(value); }
     }
 
+    @Builder
     public record Context(
-            BaseDomain.Id<?> rootId,
+            String rootId,
+            String rootType,
             String performedBy,
             LocalDateTime performedAt,
             String reason
     ) {}
 
+    @Builder
     public record Target(
-            BaseDomain.Id<?> domainId,
+            String domainId,
             String domainType,
-            Transition.TransitionType commandType,
+            Transition.TransitionType transitionType,
             List<Transition.Diff> diffList
     ) {}
 
@@ -37,7 +40,7 @@ public record TransitionLog (
                 .flatMap(t -> toTarget(t).stream())
                 .sorted(
                         Comparator.comparing(Target::domainType)
-                                .thenComparing(t -> String.valueOf(t.domainId() != null ? t.domainId().asString() : ""))
+                                .thenComparing(t -> t.domainId() != null ? t.domainId() : "")
                 )
                 .toList();
         return builder().context(ctx).targets(targets).build();
@@ -52,12 +55,12 @@ public record TransitionLog (
 
         return transition.after().stream()
                 .map(d -> {
-                    var id1 = d.id();
-                    var reflectTarget = Optional.ofNullable(id1).map(beforeMap::get).orElse(null);
+                    var id = d.id();
+                    var reflectTarget = Optional.ofNullable(id).map(beforeMap::get).orElse(null);
 
                     var diffs = Optional.ofNullable(reflectTarget).map(t -> getDiff(t, d, fieldExtractor)).orElse(asInitialState(d, fieldExtractor));
                     var transitionType = lifeCycle.apply(reflectTarget, d);
-                    return new Target(id1, d.getDomainName(), transitionType, diffs);
+                    return new Target(id == null ? "" : id.asString(), d.getDomainName(), transitionType, diffs);
                 })
                 .sorted(Comparator.comparing(Target::domainType))
                 .toList();

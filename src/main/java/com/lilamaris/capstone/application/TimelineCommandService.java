@@ -3,6 +3,7 @@ package com.lilamaris.capstone.application;
 import com.lilamaris.capstone.application.port.in.TimelineCommandUseCase;
 import com.lilamaris.capstone.application.port.in.result.TimelineResult;
 import com.lilamaris.capstone.application.port.out.TimelinePort;
+import com.lilamaris.capstone.application.port.out.TransitionLogPort;
 import com.lilamaris.capstone.domain.Effective;
 import com.lilamaris.capstone.domain.Timeline;
 import com.lilamaris.capstone.domain.TransitionLog;
@@ -17,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TimelineCommandService implements TimelineCommandUseCase {
     private final TimelinePort timelinePort;
+    private final TransitionLogPort transitionLogPort;
 
     @Override
     public TimelineResult.Command create(String description) {
@@ -47,8 +49,9 @@ public class TimelineCommandService implements TimelineCommandUseCase {
         var apply = timeline.applyTransition(preview);
         var saved = timelinePort.save(apply);
 
-        var logCtx = new TransitionLog.Context(saved.id(), "Admin", txAt, "Migrate");
+        var logCtx = new TransitionLog.Context(saved.id().asString(), saved.getDomainName(), "Admin", txAt, description);
         var logs = TransitionLog.fromTransition(logCtx, List.of(preview));
+        var logSaved = transitionLogPort.save(logs);
 
         return TimelineResult.Command.from(saved);
     }
@@ -61,6 +64,10 @@ public class TimelineCommandService implements TimelineCommandUseCase {
         var apply = timeline.applyTransition(preview);
         var saved = timelinePort.save(apply);
 
+        var logCtx = new TransitionLog.Context(saved.id().asString(), saved.getDomainName(), "Admin", txAt, description);
+        var logs = TransitionLog.fromTransition(logCtx, List.of(preview));
+        var logSaved = transitionLogPort.save(logs);
+
         return TimelineResult.Command.from(saved);
     }
 
@@ -71,6 +78,10 @@ public class TimelineCommandService implements TimelineCommandUseCase {
         var preview = timeline.rollback(txAt, targetTxAt);
         var apply = timeline.applyTransition(preview);
         var saved = timelinePort.save(apply);
+
+        var logCtx = new TransitionLog.Context(saved.id().asString(), saved.getDomainName(), "Admin", txAt, description);
+        var logs = TransitionLog.fromTransition(logCtx, List.of(preview));
+        var logSaved = transitionLogPort.save(logs);
 
         return TimelineResult.Command.from(saved);
     }
