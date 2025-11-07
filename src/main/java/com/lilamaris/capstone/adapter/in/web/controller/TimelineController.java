@@ -3,7 +3,7 @@ package com.lilamaris.capstone.adapter.in.web.controller;
 import com.lilamaris.capstone.adapter.in.web.request.TimelineRequest;
 import com.lilamaris.capstone.application.port.in.TimelineCommandUseCase;
 import com.lilamaris.capstone.application.port.in.result.TimelineResult;
-import com.lilamaris.capstone.domain.Timeline;
+import com.lilamaris.capstone.domain.timeline.Timeline;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

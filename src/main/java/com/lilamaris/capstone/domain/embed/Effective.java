@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.domain;
+package com.lilamaris.capstone.domain.embed;
 
 import lombok.Builder;
 

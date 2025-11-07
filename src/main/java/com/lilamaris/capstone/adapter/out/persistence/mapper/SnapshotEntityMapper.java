@@ -2,9 +2,9 @@ package com.lilamaris.capstone.adapter.out.persistence.mapper;
 
 import com.lilamaris.capstone.adapter.out.persistence.entity.SnapshotEntity;
 import com.lilamaris.capstone.adapter.out.persistence.entity.TimelineEntity;
-import com.lilamaris.capstone.domain.Effective;
-import com.lilamaris.capstone.domain.Snapshot;
-import com.lilamaris.capstone.domain.Timeline;
+import com.lilamaris.capstone.domain.embed.Effective;
+import com.lilamaris.capstone.domain.timeline.Snapshot;
+import com.lilamaris.capstone.domain.timeline.Timeline;
 
 import java.util.Optional;
 

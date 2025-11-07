@@ -3,7 +3,7 @@ package com.lilamaris.capstone.adapter.out.persistence;
 import com.lilamaris.capstone.adapter.out.persistence.mapper.TimelineEntityMapper;
 import com.lilamaris.capstone.adapter.out.persistence.repository.TimelineRepository;
 import com.lilamaris.capstone.application.port.out.TimelinePort;
-import com.lilamaris.capstone.domain.Timeline;
+import com.lilamaris.capstone.domain.timeline.Timeline;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

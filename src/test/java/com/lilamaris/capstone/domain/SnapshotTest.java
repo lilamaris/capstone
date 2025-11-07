@@ -1,5 +1,6 @@
 package com.lilamaris.capstone.domain;
 
+import com.lilamaris.capstone.domain.timeline.Timeline;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

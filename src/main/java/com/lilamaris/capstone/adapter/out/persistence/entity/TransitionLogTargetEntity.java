@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.adapter.out.persistence.entity;
 
-import com.lilamaris.capstone.domain.Transition;
+import com.lilamaris.capstone.domain.transitionLog.Transition;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;

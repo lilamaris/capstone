@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.domain;
+package com.lilamaris.capstone.domain.transitionLog;
 
 import java.util.List;
 import java.util.Map;

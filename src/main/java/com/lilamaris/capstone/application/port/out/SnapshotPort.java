@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.application.port.out;
 
-import com.lilamaris.capstone.domain.Snapshot;
-import com.lilamaris.capstone.domain.Timeline;
+import com.lilamaris.capstone.domain.timeline.Snapshot;
+import com.lilamaris.capstone.domain.timeline.Timeline;
 
 import java.time.LocalDateTime;
 import java.util.List;

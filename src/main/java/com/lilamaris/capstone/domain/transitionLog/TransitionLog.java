@@ -1,5 +1,6 @@
-package com.lilamaris.capstone.domain;
+package com.lilamaris.capstone.domain.transitionLog;
 
+import com.lilamaris.capstone.domain.BaseDomain;
 import lombok.Builder;
 
 import java.time.LocalDateTime;

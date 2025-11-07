@@ -1,5 +1,8 @@
-package com.lilamaris.capstone.domain;
+package com.lilamaris.capstone.domain.timeline;
 
+import com.lilamaris.capstone.domain.BaseDomain;
+import com.lilamaris.capstone.domain.embed.Effective;
+import com.lilamaris.capstone.domain.embed.EffectiveConvertible;
 import lombok.Builder;
 
 import java.time.LocalDateTime;

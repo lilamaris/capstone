@@ -3,7 +3,7 @@ package com.lilamaris.capstone.adapter.out.persistence;
 import com.lilamaris.capstone.adapter.out.persistence.mapper.TransitionLogEntityMapper;
 import com.lilamaris.capstone.adapter.out.persistence.repository.TransitionLogRepository;
 import com.lilamaris.capstone.application.port.out.TransitionLogPort;
-import com.lilamaris.capstone.domain.TransitionLog;
+import com.lilamaris.capstone.domain.transitionLog.TransitionLog;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

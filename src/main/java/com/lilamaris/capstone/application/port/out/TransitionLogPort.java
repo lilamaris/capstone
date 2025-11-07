@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.application.port.out;
 
-import com.lilamaris.capstone.domain.TransitionLog;
+import com.lilamaris.capstone.domain.transitionLog.TransitionLog;
 
 import java.util.Optional;
 

@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.application.port.out;
 
-import com.lilamaris.capstone.domain.Timeline;
+import com.lilamaris.capstone.domain.timeline.Timeline;
 
 import java.util.List;
 import java.util.Optional;

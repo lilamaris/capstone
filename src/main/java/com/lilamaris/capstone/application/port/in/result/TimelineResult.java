@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.application.port.in.result;
 
-import com.lilamaris.capstone.domain.Snapshot;
-import com.lilamaris.capstone.domain.Timeline;
+import com.lilamaris.capstone.domain.timeline.Snapshot;
+import com.lilamaris.capstone.domain.timeline.Timeline;
 import lombok.Builder;
 
 import java.util.List;

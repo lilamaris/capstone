@@ -3,8 +3,8 @@ package com.lilamaris.capstone.adapter.out.persistence.mapper;
 import com.lilamaris.capstone.adapter.out.persistence.entity.TransitionLogEntity;
 import com.lilamaris.capstone.adapter.out.persistence.entity.TransitionLogTargetDiffEntity;
 import com.lilamaris.capstone.adapter.out.persistence.entity.TransitionLogTargetEntity;
-import com.lilamaris.capstone.domain.Transition;
-import com.lilamaris.capstone.domain.TransitionLog;
+import com.lilamaris.capstone.domain.transitionLog.Transition;
+import com.lilamaris.capstone.domain.transitionLog.TransitionLog;
 import jakarta.persistence.EntityManager;
 
 import java.util.ArrayList;
