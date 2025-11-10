@@ -12,6 +12,7 @@ public class OrganizationTest {
     @BeforeEach
     void setup() {
         org = Organization.createRoot("Root");
+
     }
 
     @Test
@@ -25,5 +26,29 @@ public class OrganizationTest {
         assertThat(child.parentOrgId()).isEqualTo(org.id());
         assertThat(child.treeId()).isEqualTo(org.treeId());
         assertThat(child.treeLevel()).isEqualTo(org.treeLevel() + 1);
+    }
+
+    @Test
+    void should_update_child_org() {
+        org = org.createChild("Child");
+
+        var child = org.childOrganizationList().getFirst();
+        var updatedChild = child.toBuilder().name("Changed Child Name").build();
+        org = org.updateChild(updatedChild);
+        var afterUpdatedChild = org.childOrganizationList().getFirst();
+
+        assertThat(org.childOrganizationList().size()).isEqualTo(1);
+        assertThat(afterUpdatedChild.name()).isEqualTo("Changed Child Name");
+        assertThat(afterUpdatedChild.parentOrgId()).isEqualTo(org.id());
+    }
+
+    @Test
+    void should_delete_child_org() {
+        org = org.createChild("Child");
+
+        var child = org.childOrganizationList().getFirst();
+        org = org.deleteChild(child.id());
+
+        assertThat(org.childOrganizationList().size()).isEqualTo(0);
     }
 }

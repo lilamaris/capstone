@@ -3,6 +3,7 @@ package com.lilamaris.capstone.domain.degree;
 import com.lilamaris.capstone.domain.BaseDomain;
 import lombok.Builder;
 
+import javax.print.attribute.standard.NumberUp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -53,6 +54,24 @@ public record Organization(
         var updatedOrg = new ArrayList<>(childOrganizationList);
         updatedOrg.add(newOrg);
 
+        return toBuilder().childOrganizationList(updatedOrg).build();
+    }
+
+    public Organization updateChild(Organization organization) {
+        if (organization.isRoot()) {
+            throw new IllegalStateException("Root organization can not update");
+        }
+
+        if (organization.parentOrgId != id) {
+            throw new IllegalStateException("Can not update child organization not belong to current organization");
+        }
+
+        var updatedOrg = childOrganizationList.stream().map(org -> org.id == organization.id() ? organization : org).toList();
+        return toBuilder().childOrganizationList(updatedOrg).build();
+    }
+
+    public Organization deleteChild(Organization.Id id) {
+        var updatedOrg = childOrganizationList.stream().filter(org -> org.id != id).toList();
         return toBuilder().childOrganizationList(updatedOrg).build();
     }
 
