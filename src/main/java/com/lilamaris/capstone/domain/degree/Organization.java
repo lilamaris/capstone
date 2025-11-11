@@ -1,81 +1,50 @@
 package com.lilamaris.capstone.domain.degree;
 
 import com.lilamaris.capstone.domain.BaseDomain;
+import com.lilamaris.capstone.domain.timeline.Snapshot;
 import lombok.Builder;
 
-import javax.print.attribute.standard.NumberUp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Builder(toBuilder = true)
 public record Organization(
         Id id,
-        TreeId treeId,
-        Integer treeLevel,
-        Id parentOrgId,
+        Id parentId,
+        GroupId groupId,
+        Snapshot.Id snapshotId,
         String name,
-        List<Organization> childOrganizationList,
-        List<AcademicProgram.Id> academicProgramIdList
+        List<AcademicProgram> academicProgramList
 ) implements BaseDomain<Organization.Id, Organization> {
     public record Id(UUID value) implements BaseDomain.Id<UUID> {
         public static Id random() { return new Id(UUID.randomUUID()); }
         public static Id from(UUID value) { return new Id(value); }
     }
 
-    public record TreeId(UUID value) {
-        public static TreeId random() { return new TreeId(UUID.randomUUID()); }
-        public static TreeId from(UUID value) { return new TreeId(value); }
+    public record GroupId(UUID value) {
+        public static GroupId random() { return new GroupId(UUID.randomUUID()); }
+        public static GroupId from(UUID value) { return new GroupId(value); }
     }
 
     public Organization {
         id = Optional.ofNullable(id).orElseGet(Id::random);
-        childOrganizationList = Optional.ofNullable(childOrganizationList).orElseGet(ArrayList::new);
-        academicProgramIdList = Optional.ofNullable(academicProgramIdList).orElseGet(ArrayList::new);
-        treeId = Optional.ofNullable(treeId).orElseThrow(() -> new IllegalArgumentException("tree id must be provided within the tree context"));
-        treeLevel = Optional.ofNullable(treeLevel).orElseThrow(() -> new IllegalArgumentException("tree level must be provided within the tree context"));
+        groupId = Optional.ofNullable(groupId).orElseGet(GroupId::random);
+        academicProgramList = Optional.ofNullable(academicProgramList).orElseGet(ArrayList::new);
         name = Optional.ofNullable(name).orElseThrow(() -> new IllegalArgumentException("name must be set"));
     }
 
     public static Organization createRoot(String name) {
-        var treeId = TreeId.random();
-        return Organization.builder().treeId(treeId).treeLevel(0).name(name).build();
+        return Organization.builder().name(name).build();
     }
 
-    public Organization createChild(String name) {
-        var newOrg = Organization.builder()
-                .treeId(treeId)
-                .treeLevel(treeLevel + 1)
-                .parentOrgId(id)
+    public static Organization createChildOf(Organization parent, String name) {
+        return Organization.builder()
+                .parentId(parent.id)
+                .groupId(parent.groupId)
                 .name(name)
                 .build();
-
-        var updatedOrg = new ArrayList<>(childOrganizationList);
-        updatedOrg.add(newOrg);
-
-        return toBuilder().childOrganizationList(updatedOrg).build();
-    }
-
-    public Organization updateChild(Organization organization) {
-        if (organization.isRoot()) {
-            throw new IllegalStateException("Root organization can not update");
-        }
-
-        if (organization.parentOrgId != id) {
-            throw new IllegalStateException("Can not update child organization not belong to current organization");
-        }
-
-        var updatedOrg = childOrganizationList.stream().map(org -> org.id == organization.id() ? organization : org).toList();
-        return toBuilder().childOrganizationList(updatedOrg).build();
-    }
-
-    public Organization deleteChild(Organization.Id id) {
-        var updatedOrg = childOrganizationList.stream().filter(org -> org.id != id).toList();
-        return toBuilder().childOrganizationList(updatedOrg).build();
     }
 
     public boolean isRoot() {
-        return parentOrgId == null;
+        return parentId == null;
     }
 }
