@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.domain.degree;
+package com.lilamaris.capstone.domain.degree_course;
 
 import com.lilamaris.capstone.domain.BaseDomain;
 import lombok.Builder;

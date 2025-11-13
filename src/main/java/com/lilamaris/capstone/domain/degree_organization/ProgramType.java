@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.domain.degree;
+package com.lilamaris.capstone.domain.degree_organization;
 
 public enum ProgramType {
     BACHELOR,

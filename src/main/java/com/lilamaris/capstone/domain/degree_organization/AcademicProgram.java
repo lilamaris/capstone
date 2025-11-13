@@ -1,6 +1,7 @@
-package com.lilamaris.capstone.domain.degree;
+package com.lilamaris.capstone.domain.degree_organization;
 
 import com.lilamaris.capstone.domain.BaseDomain;
+import com.lilamaris.capstone.domain.degree_course.Course;
 import lombok.Builder;
 
 import java.util.ArrayList;
