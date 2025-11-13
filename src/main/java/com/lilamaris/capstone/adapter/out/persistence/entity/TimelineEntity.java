@@ -20,6 +20,6 @@ public class TimelineEntity extends BaseEntity<UUID> {
     private String description;
 
     @Builder.Default
-    @OneToMany(mappedBy = "timeline", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "timelineId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SnapshotEntity> snapshotList = new ArrayList<>();
 }

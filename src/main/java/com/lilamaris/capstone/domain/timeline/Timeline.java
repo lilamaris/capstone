@@ -1,14 +1,13 @@
 package com.lilamaris.capstone.domain.timeline;
 
 import com.lilamaris.capstone.domain.BaseDomain;
+import com.lilamaris.capstone.domain.configuration.DomainTypeRegistry;
 import com.lilamaris.capstone.domain.embed.Effective;
 import com.lilamaris.capstone.domain.embed.EffectiveConvertible;
-import com.lilamaris.capstone.domain.transitionLog.Transition;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -18,7 +17,8 @@ import java.util.stream.Stream;
 public record Timeline(
         Id id,
         String description,
-        List<Snapshot> snapshotList
+        List<Snapshot> snapshotList,
+        Map<Snapshot.Id, Snapshot> snapshotMap
 ) implements BaseDomain<Timeline.Id, Timeline> {
     public record Id(UUID value) implements BaseDomain.Id<UUID> {
         public static Id random() { return new Id(UUID.randomUUID()); }
@@ -61,7 +61,9 @@ public record Timeline(
     }
 
     public Timeline {
+        id = Optional.ofNullable(id).orElseGet(Id::random);
         snapshotList = Optional.ofNullable(snapshotList).orElse(new ArrayList<>());
+        snapshotMap = snapshotList.stream().collect(Collectors.toMap(Snapshot::id, Function.identity()));
     }
 
     public static Timeline initial(String description) {
@@ -72,31 +74,13 @@ public record Timeline(
         return builder().id(id).description(description).build();
     }
 
-    public Timeline applyTransition(SnapshotTransition transition) {
-        if (!transition.timelineId().equals(id)) {
-            throw new IllegalStateException("Snapshots managed on other timelines cannot be reflect: The timeline IDs for the transitions are different.");
-        }
-        var exists = snapshotList.stream().collect(Collectors.toMap(Snapshot::id, Function.identity()));
-        if (!transition.before.stream().allMatch(s -> exists.get(s.id()) != null)) {
-            throw new IllegalStateException("Snapshots that do not exist on the timeline cannot be modified: The snapshot in the ‘before’ state is not present in the snapshot list for that timeline.");
-        }
-
-        var reflect = transition.after.stream().collect(Collectors.partitioningBy(s -> s.id() != null));
-        var needUpdate = reflect.get(true).stream().collect(Collectors.toMap(Snapshot::id, Function.identity()));
-        var needInsert = reflect.get(false);
-
-        List<Snapshot> updated = snapshotList.stream().map(s -> needUpdate.getOrDefault(s.id(), s)).collect(Collectors.toList());
-        updated.addAll(needInsert);
-
-        return toBuilder().snapshotList(updated).build();
-    }
-
-    public SnapshotTransition migratePreview(LocalDateTime txAt, LocalDateTime validAt, String description) {
+    public Timeline migrateSnapshot(LocalDateTime txAt, LocalDateTime validAt, String description) {
         var va = EffectiveConvertible.of(validAt);
         var ta = EffectiveConvertible.of(txAt);
 
         if (snapshotList.isEmpty()) {
-            return SnapshotTransition.builder().timelineId(id).after(List.of(Snapshot.create(id, ta, va, description))).build();
+            var updated = upsertSnapshotList(List.of(Snapshot.create(id, null, ta, va, description)));
+            return copyWithSnapshotList(updated);
         }
 
         var sourceList = getSnapshotValidAt(validAt, s -> s.tx().isOpen());
@@ -110,16 +94,15 @@ public record Timeline(
         var closedSource = source.closeTxAt(txAt);
 
         var splitPeriod = source.valid().splitAt(validAt);
-        var migratedLeft = Snapshot.create(id, ta, splitPeriod.left(), description);
-        var migratedRight = Snapshot.create(id, ta, splitPeriod.right(), description);
+        var migratedLeft = Snapshot.create(id, closedSource.id(), ta, splitPeriod.left(), description);
+        var migratedRight = Snapshot.create(id, migratedLeft.id(), ta, splitPeriod.right(), description);
 
-        List<Snapshot> before = List.of(source);
-        List<Snapshot> after = List.of(closedSource, migratedLeft, migratedRight);
+        var updated = upsertSnapshotList(List.of(closedSource, migratedLeft, migratedRight));
 
-        return SnapshotTransition.builder().timelineId(id).before(before).after(after).build();
+        return copyWithSnapshotList(updated);
     }
 
-    public SnapshotTransition mergePreview(LocalDateTime txAt, LocalDateTime validFrom, LocalDateTime validTo, String description) {
+    public Timeline mergeSnapshot(LocalDateTime txAt, LocalDateTime validFrom, LocalDateTime validTo, String description) {
         var ta = EffectiveConvertible.of(txAt);
 
         if (snapshotList.isEmpty()) {
@@ -136,39 +119,101 @@ public record Timeline(
                 .toList();
 
         var mergedValid = Effective.mergeRange(sourceList.stream().map(Snapshot::valid).toList());
-        var mergedSnapshot = Snapshot.create(id, ta, mergedValid, description);
+        var mergedSnapshot = Snapshot.create(id, closedSource.getFirst().id(), ta, mergedValid, description);
 
-        List<Snapshot> before = sourceList.stream().toList();
-        List<Snapshot> after = Stream.concat(closedSource.stream(), Stream.of(mergedSnapshot)).toList();
+        var updated = upsertSnapshotList(Stream.concat(closedSource.stream(), Stream.of(mergedSnapshot)).toList());
 
-        return SnapshotTransition.builder().timelineId(id).before(before).after(after).build();
+        return copyWithSnapshotList(updated);
     }
 
-    public SnapshotTransition rollback(LocalDateTime txAt, LocalDateTime targetTxAt) {
-        if (snapshotList.isEmpty()) {
-            throw new IllegalStateException("No snapshot exists in the timeline.");
+//    public Timeline rollbackSnapshot(LocalDateTime txAt, LocalDateTime targetTxAt) {
+//        if (snapshotList.isEmpty()) {
+//            throw new IllegalStateException("No snapshot exists in the timeline.");
+//        }
+//
+//        var source = snapshotList.stream().collect(
+//                Collectors.teeing(
+//                        Collectors.filtering(s -> s.tx().contains(targetTxAt), Collectors.toList()),
+//                        Collectors.filtering(s -> s.tx().isOpen(), Collectors.toList()),
+//                        (containing, open) -> Map.of(
+//                                "containing", containing,
+//                                "open", open
+//                        )
+//                )
+//        );
+//        List<Snapshot> containingTxAt = source.get("containing");
+//        List<Snapshot> openTx = source.get("open");
+//
+//        var closedSnapshots = openTx.stream().map(s -> s.closeTxAt(txAt)).toList();
+//        var rollbackSnapshot = containingTxAt.stream().map(s -> s.copyWithTx(Effective.openAt(txAt))).toList();
+//
+//        List<Snapshot> before = openTx.stream().toList();
+//        List<Snapshot> after = Stream.concat(closedSnapshots.stream(), rollbackSnapshot.stream()).toList();
+//
+//        return SnapshotTransition.builder().timelineId(id).before(before).after(after).build();
+//    }
+
+    public <T extends BaseDomain<? ,?>> Map<BaseDomain.Id<?>, T> resolveAllDeltaOf(
+            Class<T> clazz,
+            Snapshot.Id snapshotId,
+            Map<BaseDomain.Id<?>, T> acc,
+            DomainTypeRegistry registry
+    ) {
+        Snapshot cur = snapshotMap.get(snapshotId);
+
+        // Start downstream -> Collect create delta
+        var delta = cur.getDeltaOf(registry.nameOf(clazz)).stream()
+                .collect(Collectors.partitioningBy(d -> d.patch().isCreated()));
+
+        Map<BaseDomain.Id<?>, DomainDelta> createDelta = delta.get(true).stream()
+                .collect(Collectors.toMap(DomainDelta::domainId, Function.identity()));
+        List<DomainDelta> updateDelta = delta.get(false);
+
+        createDelta.forEach((k, v) -> {
+            T created = v.patch().convert(clazz);
+            acc.putIfAbsent(created.id(), created);
+        });
+        // End downstream
+
+        // Branch
+        Snapshot baseSnapshot = findBaseSnapshotOf(cur);
+
+        if (baseSnapshot == null) {
+            updateDelta.forEach(d -> {
+                acc.computeIfPresent(d.domainId(), (k, v) -> d.patch().apply(clazz, v));
+            });
+            return acc;
         }
 
-        var source = snapshotList.stream().collect(
-                Collectors.teeing(
-                        Collectors.filtering(s -> s.tx().contains(targetTxAt), Collectors.toList()),
-                        Collectors.filtering(s -> s.tx().isOpen(), Collectors.toList()),
-                        (containing, open) -> Map.of(
-                                "containing", containing,
-                                "open", open
-                        )
-                )
-        );
-        List<Snapshot> containingTxAt = source.get("containing");
-        List<Snapshot> openTx = source.get("open");
+        Map<BaseDomain.Id<?>, T> mergedAcc = resolveAllDeltaOf(clazz, baseSnapshot.id(), acc, registry);
 
-        var closedSnapshots = openTx.stream().map(s -> s.closeTxAt(txAt)).toList();
-        var rollbackSnapshot = containingTxAt.stream().map(s -> s.copyWithTx(Effective.openAt(txAt))).toList();
+        // Start upstream -> Apply update delta
+        updateDelta.forEach(d -> {
+            mergedAcc.computeIfPresent(d.domainId(), (k, v) -> d.patch().apply(clazz, v));
+        });
+        // End upstream
 
-        List<Snapshot> before = openTx.stream().toList();
-        List<Snapshot> after = Stream.concat(closedSnapshots.stream(), rollbackSnapshot.stream()).toList();
+        return mergedAcc;
+    }
 
-        return SnapshotTransition.builder().timelineId(id).before(before).after(after).build();
+    private List<Snapshot> upsertSnapshotList(List<Snapshot> snapshots) {
+        var upsertMap = snapshots.stream().collect(Collectors.toMap(Snapshot::id, Function.identity()));
+        var updated = snapshotList.stream().map(s -> {
+            var id = s.id();
+            if (upsertMap.containsKey(id)) {
+                var newValue = upsertMap.get(id);
+                upsertMap.remove(id);
+                return newValue;
+            }
+            return s;
+        }).collect(Collectors.toList());
+        updated.addAll(upsertMap.values());
+
+        return updated;
+    }
+
+    private Timeline copyWithSnapshotList(List<Snapshot> snapshotList) {
+        return toBuilder().snapshotList(snapshotList).build();
     }
 
     private List<Snapshot> getSnapshotValidAtRange(LocalDateTime validFrom, LocalDateTime validTo, Predicate<Snapshot> predicate) {
@@ -186,5 +231,11 @@ public record Timeline(
                 .filter(s -> s.valid().contains(validAt))
                 .filter(predicate)
                 .toList();
+    }
+
+    private Snapshot findBaseSnapshotOf(Snapshot snapshot) {
+        var baseSnapshotId = Optional.ofNullable(snapshot).map(Snapshot::baseSnapshotId).orElse(null);
+        if (baseSnapshotId == null) return null;
+        return snapshotMap.get(baseSnapshotId);
     }
 }

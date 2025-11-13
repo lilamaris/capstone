@@ -1,14 +1,9 @@
 package com.lilamaris.capstone.adapter.out.persistence.mapper;
 
-import com.lilamaris.capstone.adapter.out.persistence.entity.SnapshotEntity;
 import com.lilamaris.capstone.adapter.out.persistence.entity.TimelineEntity;
-import com.lilamaris.capstone.domain.timeline.Snapshot;
 import com.lilamaris.capstone.domain.timeline.Timeline;
-import jakarta.persistence.EntityManager;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class TimelineEntityMapper {
     public static Timeline toDomain(TimelineEntity entity) {
@@ -25,39 +20,13 @@ public class TimelineEntityMapper {
                 .build();
     }
 
-    public static TimelineEntity toEntity(Timeline domain, EntityManager em) {
-        TimelineEntity entity = Optional.ofNullable(domain.id())
-                .map(id -> em.find(TimelineEntity.class, id.value()))
-                .orElseGet(() -> TimelineEntity.builder().build());
-
-        updateEntity(entity, domain);
-        return entity;
-    }
-
-    public static void updateEntity(TimelineEntity entity, Timeline domain) {
-        entity.setDescription(domain.description());
-
-        Map<UUID, SnapshotEntity> exist = entity.getSnapshotList()
-                .stream()
-                .filter(e -> e.getId() != null)
-                .collect(Collectors.toMap(SnapshotEntity::getId, Function.identity()));
-
-        List<SnapshotEntity> needUpdate = new ArrayList<>();
-
-        for (var s : domain.snapshotList()) {
-            var se = Optional.ofNullable(s.id()).map(Snapshot.Id::value).map(exist::remove).orElse(null);
-            if (se == null) {
-                se = SnapshotEntityMapper.toEntity(s, entity);
-            } else {
-                SnapshotEntityMapper.updateEntity(se, s);
-                if (se.getTimeline() != entity) {
-                    se.setTimeline(entity);
-                }
-            }
-            needUpdate.add(se);
-        }
-        entity.getSnapshotList().clear();
-        entity.getSnapshotList().addAll(needUpdate);
+    public static TimelineEntity toEntity(Timeline domain) {
+        var snapshotList = domain.snapshotList().stream().map(SnapshotEntityMapper::toEntity).toList();
+        return TimelineEntity.builder()
+                .id(domain.id().value())
+                .description(domain.description())
+                .snapshotList(snapshotList)
+                .build();
     }
 }
 
