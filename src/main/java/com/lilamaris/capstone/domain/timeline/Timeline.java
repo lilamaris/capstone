@@ -25,41 +25,6 @@ public record Timeline(
         public static Id from(UUID value) { return new Id(value); }
     }
 
-    @Builder
-    public record SnapshotTransition(
-            Id timelineId,
-            List<Snapshot> before,
-            List<Snapshot> after
-    ) implements Transition<Snapshot> {
-        public SnapshotTransition {
-            before = Optional.ofNullable(before).orElse(new ArrayList<>());
-            after = Optional.ofNullable(after).orElse(new ArrayList<>());
-        }
-
-        @Override
-        public Function<Snapshot, Map<String, Object>> fieldExtractor() {
-            return (s) -> Map.of(
-                    "description", s.description(),
-                    "tx.from", s.tx().from(),
-                    "tx.to", s.tx().to(),
-                    "valid.from", s.valid().from(),
-                    "valid.to", s.valid().to()
-            );
-        }
-
-        @Override
-        public BiFunction<Snapshot, Snapshot, TransitionType> lifeCycleStrategy() {
-            return (before, after) -> {
-                if (after == null)
-                    throw new IllegalStateException("Invalid lifecycle");
-
-                if (!after.tx().isOpen()) return TransitionType.RETIRE;
-                if (after.id() == null) return TransitionType.CREATE;
-                else return TransitionType.UPDATE;
-            };
-        }
-    }
-
     public Timeline {
         id = Optional.ofNullable(id).orElseGet(Id::random);
         snapshotList = Optional.ofNullable(snapshotList).orElse(new ArrayList<>());

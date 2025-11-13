@@ -42,14 +42,14 @@ public class TimelineController {
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping("/{id}/rollback")
-    public ResponseEntity<?> rollback(
-            @PathVariable("id") UUID id,
-            @RequestBody TimelineRequest.Rollback body
-    ) {
-        var result = timelineCommandUseCase.rollback(Timeline.Id.from(id), body.targetTxAt(), body.description());
-        return ResponseEntity.ok(result);
-    }
+//    @PostMapping("/{id}/rollbackSnapshot")
+//    public ResponseEntity<?> rollback(
+//            @PathVariable("id") UUID id,
+//            @RequestBody TimelineRequest.Rollback body
+//    ) {
+//        var result = timelineCommandUseCase.rollback(Timeline.Id.from(id), body.targetTxAt(), body.description());
+//        return ResponseEntity.ok(result);
+//    }
 
     @PutMapping("/{id}")
     public ResponseEntity<TimelineResult.Command> update(
