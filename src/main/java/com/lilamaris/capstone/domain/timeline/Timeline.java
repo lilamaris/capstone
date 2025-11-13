@@ -144,18 +144,14 @@ public record Timeline(
         Snapshot baseSnapshot = findBaseSnapshotOf(cur);
 
         if (baseSnapshot == null) {
-            updateDelta.forEach(d -> {
-                acc.computeIfPresent(d.domainId(), (k, v) -> d.patch().apply(clazz, v));
-            });
+            updateDelta.forEach(d -> acc.computeIfPresent(d.domainId(), (k, v) -> d.patch().apply(clazz, v)));
             return acc;
         }
 
         Map<BaseDomain.Id<?>, T> mergedAcc = resolveAllDeltaOf(clazz, baseSnapshot.id(), acc, registry);
 
         // Start upstream -> Apply update delta
-        updateDelta.forEach(d -> {
-            mergedAcc.computeIfPresent(d.domainId(), (k, v) -> d.patch().apply(clazz, v));
-        });
+        updateDelta.forEach(d -> mergedAcc.computeIfPresent(d.domainId(), (k, v) -> d.patch().apply(clazz, v)));
         // End upstream
 
         return mergedAcc;
