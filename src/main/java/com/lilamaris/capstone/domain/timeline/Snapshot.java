@@ -13,11 +13,9 @@ public record Snapshot(
         Id id,
         Effective tx,
         Effective valid,
-        Integer versionNo,
-        String description,
         Timeline.Id timelineId,
-        Snapshot.Id baseSnapshotId,
-        List<DomainDelta> deltaList
+        Integer versionNo,
+        String description
 ) implements BaseDomain<Snapshot.Id, Snapshot> {
     public record Id(UUID value) implements BaseDomain.Id<UUID> {
         public static Id random() { return new Id(UUID.randomUUID()); }
@@ -26,59 +24,64 @@ public record Snapshot(
 
     public Snapshot {
         id = Optional.ofNullable(id).orElseGet(Id::random);
-        tx = Optional.ofNullable(tx).orElseThrow(() -> new IllegalArgumentException("'tx' must be set"));
-        valid = Optional.ofNullable(valid).orElseThrow(() -> new IllegalArgumentException("'valid' must be set"));
+
+        tx = Optional.ofNullable(tx).orElseThrow(() -> new IllegalArgumentException("'tx' of type Effective cannot be null"));
+        valid = Optional.ofNullable(valid).orElseThrow(() -> new IllegalArgumentException("'valid' of type Effective cannot be null"));
+        timelineId = Optional.ofNullable(timelineId).orElseThrow(() -> new IllegalArgumentException("'timelineId' of type Timeline.Id cannot be null"));
+
         versionNo = Optional.ofNullable(versionNo).orElse(1);
-        description = Optional.ofNullable(description).orElse("No user description.");
-        timelineId = Optional.ofNullable(timelineId).orElseThrow(() -> new IllegalArgumentException("'timelineId' must be set"));
-        deltaList = Optional.ofNullable(deltaList).orElseGet(ArrayList::new);
+        description = Optional.ofNullable(description).orElse("No description");
     }
 
-    public static Snapshot create(Timeline.Id timelineId, Snapshot.Id baseSnapshotId, EffectiveConvertible tx, EffectiveConvertible valid, String description) {
-        return Snapshot.builder()
-                .timelineId(timelineId)
-                .baseSnapshotId(baseSnapshotId)
-                .tx(tx.convert())
-                .valid(valid.convert())
+    public static Snapshot from(
+            Id id,
+            Effective tx,
+            Effective valid,
+            Timeline.Id timelineId,
+            Integer versionNo,
+            String description
+    ) {
+        return getDefaultBuilder(tx, valid, timelineId)
+                .id(id)
+                .versionNo(versionNo)
                 .description(description)
                 .build();
     }
 
-    public void validateOperation() {
-        if (!tx.isOpen()) {
-            throw new IllegalStateException("can only operated to snapshots with open tx");
-        }
-    }
-
-    public Snapshot copyWithTx(Effective tx) {
-        return toBuilder().tx(tx).versionNo(versionNo + 1).build();
-    }
-
-    public Snapshot copyWithValid(Effective valid) {
-        return toBuilder().valid(valid).versionNo(versionNo + 1).build();
+    public static Snapshot create(
+            EffectiveConvertible tx,
+            EffectiveConvertible valid,
+            Timeline.Id timelineId,
+            String description
+    ) {
+        return getDefaultBuilder(tx.convert(), valid.convert(), timelineId)
+                .description(description)
+                .build();
     }
 
     public Snapshot closeTxAt(LocalDateTime at) {
-        return copyWithTx(tx.copyBeforeAt(at));
+        var updated = toBuilder().tx(tx.copyBeforeAt(at));
+        return buildWithPolicy(updated);
     }
 
     public Snapshot closeValidAt(LocalDateTime at) {
-        return copyWithValid(valid.copyBeforeAt(at));
+        var updated = toBuilder().valid(valid.copyBeforeAt(at));
+        return buildWithPolicy(updated);
     }
 
-    public List<DomainDelta> getDeltaOf(String domainName) {
-        return deltaList.stream().filter(domainDelta -> domainDelta.domainName().equals(domainName)).toList();
+    public Snapshot copyWithTimelineId(Timeline.Id timelineId) {
+        return toBuilder().timelineId(timelineId).build();
     }
 
-    public Snapshot addAllDelta(List<DomainDelta> domainDeltaList) {
-        var updated = new ArrayList<>(deltaList);
-        updated.addAll(domainDeltaList);
-        return toBuilder().deltaList(updated).build();
+//    public List<DomainDelta> getDeltaOf(String domainType) {
+//        return domainDeltaList.stream().filter(domainDelta -> domainDelta.domainType().equals(domainType)).toList();
+//    }
+
+    private Snapshot buildWithPolicy(SnapshotBuilder builder) {
+        return builder.versionNo(versionNo + 1).build();
     }
 
-    public Snapshot addDelta(DomainDelta domainDelta) {
-        var updated = new ArrayList<>(deltaList);
-        updated.add(domainDelta);
-        return toBuilder().deltaList(updated).build();
+    private static SnapshotBuilder getDefaultBuilder(Effective tx, Effective valid, Timeline.Id timelineId) {
+        return builder().tx(tx).valid(valid).timelineId(timelineId);
     }
 }

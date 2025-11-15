@@ -10,5 +10,4 @@ public interface TimelinePort {
     List<Timeline> getByIds(List<Timeline.Id> ids);
 
     Timeline save(Timeline domain);
-    void delete(Timeline.Id id);
 }

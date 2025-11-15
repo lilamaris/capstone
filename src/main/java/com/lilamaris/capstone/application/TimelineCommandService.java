@@ -18,7 +18,7 @@ public class TimelineCommandService implements TimelineCommandUseCase {
 
     @Override
     public TimelineResult.Command create(String description) {
-        var domain = Timeline.initial(description);
+        var domain = Timeline.create(description);
         var created = timelinePort.save(domain);
 
         return TimelineResult.Command.from(created);
@@ -26,15 +26,11 @@ public class TimelineCommandService implements TimelineCommandUseCase {
 
     @Override
     public TimelineResult.Command update(Timeline.Id id, String description) {
-        var domain = Timeline.from(id, description);
-        var updated = timelinePort.save(domain);
+        var timeline = timelinePort.getById(id).orElseThrow(EntityNotFoundException::new);
+        var updated = timeline.copyWithDescription(description);
+        var saved = timelinePort.save(updated);
 
-        return TimelineResult.Command.from(updated);
-    }
-
-    @Override
-    public void delete(Timeline.Id id) {
-        timelinePort.delete(id);
+        return TimelineResult.Command.from(saved);
     }
 
     @Override

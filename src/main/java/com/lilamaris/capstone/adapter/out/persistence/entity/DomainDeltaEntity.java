@@ -16,11 +16,11 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class DomainDeltaEntity extends BaseEntity<UUID> {
-    @Column(name = "snapshot_id")
-    private UUID snapshotId;
+    @Column(name = "snapshot_link_id")
+    private UUID snapshotLinkId;
 
-    @Column(name = "domain_name")
-    private String domainName;
+    @Column(name = "domain_type")
+    private String domainType;
 
     @Column(name = "domain_id")
     private String domainId;

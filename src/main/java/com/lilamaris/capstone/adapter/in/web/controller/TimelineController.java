@@ -59,12 +59,4 @@ public class TimelineController {
         var result = timelineCommandUseCase.update(Timeline.Id.from(id), body.description());
         return ResponseEntity.ok(result);
     }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<TimelineResult.Command> delete(
-            @PathVariable("id") UUID id
-    ) {
-        timelineCommandUseCase.delete(Timeline.Id.from(id));
-        return ResponseEntity.ok().build();
-    }
 }

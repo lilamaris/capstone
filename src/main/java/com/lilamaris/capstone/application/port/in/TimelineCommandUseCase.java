@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 public interface TimelineCommandUseCase {
     TimelineResult.Command create(String description);
     TimelineResult.Command update(Timeline.Id id, String description);
-    void delete(Timeline.Id id);
 
     TimelineResult.Command migrate(Timeline.Id id, LocalDateTime validAt, String description);
     TimelineResult.Command merge(Timeline.Id id, LocalDateTime validFrom, LocalDateTime validTo, String description);

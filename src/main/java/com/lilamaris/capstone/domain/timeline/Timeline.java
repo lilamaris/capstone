@@ -17,8 +17,10 @@ import java.util.stream.Stream;
 public record Timeline(
         Id id,
         String description,
-        List<Snapshot> snapshotList,
-        Map<Snapshot.Id, Snapshot> snapshotMap
+        Map<Snapshot.Id, Snapshot> snapshotMap,
+        Map<SnapshotLink.Id, SnapshotLink> snapshotLinkMap,
+        Map<Snapshot.Id, SnapshotLink> snapshotLinkByAncestor,
+        Map<Snapshot.Id, SnapshotLink> snapshotLinkByDescendant
 ) implements BaseDomain<Timeline.Id, Timeline> {
     public record Id(UUID value) implements BaseDomain.Id<UUID> {
         public static Id random() { return new Id(UUID.randomUUID()); }
@@ -27,25 +29,43 @@ public record Timeline(
 
     public Timeline {
         id = Optional.ofNullable(id).orElseGet(Id::random);
-        snapshotList = Optional.ofNullable(snapshotList).orElse(new ArrayList<>());
-        snapshotMap = snapshotList.stream().collect(Collectors.toMap(Snapshot::id, Function.identity()));
+        description = Optional.ofNullable(description).orElse("No description");
+        snapshotMap = Optional.ofNullable(snapshotMap).orElse(new HashMap<>());
+        snapshotLinkMap = Optional.ofNullable(snapshotLinkMap).orElse(new HashMap<>());
+        snapshotLinkByAncestor = snapshotLinkMap.values().stream()
+                .filter(l -> l.ancestorSnapshotId() != null)
+                .collect(Collectors.toMap(SnapshotLink::ancestorSnapshotId, Function.identity()));
+        snapshotLinkByDescendant = snapshotLinkMap.values().stream()
+                .collect(Collectors.toMap(SnapshotLink::descendantSnapshotId, Function.identity()));
     }
 
-    public static Timeline initial(String description) {
-        return builder().description(description).build();
+    public static Timeline from(Timeline.Id id, String description, Map<Snapshot.Id, Snapshot> snapshotMap, Map<SnapshotLink.Id, SnapshotLink> snapshotLinkMap) {
+        return getDefaultBuilder()
+                .id(id)
+                .description(description)
+                .snapshotMap(snapshotMap)
+                .snapshotLinkMap(snapshotLinkMap)
+                .build();
     }
 
-    public static Timeline from(Timeline.Id id, String description) {
-        return builder().id(id).description(description).build();
+    public static Timeline create(String description) {
+        return getDefaultBuilder().description(description).build();
     }
 
     public Timeline migrateSnapshot(LocalDateTime txAt, LocalDateTime validAt, String description) {
-        var va = EffectiveConvertible.of(validAt);
         var ta = EffectiveConvertible.of(txAt);
+        var va = EffectiveConvertible.of(validAt);
+        var currentSnapshotMap = new HashMap<>(snapshotMap);
+        var currentSnapshotLinkMap = new HashMap<>(snapshotLinkMap);
 
-        if (snapshotList.isEmpty()) {
-            var updated = upsertSnapshotList(List.of(Snapshot.create(id, null, ta, va, description)));
-            return copyWithSnapshotList(updated);
+        if (snapshotMap.isEmpty()) {
+            var initialSnapshot = Snapshot.create(ta, va, this.id(), description);
+            var initialSnapshotLink = SnapshotLink.createRoot(this.id(), initialSnapshot.id());
+
+            updateSnapshotMap(currentSnapshotMap, List.of(initialSnapshot));
+            updateSnapshotLinkMap(currentSnapshotLinkMap, List.of(initialSnapshotLink));
+
+            return copyWithSnapshotContext(currentSnapshotMap, currentSnapshotLinkMap);
         }
 
         var sourceList = getSnapshotValidAt(validAt, s -> s.tx().isOpen());
@@ -59,20 +79,26 @@ public record Timeline(
         var closedSource = source.closeTxAt(txAt);
 
         var splitPeriod = source.valid().splitAt(validAt);
-        var migratedLeft = Snapshot.create(id, closedSource.id(), ta, splitPeriod.left(), description);
-        var migratedRight = Snapshot.create(id, migratedLeft.id(), ta, splitPeriod.right(), description);
 
-        var updated = upsertSnapshotList(List.of(closedSource, migratedLeft, migratedRight));
+        var migratedLeft = Snapshot.create(ta, splitPeriod.left(), this.id(), description);
+        var migratedLeftLink = SnapshotLink.create(this.id(), migratedLeft.id(), closedSource.id());
 
-        return copyWithSnapshotList(updated);
+        var migratedRight = Snapshot.create(ta, splitPeriod.right(), this.id(), description);
+        var migratedRightLink = SnapshotLink.create(this.id(), migratedRight.id(), migratedLeft.id());
+
+        var updateSnapshot = List.of(closedSource, migratedLeft, migratedRight);
+        var updateSnapshotLink = List.of(migratedLeftLink, migratedRightLink);
+
+        updateSnapshotMap(currentSnapshotMap, updateSnapshot);
+        updateSnapshotLinkMap(currentSnapshotLinkMap, updateSnapshotLink);
+
+        return copyWithSnapshotContext(currentSnapshotMap, currentSnapshotLinkMap);
     }
 
     public Timeline mergeSnapshot(LocalDateTime txAt, LocalDateTime validFrom, LocalDateTime validTo, String description) {
         var ta = EffectiveConvertible.of(txAt);
-
-        if (snapshotList.isEmpty()) {
-            throw new IllegalStateException("No snapshot exists in the timeline.");
-        }
+        var currentSnapshotMap = new HashMap<>(snapshotMap);
+        var currentSnapshotLinkMap = new HashMap<>(snapshotLinkMap);
 
         var sourceList = getSnapshotValidAtRange(validFrom, validTo, s -> s.tx().isOpen());
         if (sourceList.isEmpty()) {
@@ -84,11 +110,17 @@ public record Timeline(
                 .toList();
 
         var mergedValid = Effective.mergeRange(sourceList.stream().map(Snapshot::valid).toList());
-        var mergedSnapshot = Snapshot.create(id, closedSource.getFirst().id(), ta, mergedValid, description);
 
-        var updated = upsertSnapshotList(Stream.concat(closedSource.stream(), Stream.of(mergedSnapshot)).toList());
+        var mergedSnapshot = Snapshot.create(ta, mergedValid, this.id(), description);
+        var mergedSnapshotLink = SnapshotLink.create(this.id(), mergedSnapshot.id(), closedSource.getLast().id());
 
-        return copyWithSnapshotList(updated);
+        var updateSnapshotMap = Stream.concat(closedSource.stream(), Stream.of(mergedSnapshot)).toList();
+        var updateSnapshotLinkMap = List.of(mergedSnapshotLink);
+
+        updateSnapshotMap(currentSnapshotMap, updateSnapshotMap);
+        updateSnapshotLinkMap(currentSnapshotLinkMap, updateSnapshotLinkMap);
+
+        return copyWithSnapshotContext(currentSnapshotMap, currentSnapshotLinkMap);
     }
 
 //    public Timeline rollbackSnapshot(LocalDateTime txAt, LocalDateTime targetTxAt) {
@@ -100,7 +132,7 @@ public record Timeline(
 //                Collectors.teeing(
 //                        Collectors.filtering(s -> s.tx().contains(targetTxAt), Collectors.toList()),
 //                        Collectors.filtering(s -> s.tx().isOpen(), Collectors.toList()),
-//                        (containing, open) -> Map.of(
+//              Map<Snapshot.Id, Snapshot> snapshotMap          (containing, open) -> Map.of(
 //                                "containing", containing,
 //                                "open", open
 //                        )
@@ -121,82 +153,97 @@ public record Timeline(
     public <T extends BaseDomain<? ,?>> Map<BaseDomain.Id<?>, T> resolveAllDeltaOf(
             Class<T> clazz,
             Snapshot.Id snapshotId,
-            Map<BaseDomain.Id<?>, T> acc,
             DomainTypeRegistry registry
     ) {
-        Snapshot cur = snapshotMap.get(snapshotId);
+        String domainType = registry.nameOf(clazz);
+        Map<BaseDomain.Id<?>, T> current = new HashMap<>();
+        List<SnapshotLink> descToRoot = buildDescendantToRootChain(snapshotId);
+        applyCreateDeltas(descToRoot, domainType, clazz, current);
+        applyUpdateDeltas(descToRoot.reversed(), domainType, clazz, current);
 
-        // Start downstream -> Collect create delta
-        var delta = cur.getDeltaOf(registry.nameOf(clazz)).stream()
-                .collect(Collectors.partitioningBy(d -> d.patch().isCreated()));
+        return current;
+    }
 
-        Map<BaseDomain.Id<?>, DomainDelta> createDelta = delta.get(true).stream()
-                .collect(Collectors.toMap(DomainDelta::domainId, Function.identity()));
-        List<DomainDelta> updateDelta = delta.get(false);
+    public Timeline copyWithDescription(String description) {
+        return toBuilder().description(description).build();
+    }
 
-        createDelta.forEach((k, v) -> {
-            T created = v.patch().convert(clazz);
-            acc.putIfAbsent(created.id(), created);
+    private static TimelineBuilder getDefaultBuilder() {
+        return builder();
+    }
+
+    private void updateSnapshotMap(Map<Snapshot.Id, Snapshot> current, List<Snapshot> toUpdate) {
+        toUpdate.forEach(s -> {
+            Objects.requireNonNull(s.id(), "Snapshot Id cannot be null");
+            current.put(s.id(), s);
         });
-        // End downstream
-
-        // Branch
-        Snapshot baseSnapshot = findBaseSnapshotOf(cur);
-
-        if (baseSnapshot == null) {
-            updateDelta.forEach(d -> acc.computeIfPresent(d.domainId(), (k, v) -> d.patch().apply(clazz, v)));
-            return acc;
-        }
-
-        Map<BaseDomain.Id<?>, T> mergedAcc = resolveAllDeltaOf(clazz, baseSnapshot.id(), acc, registry);
-
-        // Start upstream -> Apply update delta
-        updateDelta.forEach(d -> mergedAcc.computeIfPresent(d.domainId(), (k, v) -> d.patch().apply(clazz, v)));
-        // End upstream
-
-        return mergedAcc;
     }
 
-    private List<Snapshot> upsertSnapshotList(List<Snapshot> snapshots) {
-        var upsertMap = snapshots.stream().collect(Collectors.toMap(Snapshot::id, Function.identity()));
-        var updated = snapshotList.stream().map(s -> {
-            var id = s.id();
-            if (upsertMap.containsKey(id)) {
-                var newValue = upsertMap.get(id);
-                upsertMap.remove(id);
-                return newValue;
-            }
-            return s;
-        }).collect(Collectors.toList());
-        updated.addAll(upsertMap.values());
-
-        return updated;
+    private void updateSnapshotLinkMap(Map<SnapshotLink.Id, SnapshotLink> current, List<SnapshotLink> toUpdate) {
+        toUpdate.forEach(l -> {
+            Objects.requireNonNull(l.id(), "SnapshotLink Id cannot be null");
+            Objects.requireNonNull(l.descendantSnapshotId(), "SnapshotLink descendant snapshot id cannot be null");
+            current.put(l.id(), l);
+        });
     }
 
-    private Timeline copyWithSnapshotList(List<Snapshot> snapshotList) {
-        return toBuilder().snapshotList(snapshotList).build();
+    private Timeline copyWithSnapshotContext(Map<Snapshot.Id, Snapshot> snapshotMap, Map<SnapshotLink.Id, SnapshotLink> snapshotLinkMap) {
+        return toBuilder().snapshotMap(snapshotMap).snapshotLinkMap(snapshotLinkMap).build();
     }
 
     private List<Snapshot> getSnapshotValidAtRange(LocalDateTime validFrom, LocalDateTime validTo, Predicate<Snapshot> predicate) {
         var range = Effective.from(validFrom, validTo);
-        return snapshotList
+        return snapshotMap.values()
                 .stream()
                 .filter(s -> s.valid().isOverlap(range))
                 .filter(predicate)
+                .sorted(Comparator.comparing(s -> s.tx().from()))
                 .toList();
     }
 
     private List<Snapshot> getSnapshotValidAt(LocalDateTime validAt, Predicate<Snapshot> predicate) {
-        return snapshotList
+        return snapshotMap.values()
                 .stream()
                 .filter(s -> s.valid().contains(validAt))
                 .filter(predicate)
+                .sorted(Comparator.comparing(s -> s.valid().from()))
                 .toList();
     }
 
-    private Snapshot findBaseSnapshotOf(Snapshot snapshot) {
-        var baseSnapshotId = Optional.ofNullable(snapshot).map(Snapshot::baseSnapshotId).orElse(null);
-        if (baseSnapshotId == null) return null;
-        return snapshotMap.get(baseSnapshotId);
+    private List<SnapshotLink> buildDescendantToRootChain(Snapshot.Id startSnapshotId) {
+        return Stream.iterate(
+                snapshotLinkByDescendant.get(startSnapshotId),
+                Objects::isNull,
+                link -> snapshotLinkByDescendant.get(link.ancestorSnapshotId())
+        ).toList();
+    }
+
+    private <T extends BaseDomain<?, ?>> void applyCreateDeltas(
+            List<SnapshotLink> descToRoot,
+            String domainType,
+            Class<T> clazz,
+            Map<BaseDomain.Id<?>, T> current
+    ) {
+        descToRoot.stream()
+                .flatMap(l -> l.domainDeltaList().stream())
+                .filter(d -> domainType.equals(d.domainType()))
+                .filter(d -> d.patch().isCreated())
+                .forEach(d -> {
+                    T created = d.patch().convert(clazz);
+                    current.putIfAbsent(created.id(), created);
+                });
+    }
+
+    private <T extends BaseDomain<?, ?>> void applyUpdateDeltas(
+            List<SnapshotLink> rootToDesc,
+            String domainType,
+            Class<T> clazz,
+            Map<BaseDomain.Id<?>, T> current
+    ) {
+        rootToDesc.stream()
+                .flatMap(l -> l.domainDeltaList().stream())
+                .filter(d -> domainType.equals(d.domainType()))
+                .filter(d -> !d.patch().isCreated())
+                .forEach(d -> current.computeIfPresent(d.domainId(), (k, v) -> d.patch().apply(clazz, v)));
     }
 }

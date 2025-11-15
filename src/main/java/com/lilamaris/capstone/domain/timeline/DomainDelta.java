@@ -4,19 +4,36 @@ import com.lilamaris.capstone.application.util.JsonPatchEngine;
 import com.lilamaris.capstone.domain.BaseDomain;
 import lombok.Builder;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Builder(toBuilder = true)
 public record DomainDelta (
         Id id,
-        Snapshot.Id snapshotId,
-        String domainName,
+        SnapshotLink.Id snapshotLinkId,
+        String domainType,
         BaseDomain.Id<?> domainId,
         Patch patch
 ) implements BaseDomain<DomainDelta.Id, DomainDelta> {
     public record Id(UUID value) implements BaseDomain.Id<UUID> {
         public static Id random() { return new Id(UUID.randomUUID()); }
         public static Id from(UUID value) { return new Id(value); }
+    }
+
+    public DomainDelta {
+        id = Optional.ofNullable(id).orElseGet(Id::random);
+        snapshotLinkId = Optional.ofNullable(snapshotLinkId).orElseThrow(() -> new IllegalArgumentException("'snapshotLinkId' of type SnapshotLink.Id cannot be null"));
+        domainType = Optional.ofNullable(domainType).orElseThrow(() -> new IllegalArgumentException("'domainType' of type String cannot be null"));
+        domainId = Optional.ofNullable(domainId).orElseThrow(() -> new IllegalArgumentException("'domainId' of type BaseDomain.Id<?> cannot be null"));
+        patch = Optional.ofNullable(patch).orElseThrow(() -> new IllegalArgumentException("'patch' of type 'Patch' cannot be null"));
+    }
+
+    public static DomainDelta from(Id id, SnapshotLink.Id snapshotLinkId, String domainName, BaseDomain.Id<?> domainId, Patch patch) {
+        return DomainDelta.getDefaultBuilder(snapshotLinkId, domainName, domainId, patch).id(id).build();
+    }
+
+    public static DomainDelta create(SnapshotLink.Id snapshotLinkId, String domainName, BaseDomain.Id<?> domainId, Patch patch) {
+        return DomainDelta.getDefaultBuilder(snapshotLinkId, domainName, domainId, patch).build();
     }
 
     public interface Patch {
@@ -46,5 +63,9 @@ public record DomainDelta (
         public String getRaw() {
             return jsonPatch;
         }
+    }
+
+    private static DomainDeltaBuilder getDefaultBuilder(SnapshotLink.Id snapshotLinkId, String domainType, BaseDomain.Id<?> domainId, Patch patch) {
+        return builder().snapshotLinkId(snapshotLinkId).domainType(domainType).domainId(domainId).patch(patch);
     }
 }

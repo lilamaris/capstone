@@ -5,8 +5,6 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -37,11 +35,4 @@ public class SnapshotEntity extends BaseEntity<UUID> {
 
     @Column(name = "timeline_id", nullable = false)
     private UUID timelineId;
-
-    @Column(name = "base_snapshot_id")
-    private UUID baseSnapshotId;
-
-    @Builder.Default
-    @OneToMany(mappedBy = "snapshotId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DomainDeltaEntity> domainDeltaEntityList = new ArrayList<>();
 }
