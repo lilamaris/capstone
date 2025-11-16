@@ -2,6 +2,7 @@ package com.lilamaris.capstone.domain.timeline;
 
 import com.lilamaris.capstone.application.util.JsonPatchEngine;
 import com.lilamaris.capstone.domain.BaseDomain;
+import com.lilamaris.capstone.domain.event.DomainDeltaEventBase;
 import lombok.Builder;
 
 import java.util.Optional;
@@ -20,6 +21,29 @@ public record DomainDelta (
         public static Id from(UUID value) { return new Id(value); }
     }
 
+    public interface Patch {
+        <T extends BaseDomain<?, ?>> T convert(Class<T> clazz);
+        <T extends BaseDomain<?, ?>> T apply(Class<T> clazz, T target);
+        String getRaw();
+    }
+
+    public record JsonPatch (String jsonPatch) implements Patch {
+        @Override
+        public <T extends BaseDomain<?, ?>> T convert(Class<T> clazz) {
+            return JsonPatchEngine.applyJsonPatch(jsonPatch, clazz);
+        }
+
+        @Override
+        public <T extends BaseDomain<?, ?>> T apply(Class<T> clazz, T target) {
+            return JsonPatchEngine.applyJsonPatch(jsonPatch, target, clazz);
+        }
+
+        @Override
+        public String getRaw() {
+            return jsonPatch;
+        }
+    }
+
     public DomainDelta {
         id = Optional.ofNullable(id).orElseGet(Id::random);
         snapshotLinkId = Optional.ofNullable(snapshotLinkId).orElseThrow(() -> new IllegalArgumentException("'snapshotLinkId' of type SnapshotLink.Id cannot be null"));
@@ -36,33 +60,13 @@ public record DomainDelta (
         return DomainDelta.getDefaultBuilder(snapshotLinkId, domainName, domainId, patch).build();
     }
 
-    public interface Patch {
-        boolean isCreated();
-        <T extends BaseDomain<?, ?>> T convert(Class<T> clazz);
-        <T extends BaseDomain<?, ?>> T apply(Class<T> clazz, T target);
-        String getRaw();
-    }
-
-    public record JsonPatch (String jsonPatch) implements Patch {
-        @Override
-        public boolean isCreated() {
-            return jsonPatch.contains("\"op\"") && jsonPatch.contains("\"add\"");
-        }
-
-        @Override
-        public <T extends BaseDomain<?, ?>> T convert(Class<T> clazz) {
-            return JsonPatchEngine.applyJsonPatch(jsonPatch, clazz);
-        }
-
-        @Override
-        public <T extends BaseDomain<?, ?>> T apply(Class<T> clazz, T target) {
-            return JsonPatchEngine.applyJsonPatch(jsonPatch, target, clazz);
-        }
-
-        @Override
-        public String getRaw() {
-            return jsonPatch;
-        }
+    public static DomainDelta fromEvent(SnapshotLink.Id snapshotLinkId, DomainDeltaEventBase eventBase) {
+        return builder()
+                .snapshotLinkId(snapshotLinkId)
+                .domainType(eventBase.domainType())
+                .domainId(eventBase.domainId())
+                .patch(eventBase.toPatch())
+                .build();
     }
 
     private static DomainDeltaBuilder getDefaultBuilder(SnapshotLink.Id snapshotLinkId, String domainType, BaseDomain.Id<?> domainId, Patch patch) {

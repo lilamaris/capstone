@@ -26,7 +26,7 @@ public class DomainDeltaEntityMapper {
         return DomainDeltaEntity.builder()
                 .id(domain.id().value())
                 .snapshotLinkId(domain.snapshotLinkId().value())
-                .domainType(domain.getDomainName())
+                .domainType(domain.domainType())
                 .domainId(domain.domainId().value().toString())
                 .patch(domain.patch().getRaw())
                 .build();

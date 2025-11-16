@@ -4,10 +4,15 @@ import com.lilamaris.capstone.application.port.in.TimelineCommandUseCase;
 import com.lilamaris.capstone.application.port.in.result.TimelineResult;
 import com.lilamaris.capstone.application.port.out.TimelinePort;
 import com.lilamaris.capstone.domain.embed.Effective;
+import com.lilamaris.capstone.domain.event.SnapshotDeltaEvent;
 import com.lilamaris.capstone.domain.timeline.Timeline;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.time.LocalDateTime;
 
@@ -63,4 +68,12 @@ public class TimelineCommandService implements TimelineCommandUseCase {
 //
 //        return TimelineResult.Command.from(saved);
 //    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handleSnapshotDeltaEvent(SnapshotDeltaEvent event) {
+        var timeline = timelinePort.getById(event.timelineId()).orElseThrow(EntityNotFoundException::new);
+        var updated = timeline.updateDomainDelta(event.snapshotId(), event.domainType(), event.domainId(), event.toPatch());
+        timelinePort.save(updated);
+    }
 }

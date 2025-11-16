@@ -52,6 +52,37 @@ public record Timeline(
         return getDefaultBuilder().description(description).build();
     }
 
+    public Timeline copyWithDescription(String description) {
+        return toBuilder().description(description).build();
+    }
+
+    public <T extends BaseDomain<? ,?>> Map<BaseDomain.Id<?>, List<DomainDelta>> resolveAllDeltaOf(
+            Class<T> clazz,
+            Snapshot.Id snapshotId,
+            DomainTypeRegistry registry
+    ) {
+        String domainType = registry.nameOf(clazz);
+        Map<BaseDomain.Id<?>, List<DomainDelta>> bucket = new HashMap<>();
+        List<SnapshotLink> descToRoot = buildDescendantToRootChain(snapshotId);
+
+        descToRoot.stream()
+                .flatMap(l -> l.domainDeltaList().stream())
+                .filter(d -> domainType.equals(d.domainType()))
+                .forEach(d -> bucket.computeIfAbsent(d.domainId(), k -> new ArrayList<>()).add(d));
+
+        return bucket;
+    }
+
+    public Timeline updateDomainDelta(Snapshot.Id targetSnapshotId, String domainType, BaseDomain.Id<?> domainId, DomainDelta.Patch patch) {
+        var currentSnapshotLinkMap = new HashMap<>(snapshotLinkMap);
+        var targetSnapshotLink = snapshotLinkByDescendant.get(targetSnapshotId);
+        var domainDelta = DomainDelta.create(targetSnapshotLink.id(), domainType, domainId, patch);
+        var updatedSnapshotLink = targetSnapshotLink.upsertDomainDelta(List.of(domainDelta));
+        currentSnapshotLinkMap.put(updatedSnapshotLink.id(), updatedSnapshotLink);
+
+        return copyWithSnapshotLink(currentSnapshotLinkMap);
+    }
+
     public Timeline migrateSnapshot(LocalDateTime txAt, LocalDateTime validAt, String description) {
         var ta = EffectiveConvertible.of(txAt);
         var va = EffectiveConvertible.of(validAt);
@@ -150,26 +181,43 @@ public record Timeline(
 //        return SnapshotTransition.builder().timelineId(id).before(before).after(after).build();
 //    }
 
-    public <T extends BaseDomain<? ,?>> Map<BaseDomain.Id<?>, T> resolveAllDeltaOf(
-            Class<T> clazz,
-            Snapshot.Id snapshotId,
-            DomainTypeRegistry registry
-    ) {
-        String domainType = registry.nameOf(clazz);
-        Map<BaseDomain.Id<?>, T> current = new HashMap<>();
-        List<SnapshotLink> descToRoot = buildDescendantToRootChain(snapshotId);
-        applyCreateDeltas(descToRoot, domainType, clazz, current);
-        applyUpdateDeltas(descToRoot.reversed(), domainType, clazz, current);
-
-        return current;
-    }
-
-    public Timeline copyWithDescription(String description) {
-        return toBuilder().description(description).build();
-    }
-
     private static TimelineBuilder getDefaultBuilder() {
         return builder();
+    }
+
+    private List<Snapshot> getSnapshotValidAt(LocalDateTime validAt, Predicate<Snapshot> predicate) {
+        return snapshotMap.values()
+                .stream()
+                .filter(s -> s.valid().contains(validAt))
+                .filter(predicate)
+                .sorted(Comparator.comparing(s -> s.valid().from()))
+                .toList();
+    }
+
+    private List<Snapshot> getSnapshotValidAtRange(LocalDateTime validFrom, LocalDateTime validTo, Predicate<Snapshot> predicate) {
+        var range = Effective.from(validFrom, validTo);
+        return snapshotMap.values()
+                .stream()
+                .filter(s -> s.valid().isOverlap(range))
+                .filter(predicate)
+                .sorted(Comparator.comparing(s -> s.tx().from()))
+                .toList();
+    }
+
+    private Timeline copyWithSnapshotContext(Map<Snapshot.Id, Snapshot> snapshotMap, Map<SnapshotLink.Id, SnapshotLink> snapshotLinkMap) {
+        return toBuilder().snapshotMap(snapshotMap).snapshotLinkMap(snapshotLinkMap).build();
+    }
+
+    private Timeline copyWithSnapshotLink(Map<SnapshotLink.Id, SnapshotLink> snapshotLinkMap) {
+        return toBuilder().snapshotLinkMap(snapshotLinkMap).build();
+    }
+
+    private List<SnapshotLink> buildDescendantToRootChain(Snapshot.Id startSnapshotId) {
+        return Stream.iterate(
+                snapshotLinkByDescendant.get(startSnapshotId),
+                Objects::isNull,
+                link -> snapshotLinkByDescendant.get(link.ancestorSnapshotId())
+        ).toList();
     }
 
     private void updateSnapshotMap(Map<Snapshot.Id, Snapshot> current, List<Snapshot> toUpdate) {
@@ -185,65 +233,5 @@ public record Timeline(
             Objects.requireNonNull(l.descendantSnapshotId(), "SnapshotLink descendant snapshot id cannot be null");
             current.put(l.id(), l);
         });
-    }
-
-    private Timeline copyWithSnapshotContext(Map<Snapshot.Id, Snapshot> snapshotMap, Map<SnapshotLink.Id, SnapshotLink> snapshotLinkMap) {
-        return toBuilder().snapshotMap(snapshotMap).snapshotLinkMap(snapshotLinkMap).build();
-    }
-
-    private List<Snapshot> getSnapshotValidAtRange(LocalDateTime validFrom, LocalDateTime validTo, Predicate<Snapshot> predicate) {
-        var range = Effective.from(validFrom, validTo);
-        return snapshotMap.values()
-                .stream()
-                .filter(s -> s.valid().isOverlap(range))
-                .filter(predicate)
-                .sorted(Comparator.comparing(s -> s.tx().from()))
-                .toList();
-    }
-
-    private List<Snapshot> getSnapshotValidAt(LocalDateTime validAt, Predicate<Snapshot> predicate) {
-        return snapshotMap.values()
-                .stream()
-                .filter(s -> s.valid().contains(validAt))
-                .filter(predicate)
-                .sorted(Comparator.comparing(s -> s.valid().from()))
-                .toList();
-    }
-
-    private List<SnapshotLink> buildDescendantToRootChain(Snapshot.Id startSnapshotId) {
-        return Stream.iterate(
-                snapshotLinkByDescendant.get(startSnapshotId),
-                Objects::isNull,
-                link -> snapshotLinkByDescendant.get(link.ancestorSnapshotId())
-        ).toList();
-    }
-
-    private <T extends BaseDomain<?, ?>> void applyCreateDeltas(
-            List<SnapshotLink> descToRoot,
-            String domainType,
-            Class<T> clazz,
-            Map<BaseDomain.Id<?>, T> current
-    ) {
-        descToRoot.stream()
-                .flatMap(l -> l.domainDeltaList().stream())
-                .filter(d -> domainType.equals(d.domainType()))
-                .filter(d -> d.patch().isCreated())
-                .forEach(d -> {
-                    T created = d.patch().convert(clazz);
-                    current.putIfAbsent(created.id(), created);
-                });
-    }
-
-    private <T extends BaseDomain<?, ?>> void applyUpdateDeltas(
-            List<SnapshotLink> rootToDesc,
-            String domainType,
-            Class<T> clazz,
-            Map<BaseDomain.Id<?>, T> current
-    ) {
-        rootToDesc.stream()
-                .flatMap(l -> l.domainDeltaList().stream())
-                .filter(d -> domainType.equals(d.domainType()))
-                .filter(d -> !d.patch().isCreated())
-                .forEach(d -> current.computeIfPresent(d.domainId(), (k, v) -> d.patch().apply(clazz, v)));
     }
 }

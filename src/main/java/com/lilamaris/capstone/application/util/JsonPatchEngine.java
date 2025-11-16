@@ -28,4 +28,12 @@ public class JsonPatchEngine {
             throw new RuntimeException("Failed to apply JSON Patch ", e);
         }
     }
+
+    public static <T> String createAddPatch(T target) {
+        try {
+            return mapper.writeValueAsString(target);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to apply JSON Patch ", e);
+        }
+    }
 }
