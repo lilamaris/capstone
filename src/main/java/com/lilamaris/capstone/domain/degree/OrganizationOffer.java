@@ -1,6 +1,7 @@
 package com.lilamaris.capstone.domain.degree;
 
 import com.lilamaris.capstone.domain.BaseDomain;
+import com.lilamaris.capstone.domain.degree_organization.Organization;
 import com.lilamaris.capstone.domain.timeline.Snapshot;
 import lombok.Builder;
 

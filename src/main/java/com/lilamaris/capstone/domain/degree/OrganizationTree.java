@@ -1,5 +1,6 @@
 package com.lilamaris.capstone.domain.degree;
 
+import com.lilamaris.capstone.domain.degree_organization.Organization;
 import lombok.Builder;
 
 import java.util.ArrayList;
@@ -13,19 +14,6 @@ public record OrganizationTree(
     Organization root,
     Map<Organization.Id, List<Organization>> children
 ) {
-    public static OrganizationTree from(List<Organization> orgList) {
-        var root = orgList.stream()
-                .filter(Organization::isRoot)
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Root organization missing"));
-
-        var byParent = orgList.stream()
-                .filter(o -> !o.isRoot())
-                .collect(Collectors.groupingBy(Organization::parentId));
-
-        return new OrganizationTree(root, byParent);
-    }
-
     public List<Organization> childrenOf(Organization.Id id) {
         return children.getOrDefault(id, List.of());
     }
