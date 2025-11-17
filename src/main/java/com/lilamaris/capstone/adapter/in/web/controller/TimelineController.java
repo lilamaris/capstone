@@ -7,6 +7,7 @@ import com.lilamaris.capstone.application.port.in.condition.SnapshotQueryConditi
 import com.lilamaris.capstone.application.port.in.result.TimelineResult;
 import com.lilamaris.capstone.domain.timeline.Timeline;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,8 +40,8 @@ public class TimelineController {
     @GetMapping("/{id}/snapshots")
     public ResponseEntity<?> getSnapshots(
             @PathVariable("id") UUID id,
-            @RequestParam(required = false) LocalDateTime txAt,
-            @RequestParam(required = false) LocalDateTime validAt
+            @RequestParam(name = "txAt", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime txAt,
+            @RequestParam(name = "validAt", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  LocalDateTime validAt
     ) {
         var condition = SnapshotQueryCondition.builder().timelineId(Timeline.Id.from(id)).txAt(txAt).validAt(validAt).build();
         var result = timelineQueryUseCase.getSnapshot(condition);

@@ -1,5 +1,6 @@
 package com.lilamaris.capstone.application.port.in.result;
 
+import com.lilamaris.capstone.domain.embed.Audit;
 import com.lilamaris.capstone.domain.timeline.Snapshot;
 import com.lilamaris.capstone.domain.timeline.Timeline;
 import lombok.Builder;
@@ -11,13 +12,15 @@ public class TimelineResult {
     public record Command(
             Timeline.Id id,
             String description,
-            List<SnapshotResult.Command> snapshotList
+            List<SnapshotResult.Command> snapshotList,
+            AuditResult audit
     ) {
         public static Command from(Timeline domain) {
-            return Command.builder()
+            return builder()
                     .id(domain.id())
                     .description(domain.description())
                     .snapshotList(domain.snapshotMap().values().stream().map(SnapshotResult.Command::from).toList())
+                    .audit(AuditResult.from(domain.audit()))
                     .build();
         }
     }
@@ -26,13 +29,15 @@ public class TimelineResult {
     public record Query(
             Timeline.Id id,
             String description,
-            List<SnapshotResult.Query> snapshotList
+            List<SnapshotResult.Query> snapshotList,
+            AuditResult audit
     ) {
         public static Query from(Timeline domain) {
-            return Query.builder()
+            return builder()
                     .id(domain.id())
                     .description(domain.description())
                     .snapshotList(domain.snapshotMap().values().stream().map(SnapshotResult.Query::from).toList())
+                    .audit(AuditResult.from(domain.audit()))
                     .build();
         }
     }
@@ -41,13 +46,15 @@ public class TimelineResult {
     public record QueryCompressed(
             Timeline.Id id,
             String description,
-            Integer snapshotListNumber
+            Integer snapshotListNumber,
+            AuditResult audit
     ) {
         public static QueryCompressed from(Timeline domain) {
-            return QueryCompressed.builder()
+            return builder()
                     .id(domain.id())
                     .description(domain.description())
                     .snapshotListNumber(domain.snapshotMap().size())
+                    .audit(AuditResult.from(domain.audit()))
                     .build();
         }
     }

@@ -12,14 +12,10 @@ public class DomainDeltaEntityMapper {
         var id = DomainDelta.Id.from(entity.getId());
         var snapshotLinkId = SnapshotLink.Id.from(entity.getSnapshotLinkId());
         var domainId = BaseDomain.UuidId.from(UUID.fromString(entity.getDomainId()));
+        var patch = new DomainDelta.JsonPatch(entity.getPatch());
+        var audit = AuditableEntityMapper.toDomain(entity);
 
-        return DomainDelta.builder()
-                .id(id)
-                .snapshotLinkId(snapshotLinkId)
-                .domainType(entity.getDomainType())
-                .domainId(domainId)
-                .patch(new DomainDelta.JsonPatch(entity.getPatch()))
-                .build();
+        return DomainDelta.from(id, snapshotLinkId, entity.getDomainType(), domainId, patch, audit);
     }
 
     public static DomainDeltaEntity toEntity(DomainDelta domain) {

@@ -2,6 +2,7 @@ package com.lilamaris.capstone.domain.timeline;
 
 import com.lilamaris.capstone.application.util.JsonPatchEngine;
 import com.lilamaris.capstone.domain.BaseDomain;
+import com.lilamaris.capstone.domain.embed.Audit;
 import com.lilamaris.capstone.domain.event.DomainDeltaEventBase;
 import lombok.Builder;
 
@@ -14,7 +15,8 @@ public record DomainDelta (
         SnapshotLink.Id snapshotLinkId,
         String domainType,
         BaseDomain.Id<?> domainId,
-        Patch patch
+        Patch patch,
+        Audit audit
 ) implements BaseDomain<DomainDelta.Id, DomainDelta> {
     public record Id(UUID value) implements BaseDomain.Id<UUID> {
         public static Id random() { return new Id(UUID.randomUUID()); }
@@ -52,8 +54,8 @@ public record DomainDelta (
         patch = Optional.ofNullable(patch).orElseThrow(() -> new IllegalArgumentException("'patch' of type 'Patch' cannot be null"));
     }
 
-    public static DomainDelta from(Id id, SnapshotLink.Id snapshotLinkId, String domainName, BaseDomain.Id<?> domainId, Patch patch) {
-        return DomainDelta.getDefaultBuilder(snapshotLinkId, domainName, domainId, patch).id(id).build();
+    public static DomainDelta from(Id id, SnapshotLink.Id snapshotLinkId, String domainName, BaseDomain.Id<?> domainId, Patch patch, Audit audit) {
+        return DomainDelta.getDefaultBuilder(snapshotLinkId, domainName, domainId, patch).id(id).audit(audit).build();
     }
 
     public static DomainDelta create(SnapshotLink.Id snapshotLinkId, String domainName, BaseDomain.Id<?> domainId, Patch patch) {

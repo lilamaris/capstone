@@ -11,14 +11,16 @@ public class CourseResult {
             Course.Id id,
             String code,
             String name,
-            Integer credit
+            Integer credit,
+            AuditResult audit
     ) {
         public static Command from(Course domain) {
-            return Command.builder()
+            return builder()
                     .id(domain.id())
                     .code(domain.code())
                     .name(domain.name())
                     .credit(domain.credit())
+                    .audit(AuditResult.from(domain.audit()))
                     .build();
         }
     }
@@ -29,14 +31,16 @@ public class CourseResult {
             String code,
             String name,
             Integer credit,
-            List<CourseOfferResult.Query> courseOfferList
+            List<CourseOfferResult.Query> courseOfferList,
+            AuditResult audit
     ) {
         public static Query from(Course domain) {
-            return Query.builder()
+            return builder()
                     .id(domain.id())
                     .code(domain.code())
                     .name(domain.name())
                     .credit(domain.credit())
+                    .audit(AuditResult.from(domain.audit()))
                     .build();
         }
     }

@@ -1,6 +1,7 @@
 package com.lilamaris.capstone.domain.degree_course;
 
 import com.lilamaris.capstone.domain.BaseDomain;
+import com.lilamaris.capstone.domain.embed.Audit;
 import com.lilamaris.capstone.domain.event.CourseOfferDeltaEvent;
 import lombok.Builder;
 
@@ -16,7 +17,8 @@ public record Course(
         String name,
         Integer credit,
         List<CourseOffer> courseOfferList,
-        List<CourseOfferDeltaEvent> courseOfferEventList //
+        List<CourseOfferDeltaEvent> courseOfferEventList,
+        Audit audit
 ) implements BaseDomain<Course.Id, Course> {
     public record Id(UUID value) implements BaseDomain.Id<UUID> {
         public static Id random() { return new Id(UUID.randomUUID()); }
@@ -34,8 +36,8 @@ public record Course(
         courseOfferEventList = Optional.ofNullable(courseOfferEventList).orElseGet(ArrayList::new);
     }
 
-    public static Course from(Id id, String code, String name, Integer credit, List<CourseOffer> courseOfferList) {
-        return getDefaultBuilder(code, name, credit).id(id).courseOfferList(courseOfferList).build();
+    public static Course from(Id id, String code, String name, Integer credit, List<CourseOffer> courseOfferList, Audit audit) {
+        return getDefaultBuilder(code, name, credit).id(id).courseOfferList(courseOfferList).audit(audit).build();
     }
 
     public static Course create(String code, String name, Integer credit) {

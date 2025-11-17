@@ -2,6 +2,7 @@ package com.lilamaris.capstone.domain.timeline;
 
 import com.lilamaris.capstone.domain.BaseDomain;
 import com.lilamaris.capstone.domain.configuration.DomainTypeRegistry;
+import com.lilamaris.capstone.domain.embed.Audit;
 import com.lilamaris.capstone.domain.embed.Effective;
 import com.lilamaris.capstone.domain.embed.EffectiveConvertible;
 import lombok.Builder;
@@ -20,7 +21,8 @@ public record Timeline(
         Map<Snapshot.Id, Snapshot> snapshotMap,
         Map<SnapshotLink.Id, SnapshotLink> snapshotLinkMap,
         Map<Snapshot.Id, SnapshotLink> snapshotLinkByAncestor,
-        Map<Snapshot.Id, SnapshotLink> snapshotLinkByDescendant
+        Map<Snapshot.Id, SnapshotLink> snapshotLinkByDescendant,
+        Audit audit
 ) implements BaseDomain<Timeline.Id, Timeline> {
     public record Id(UUID value) implements BaseDomain.Id<UUID> {
         public static Id random() { return new Id(UUID.randomUUID()); }
@@ -39,12 +41,13 @@ public record Timeline(
                 .collect(Collectors.toMap(SnapshotLink::descendantSnapshotId, Function.identity()));
     }
 
-    public static Timeline from(Timeline.Id id, String description, Map<Snapshot.Id, Snapshot> snapshotMap, Map<SnapshotLink.Id, SnapshotLink> snapshotLinkMap) {
+    public static Timeline from(Timeline.Id id, String description, Map<Snapshot.Id, Snapshot> snapshotMap, Map<SnapshotLink.Id, SnapshotLink> snapshotLinkMap, Audit audit) {
         return getDefaultBuilder()
                 .id(id)
                 .description(description)
                 .snapshotMap(snapshotMap)
                 .snapshotLinkMap(snapshotLinkMap)
+                .audit(audit)
                 .build();
     }
 

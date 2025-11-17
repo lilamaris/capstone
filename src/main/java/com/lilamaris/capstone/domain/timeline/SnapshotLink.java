@@ -1,6 +1,7 @@
 package com.lilamaris.capstone.domain.timeline;
 
 import com.lilamaris.capstone.domain.BaseDomain;
+import com.lilamaris.capstone.domain.embed.Audit;
 import lombok.Builder;
 
 import java.util.ArrayList;
@@ -17,7 +18,8 @@ public record SnapshotLink(
         Snapshot.Id ancestorSnapshotId,
         Snapshot.Id descendantSnapshotId,
         Boolean isRoot,
-        List<DomainDelta> domainDeltaList
+        List<DomainDelta> domainDeltaList,
+        Audit audit
 ) implements BaseDomain<SnapshotLink.Id, SnapshotLink> {
     public record Id(UUID value) implements BaseDomain.Id<UUID> {
         public static Id random() { return new Id(UUID.randomUUID()); }
@@ -34,11 +36,12 @@ public record SnapshotLink(
         domainDeltaList = Optional.ofNullable(domainDeltaList).orElseGet(ArrayList::new);
     }
 
-    public static SnapshotLink from(Id id, Timeline.Id timelineId, Snapshot.Id descendantSnapshotId, Snapshot.Id ancestorSnapshotId, List<DomainDelta> domainDeltaList) {
+    public static SnapshotLink from(Id id, Timeline.Id timelineId, Snapshot.Id descendantSnapshotId, Snapshot.Id ancestorSnapshotId, List<DomainDelta> domainDeltaList, Audit audit) {
         return getDefaultBuilder(timelineId, descendantSnapshotId)
                 .id(id)
                 .ancestorSnapshotId(ancestorSnapshotId)
                 .domainDeltaList(domainDeltaList)
+                .audit(audit)
                 .build();
     }
 

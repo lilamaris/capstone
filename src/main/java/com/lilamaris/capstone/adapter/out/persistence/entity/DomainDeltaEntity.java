@@ -15,7 +15,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class DomainDeltaEntity extends BaseEntity<UUID> {
+public class DomainDeltaEntity extends BaseAuditableEntity<UUID> {
     @Column(name = "snapshot_link_id")
     private UUID snapshotLinkId;
 

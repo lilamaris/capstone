@@ -7,7 +7,9 @@ public class CourseEntityMapper {
     public static Course toDomain(CourseEntity entity) {
         var id = Course.Id.from(entity.getId());
         var courseOfferList = entity.getCourseOfferList().stream().map(CourseOfferEntityMapper::toDomain).toList();
-        return Course.from(id, entity.getCode(), entity.getName(), entity.getCredit(), courseOfferList);
+        var audit = AuditableEntityMapper.toDomain(entity);
+
+        return Course.from(id, entity.getCode(), entity.getName(), entity.getCredit(), courseOfferList, audit);
     }
 
     public static CourseEntity toEntity(Course domain) {

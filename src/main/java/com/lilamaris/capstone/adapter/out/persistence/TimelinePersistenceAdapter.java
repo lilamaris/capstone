@@ -36,9 +36,11 @@ public class TimelinePersistenceAdapter implements TimelinePort {
 
         spec = spec.and(TimelineSpecification.timelineEqual(condition.timelineId()));
         if (condition.hasTxAt()) spec = spec.and(TimelineSpecification.betweenTx(condition.txAt()));
-        if (condition.hasValidAt()) spec = spec.and(TimelineSpecification.betweenValid(condition.validAt()));
+//        if (condition.hasValidAt()) spec = spec.and(TimelineSpecification.betweenValid(condition.validAt()));
 
-        return snapshotRepository.findAll(spec).stream().map(SnapshotEntityMapper::toDomain).toList();
+        var entities = snapshotRepository.findAll(spec);
+
+        return entities.stream().map(SnapshotEntityMapper::toDomain).toList();
     }
 
     @Override

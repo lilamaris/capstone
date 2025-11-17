@@ -15,7 +15,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class SnapshotLinkEntity extends BaseEntity<UUID> {
+public class SnapshotLinkEntity extends BaseAuditableEntity<UUID> {
     @Column(name = "timeline_id", nullable = false)
     private UUID timelineId;
 

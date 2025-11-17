@@ -1,6 +1,7 @@
 package com.lilamaris.capstone.domain.degree_course;
 
 import com.lilamaris.capstone.domain.BaseDomain;
+import com.lilamaris.capstone.domain.embed.Audit;
 import lombok.Builder;
 
 import java.util.Optional;
@@ -11,7 +12,8 @@ public record CourseOffer(
         Id id,
         Course.Id courseId,
         Integer semester,
-        Boolean isRetire
+        Boolean isRetire,
+        Audit audit
 ) implements BaseDomain<CourseOffer.Id, CourseOffer> {
     public record Id(UUID value) implements BaseDomain.Id<UUID> {
         public static Id random() { return new Id(UUID.randomUUID()); }
@@ -27,7 +29,7 @@ public record CourseOffer(
         isRetire = Optional.ofNullable(isRetire).orElse(false);
     }
 
-    public static CourseOffer from(Id id, Course.Id courseId, Integer semester) {
+    public static CourseOffer from(Id id, Course.Id courseId, Integer semester, Audit audit) {
         return getDefaultBuilder(courseId, semester).id(id).build();
     }
 

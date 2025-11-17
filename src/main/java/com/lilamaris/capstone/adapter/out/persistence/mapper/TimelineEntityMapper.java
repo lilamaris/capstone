@@ -19,8 +19,9 @@ public class TimelineEntityMapper {
         var snapshotLinkMap = entity.getSnapshotLinkList().stream()
                 .map(SnapshotLinkEntityMapper::toDomain)
                 .collect(Collectors.toMap(SnapshotLink::id, Function.identity()));
+        var audit = AuditableEntityMapper.toDomain(entity);
 
-        return Timeline.from(id, entity.getDescription(), snapshotMap, snapshotLinkMap);
+        return Timeline.from(id, entity.getDescription(), snapshotMap, snapshotLinkMap, audit);
     }
 
     public static TimelineEntity toEntity(Timeline domain) {

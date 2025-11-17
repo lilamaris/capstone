@@ -10,13 +10,15 @@ public class CourseOfferResult {
     public record Command(
             CourseOffer.Id id,
             Course.Id courseId,
-            Integer semester
+            Integer semester,
+            AuditResult audit
     ) {
         public static Command from(CourseOffer domain) {
-            return Command.builder()
+            return builder()
                     .id(domain.id())
                     .courseId(domain.courseId())
                     .semester(domain.semester())
+                    .audit(AuditResult.from(domain.audit()))
                     .build();
         }
     }
@@ -26,13 +28,15 @@ public class CourseOfferResult {
             CourseOffer.Id id,
             Snapshot.Id snapshotId,
             Course.Id courseId,
-            Integer semester
+            Integer semester,
+            AuditResult audit
     ) {
         public static Query from(CourseOffer domain) {
-            return Query.builder()
+            return builder()
                     .id(domain.id())
                     .courseId(domain.courseId())
                     .semester(domain.semester())
+                    .audit(AuditResult.from(domain.audit()))
                     .build();
         }
     }
