@@ -34,19 +34,8 @@ public class SnapshotResult {
             Effective valid,
             Integer versionNo,
             String description,
-            TimelineResult.Query timeline
+            Timeline.Id timelineId
     ) {
-        public static Query from(Snapshot domain, Timeline timeline) {
-            return builder()
-                    .id(domain.id())
-                    .tx(domain.tx())
-                    .valid(domain.valid())
-                    .versionNo(domain.versionNo())
-                    .description(domain.description())
-                    .timeline(TimelineResult.Query.from(timeline))
-                    .build();
-        }
-
         public static Query from(Snapshot domain) {
             return builder()
                     .id(domain.id())
@@ -54,6 +43,7 @@ public class SnapshotResult {
                     .valid(domain.valid())
                     .versionNo(domain.versionNo())
                     .description(domain.description())
+                    .timelineId(domain.timelineId())
                     .build();
         }
     }

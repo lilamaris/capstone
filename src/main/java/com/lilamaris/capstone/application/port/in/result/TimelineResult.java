@@ -20,14 +20,6 @@ public class TimelineResult {
                     .snapshotList(domain.snapshotMap().values().stream().map(SnapshotResult.Command::from).toList())
                     .build();
         }
-
-        public static Command from(Timeline domain, List<Snapshot> snapshotList) {
-            return Command.builder()
-                    .id(domain.id())
-                    .description(domain.description())
-                    .snapshotList(snapshotList.stream().map(SnapshotResult.Command::from).toList())
-                    .build();
-        }
     }
 
     @Builder
@@ -36,18 +28,26 @@ public class TimelineResult {
             String description,
             List<SnapshotResult.Query> snapshotList
     ) {
-        public static Query from(Timeline domain, List<Snapshot> snapshotList) {
-            return Query.builder()
-                    .id(domain.id())
-                    .description(domain.description())
-                    .snapshotList(snapshotList.stream().map(SnapshotResult.Query::from).toList())
-                    .build();
-        }
-
         public static Query from(Timeline domain) {
             return Query.builder()
                     .id(domain.id())
                     .description(domain.description())
+                    .snapshotList(domain.snapshotMap().values().stream().map(SnapshotResult.Query::from).toList())
+                    .build();
+        }
+    }
+
+    @Builder
+    public record QueryCompressed(
+            Timeline.Id id,
+            String description,
+            Integer snapshotListNumber
+    ) {
+        public static QueryCompressed from(Timeline domain) {
+            return QueryCompressed.builder()
+                    .id(domain.id())
+                    .description(domain.description())
+                    .snapshotListNumber(domain.snapshotMap().size())
                     .build();
         }
     }
