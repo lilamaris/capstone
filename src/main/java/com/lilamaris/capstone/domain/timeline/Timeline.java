@@ -56,6 +56,32 @@ public record Timeline(
         return toBuilder().description(description).build();
     }
 
+    public List<Snapshot> getSnapshotTxAt(LocalDateTime txAt) {
+        return snapshotMap.values().stream()
+                .filter(s -> s.tx().contains(txAt))
+                .toList();
+    }
+
+    public List<Snapshot> getSnapshotTxAtRange(LocalDateTime txFrom, LocalDateTime txTo) {
+        var range = Effective.from(txFrom, txTo);
+        return snapshotMap.values().stream()
+                .filter(s -> s.tx().isOverlap(range))
+                .toList();
+    }
+
+    public List<Snapshot> getSnapshotValidAt(LocalDateTime validAt) {
+        return snapshotMap.values().stream()
+                .filter(s -> s.valid().contains(validAt))
+                .toList();
+    }
+
+    public List<Snapshot> getSnapshotValidAtRange(LocalDateTime validFrom, LocalDateTime validTo) {
+        var range = Effective.from(validFrom, validTo);
+        return snapshotMap.values().stream()
+                .filter(s -> s.valid().isOverlap(range))
+                .toList();
+    }
+
     public <T extends BaseDomain<? ,?>> Map<BaseDomain.Id<?>, List<DomainDelta>> resolveAllDeltaOf(
             Class<T> clazz,
             Snapshot.Id snapshotId,
@@ -99,7 +125,10 @@ public record Timeline(
             return copyWithSnapshotContext(currentSnapshotMap, currentSnapshotLinkMap);
         }
 
-        var sourceList = getSnapshotValidAt(validAt, s -> s.tx().isOpen());
+        var sourceList = getSnapshotValidAt(validAt).stream()
+                .filter(s -> s.tx().isOpen())
+                .sorted(Comparator.comparing(s -> s.valid().from()))
+                .toList();
         if (sourceList.isEmpty()) {
             throw new IllegalArgumentException("No snapshot exists at that time.");
         }
@@ -131,7 +160,10 @@ public record Timeline(
         var currentSnapshotMap = new HashMap<>(snapshotMap);
         var currentSnapshotLinkMap = new HashMap<>(snapshotLinkMap);
 
-        var sourceList = getSnapshotValidAtRange(validFrom, validTo, s -> s.tx().isOpen());
+        var sourceList = getSnapshotValidAtRange(validFrom, validTo).stream()
+                .filter(s -> s.tx().isOpen())
+                .sorted(Comparator.comparing(s -> s.tx().from()))
+                .toList();
         if (sourceList.isEmpty()) {
             throw new IllegalArgumentException("No snapshot exists at that time.");
         }
@@ -183,25 +215,6 @@ public record Timeline(
 
     private static TimelineBuilder getDefaultBuilder() {
         return builder();
-    }
-
-    private List<Snapshot> getSnapshotValidAt(LocalDateTime validAt, Predicate<Snapshot> predicate) {
-        return snapshotMap.values()
-                .stream()
-                .filter(s -> s.valid().contains(validAt))
-                .filter(predicate)
-                .sorted(Comparator.comparing(s -> s.valid().from()))
-                .toList();
-    }
-
-    private List<Snapshot> getSnapshotValidAtRange(LocalDateTime validFrom, LocalDateTime validTo, Predicate<Snapshot> predicate) {
-        var range = Effective.from(validFrom, validTo);
-        return snapshotMap.values()
-                .stream()
-                .filter(s -> s.valid().isOverlap(range))
-                .filter(predicate)
-                .sorted(Comparator.comparing(s -> s.tx().from()))
-                .toList();
     }
 
     private Timeline copyWithSnapshotContext(Map<Snapshot.Id, Snapshot> snapshotMap, Map<SnapshotLink.Id, SnapshotLink> snapshotLinkMap) {
