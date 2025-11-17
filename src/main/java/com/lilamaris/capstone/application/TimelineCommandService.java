@@ -8,7 +8,7 @@ import com.lilamaris.capstone.domain.event.SnapshotDeltaEvent;
 import com.lilamaris.capstone.domain.timeline.Timeline;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
@@ -16,7 +16,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.time.LocalDateTime;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class TimelineCommandService implements TimelineCommandUseCase {
     private final TimelinePort timelinePort;

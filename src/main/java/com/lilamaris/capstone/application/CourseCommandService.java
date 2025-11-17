@@ -10,10 +10,10 @@ import com.lilamaris.capstone.domain.timeline.Timeline;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Component
+@Service
 @RequiredArgsConstructor
 @Transactional
 public class CourseCommandService implements CourseCommandUseCase {
