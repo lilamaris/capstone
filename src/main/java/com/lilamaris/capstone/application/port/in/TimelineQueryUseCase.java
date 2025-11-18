@@ -4,9 +4,7 @@ import com.lilamaris.capstone.application.port.in.condition.SnapshotQueryConditi
 import com.lilamaris.capstone.application.port.in.result.SnapshotResult;
 import com.lilamaris.capstone.application.port.in.result.TimelineResult;
 import com.lilamaris.capstone.domain.timeline.Timeline;
-import org.springframework.lang.Nullable;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface TimelineQueryUseCase {

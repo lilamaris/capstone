@@ -3,7 +3,10 @@ package com.lilamaris.capstone.domain.degree_organization;
 import com.lilamaris.capstone.domain.BaseDomain;
 import lombok.Builder;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Builder(toBuilder = true)
 public record Organization(

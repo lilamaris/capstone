@@ -15,7 +15,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class CourseEntity extends BaseAuditableEntity<UUID> {
+public class CourseEntity extends BaseEntity<UUID> {
     @Column(name = "code")
     private String code;
 

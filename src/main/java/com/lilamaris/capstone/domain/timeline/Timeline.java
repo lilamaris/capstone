@@ -5,7 +5,7 @@ import com.lilamaris.capstone.domain.embed.Audit;
 import com.lilamaris.capstone.domain.embed.Effective;
 import lombok.Builder;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -56,7 +56,7 @@ public record Timeline(
         return toBuilder().description(description).build();
     }
 
-    public List<Snapshot> getSnapshotTxAt(ZonedDateTime txAt) {
+    public List<Snapshot> getSnapshotTxAt(Instant txAt) {
         return snapshotMap.values().stream()
                 .filter(s -> s.tx().contains(txAt))
                 .toList();
@@ -68,7 +68,7 @@ public record Timeline(
                 .toList();
     }
 
-    public List<Snapshot> getSnapshotValidAt(ZonedDateTime validAt) {
+    public List<Snapshot> getSnapshotValidAt(Instant validAt) {
         return snapshotMap.values().stream()
                 .filter(s -> s.valid().contains(validAt))
                 .toList();
@@ -105,12 +105,12 @@ public record Timeline(
         return copyWithSnapshotLink(currentSnapshotLinkMap);
     }
 
-    public Timeline migrateSnapshot(ZonedDateTime txAt, ZonedDateTime validAt, String description) {
+    public Timeline migrateSnapshot(Instant txAt, Instant validAt, String description) {
         var currentSnapshotMap = new HashMap<>(snapshotMap);
         var currentSnapshotLinkMap = new HashMap<>(snapshotLinkMap);
 
         if (snapshotMap.isEmpty()) {
-            var initialSnapshot = Snapshot.create(txAt, validAt, id, description);
+            var initialSnapshot = Snapshot.create(Effective.openAt(txAt), Effective.openAt(validAt), id, description);
             var initialSnapshotLink = SnapshotLink.createRoot(id, initialSnapshot.id());
 
             updateSnapshotMap(currentSnapshotMap, List.of(initialSnapshot));
@@ -134,10 +134,10 @@ public record Timeline(
 
         var splitPeriod = source.valid().splitAt(validAt);
 
-        var migratedLeft = Snapshot.create(txAt, splitPeriod.left(), id, description);
+        var migratedLeft = Snapshot.create(Effective.openAt(txAt), splitPeriod.left(), id, description);
         var migratedLeftLink = SnapshotLink.create(id, migratedLeft.id(), closedSource.id());
 
-        var migratedRight = Snapshot.create(txAt, splitPeriod.right(), id, description);
+        var migratedRight = Snapshot.create(Effective.openAt(txAt), splitPeriod.right(), id, description);
         var migratedRightLink = SnapshotLink.create(id, migratedRight.id(), migratedLeft.id());
 
         var updateSnapshot = List.of(closedSource, migratedLeft, migratedRight);
@@ -149,7 +149,7 @@ public record Timeline(
         return copyWithSnapshotContext(currentSnapshotMap, currentSnapshotLinkMap);
     }
 
-    public Timeline mergeSnapshot(ZonedDateTime txAt, Effective validRange, String description) {
+    public Timeline mergeSnapshot(Instant txAt, Effective validRange, String description) {
         var currentSnapshotMap = new HashMap<>(snapshotMap);
         var currentSnapshotLinkMap = new HashMap<>(snapshotLinkMap);
 
@@ -167,7 +167,7 @@ public record Timeline(
 
         var mergedValid = sourceList.getFirst().valid().mergeRange(sourceList.getLast().valid());
 
-        var mergedSnapshot = Snapshot.create(txAt, mergedValid, this.id(), description);
+        var mergedSnapshot = Snapshot.create(Effective.openAt(txAt), mergedValid, this.id(), description);
         var mergedSnapshotLink = SnapshotLink.create(this.id(), mergedSnapshot.id(), closedSource.getLast().id());
 
         var updateSnapshotMap = Stream.concat(closedSource.stream(), Stream.of(mergedSnapshot)).toList();

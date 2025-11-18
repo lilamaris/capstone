@@ -8,6 +8,7 @@ import com.lilamaris.capstone.adapter.out.persistence.repository.TimelineReposit
 import com.lilamaris.capstone.adapter.out.persistence.specification.TimelineSpecification;
 import com.lilamaris.capstone.application.port.in.condition.SnapshotQueryCondition;
 import com.lilamaris.capstone.application.port.out.TimelinePort;
+import com.lilamaris.capstone.application.util.UniversityClock;
 import com.lilamaris.capstone.domain.timeline.Snapshot;
 import com.lilamaris.capstone.domain.timeline.Timeline;
 import jakarta.transaction.Transactional;
@@ -34,8 +35,9 @@ public class TimelinePersistenceAdapter implements TimelinePort {
         Specification<SnapshotEntity> spec = Specification.unrestricted();
 
         spec = spec.and(TimelineSpecification.timelineEqual(condition.timelineId()));
-        if (condition.hasTxAt()) spec = spec.and(TimelineSpecification.betweenTx(condition.txAt()));
-        if (condition.hasValidAt()) spec = spec.and(TimelineSpecification.betweenValid(condition.validAt()));
+        if (condition.hasValidAt()) spec = spec.and(TimelineSpecification.betweenValid(UniversityClock.at(condition.validAt())));
+        if (condition.hasTxAt()) spec = spec.and(TimelineSpecification.betweenTx(UniversityClock.at(condition.txAt())));
+        else spec = spec.and(TimelineSpecification.isOpenTx());
 
         var entities = snapshotRepository.findAll(spec);
 

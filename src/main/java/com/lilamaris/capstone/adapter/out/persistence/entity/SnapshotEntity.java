@@ -18,7 +18,6 @@ public class SnapshotEntity extends BaseEntity<UUID> {
     @AttributeOverrides({
             @AttributeOverride(name = "from", column = @Column(name = "tx_from")),
             @AttributeOverride(name = "to", column = @Column(name = "tx_to")),
-            @AttributeOverride(name = "zoneId", column = @Column(name = "tx_zone_id"))
     })
     private EffectiveEmbeddableEntity tx;
 
@@ -26,7 +25,6 @@ public class SnapshotEntity extends BaseEntity<UUID> {
     @AttributeOverrides({
             @AttributeOverride(name = "from", column = @Column(name = "valid_from")),
             @AttributeOverride(name = "to", column = @Column(name = "valid_to")),
-            @AttributeOverride(name = "zoneId", column = @Column(name = "valid_zone_id"))
     })
     private EffectiveEmbeddableEntity valid;
 

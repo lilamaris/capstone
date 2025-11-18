@@ -8,7 +8,7 @@ public class CourseOfferEntityMapper {
     public static CourseOffer toDomain(CourseOfferEntity entity) {
         var id = CourseOffer.Id.from(entity.getId());
         var courseId = Course.Id.from(entity.getCourseId());
-        var audit = AuditableEntityMapper.toDomain(entity);
+        var audit = AuditEmbeddableEntityMapper.toDomain(entity);
 
         return CourseOffer.from(id, courseId, entity.getSemester(), audit);
     }

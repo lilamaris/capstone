@@ -5,7 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.*;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 
 @Embeddable
 @Builder(toBuilder = true)
@@ -15,11 +15,8 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class EffectiveEmbeddableEntity {
     @Column(name = "from", nullable = false)
-    private ZonedDateTime from;
+    private Instant from;
 
     @Column(name = "to", nullable = false)
-    private ZonedDateTime to;
-
-    @Column(name = "zone_id")
-    private String zoneId;
+    private Instant to;
 }

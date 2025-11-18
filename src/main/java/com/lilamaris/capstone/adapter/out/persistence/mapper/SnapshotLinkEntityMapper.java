@@ -14,7 +14,7 @@ public class SnapshotLinkEntityMapper {
         var timelineId = Timeline.Id.from(entity.getTimelineId());
         var ancestorSnapshotId = Snapshot.Id.from(entity.getAncestorSnapshotId());
         var domainDeltaList = entity.getDomainDeltaList().stream().map(DomainDeltaEntityMapper::toDomain).toList();
-        var audit = AuditableEntityMapper.toDomain(entity);
+        var audit = AuditEmbeddableEntityMapper.toDomain(entity);
 
         return SnapshotLink.from(id, timelineId, descendantSnapshotId, ancestorSnapshotId, domainDeltaList, audit);
     }

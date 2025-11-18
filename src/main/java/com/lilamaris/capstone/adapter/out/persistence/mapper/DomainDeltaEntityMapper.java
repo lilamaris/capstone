@@ -13,7 +13,7 @@ public class DomainDeltaEntityMapper {
         var snapshotLinkId = SnapshotLink.Id.from(entity.getSnapshotLinkId());
         var domainId = BaseDomain.UuidId.from(UUID.fromString(entity.getDomainId()));
         var patch = new DomainDelta.JsonPatch(entity.getPatch());
-        var audit = AuditableEntityMapper.toDomain(entity);
+        var audit = AuditEmbeddableEntityMapper.toDomain(entity);
 
         return DomainDelta.from(id, snapshotLinkId, entity.getDomainType(), domainId, patch, audit);
     }

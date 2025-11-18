@@ -15,7 +15,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class TimelineEntity extends BaseAuditableEntity<UUID> {
+public class TimelineEntity extends BaseEntity<UUID> {
     @Column(name = "description")
     private String description;
 

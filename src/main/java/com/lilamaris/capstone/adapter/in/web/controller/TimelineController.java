@@ -43,7 +43,7 @@ public class TimelineController {
             @RequestParam(name = "txAt", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime txAt,
             @RequestParam(name = "validAt", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  LocalDateTime validAt
     ) {
-        var condition = SnapshotQueryCondition.builder().timelineId(Timeline.Id.from(id)).txAt(txAt).validAt(validAt).build();
+        var condition = SnapshotQueryCondition.create(Timeline.Id.from(id), txAt, validAt);
         var result = timelineQueryUseCase.getSnapshot(condition);
         return ResponseEntity.ok(result);
     }

@@ -1,7 +1,5 @@
 package com.lilamaris.capstone.application.port.in.result;
 
-import com.lilamaris.capstone.domain.embed.Audit;
-import com.lilamaris.capstone.domain.timeline.Snapshot;
 import com.lilamaris.capstone.domain.timeline.Timeline;
 import lombok.Builder;
 

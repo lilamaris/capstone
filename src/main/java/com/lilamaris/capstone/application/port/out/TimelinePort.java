@@ -4,7 +4,6 @@ import com.lilamaris.capstone.application.port.in.condition.SnapshotQueryConditi
 import com.lilamaris.capstone.domain.timeline.Snapshot;
 import com.lilamaris.capstone.domain.timeline.Timeline;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 

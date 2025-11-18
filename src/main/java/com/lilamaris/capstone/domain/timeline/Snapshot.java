@@ -4,8 +4,9 @@ import com.lilamaris.capstone.domain.BaseDomain;
 import com.lilamaris.capstone.domain.embed.Effective;
 import lombok.Builder;
 
-import java.time.ZonedDateTime;
-import java.util.*;
+import java.time.Instant;
+import java.util.Optional;
+import java.util.UUID;
 
 @Builder(toBuilder = true)
 public record Snapshot(
@@ -40,11 +41,7 @@ public record Snapshot(
             Integer versionNo,
             String description
     ) {
-        return getDefaultBuilder(tx, valid, timelineId)
-                .id(id)
-                .versionNo(versionNo)
-                .description(description)
-                .build();
+        return new Snapshot(id, tx, valid, timelineId, versionNo, description);
     }
 
     public static Snapshot create(
@@ -53,53 +50,40 @@ public record Snapshot(
             Timeline.Id timelineId,
             String description
     ) {
-        return getDefaultBuilder(tx, valid, timelineId).description(description).build();
+        return new Snapshot(null, tx, valid, timelineId, 0, description);
     }
 
-    public static Snapshot create(
-            ZonedDateTime txAt,
-            Effective valid,
-            Timeline.Id timelineId,
-            String description
-    ) {
-        var tx = Effective.from(txAt, Effective.MAX);
-        return create(tx, valid, timelineId, description);
+    public Snapshot closeTxAt(Instant at) {
+        var closedTx = tx.closeAt(at);
+        return copyWithTx(closedTx);
     }
 
-    public static Snapshot create(
-            ZonedDateTime txAt,
-            ZonedDateTime validAt,
-            Timeline.Id timelineId,
-            String description
-    ) {
-        var tx = Effective.from(txAt, Effective.MAX);
-        var valid = Effective.from(validAt, Effective.MAX);
-        return create(tx, valid, timelineId, description);
-    }
-
-    public Snapshot closeTxAt(ZonedDateTime at) {
-        var updated = toBuilder().tx(tx.copyBeforeAt(at));
-        return buildWithPolicy(updated);
-    }
-
-    public Snapshot closeValidAt(ZonedDateTime at) {
-        var updated = toBuilder().valid(valid.copyBeforeAt(at));
-        return buildWithPolicy(updated);
-    }
-
-    public Snapshot copyWithTimelineId(Timeline.Id timelineId) {
-        return toBuilder().timelineId(timelineId).build();
+    public Snapshot closeValidAt(Instant at) {
+        var closedValid = tx.closeAt(at);
+        return copyWithValid(closedValid);
     }
 
 //    public List<DomainDelta> getDeltaOf(String domainType) {
 //        return domainDeltaList.stream().filter(domainDelta -> domainDelta.domainType().equals(domainType)).toList();
 //    }
 
+    private static SnapshotBuilder getDefaultBuilder(Effective tx, Effective valid, Timeline.Id timelineId) {
+        return builder().tx(tx).valid(valid).timelineId(timelineId);
+    }
+
     private Snapshot buildWithPolicy(SnapshotBuilder builder) {
         return builder.versionNo(versionNo + 1).build();
     }
 
-    private static SnapshotBuilder getDefaultBuilder(Effective tx, Effective valid, Timeline.Id timelineId) {
-        return builder().tx(tx).valid(valid).timelineId(timelineId);
+    private Snapshot copyWithDescription(String description) {
+        return buildWithPolicy(toBuilder().description(description));
+    }
+
+    private Snapshot copyWithTx(Effective tx) {
+        return buildWithPolicy(toBuilder().tx(tx));
+    }
+
+    private Snapshot copyWithValid(Effective valid) {
+        return buildWithPolicy(toBuilder().valid(valid));
     }
 }
