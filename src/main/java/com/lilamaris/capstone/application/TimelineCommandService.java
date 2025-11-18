@@ -3,7 +3,8 @@ package com.lilamaris.capstone.application;
 import com.lilamaris.capstone.application.port.in.TimelineCommandUseCase;
 import com.lilamaris.capstone.application.port.in.result.TimelineResult;
 import com.lilamaris.capstone.application.port.out.TimelinePort;
-import com.lilamaris.capstone.domain.embed.Effective;
+import com.lilamaris.capstone.application.util.EffectiveFactory;
+import com.lilamaris.capstone.application.util.UniversityClock;
 import com.lilamaris.capstone.domain.event.SnapshotDeltaEvent;
 import com.lilamaris.capstone.domain.timeline.Timeline;
 import jakarta.persistence.EntityNotFoundException;
@@ -20,6 +21,9 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class TimelineCommandService implements TimelineCommandUseCase {
     private final TimelinePort timelinePort;
+
+    private final UniversityClock clock;
+    private final EffectiveFactory effectiveFactory;
 
     @Override
     public TimelineResult.Command create(String description) {
@@ -40,9 +44,8 @@ public class TimelineCommandService implements TimelineCommandUseCase {
 
     @Override
     public TimelineResult.Command migrate(Timeline.Id id, LocalDateTime validAt, String description) {
-        var txAt = Effective.now();
         var timeline = timelinePort.getById(id).orElseThrow(EntityNotFoundException::new);
-        var updated = timeline.migrateSnapshot(txAt, validAt, description);
+        var updated = timeline.migrateSnapshot(clock.now(), clock.at(validAt), description);
         var saved = timelinePort.save(updated);
 
         return TimelineResult.Command.from(saved);
@@ -50,9 +53,9 @@ public class TimelineCommandService implements TimelineCommandUseCase {
 
     @Override
     public TimelineResult.Command merge(Timeline.Id id, LocalDateTime validFrom, LocalDateTime validTo, String description) {
-        var txAt = Effective.now();
+        var validRange = effectiveFactory.from(validFrom, validTo);
         var timeline = timelinePort.getById(id).orElseThrow(EntityNotFoundException::new);
-        var updated = timeline.mergeSnapshot(txAt, validFrom, validTo, description);
+        var updated = timeline.mergeSnapshot(clock.now(), validRange, description);
         var saved = timelinePort.save(updated);
 
         return TimelineResult.Command.from(saved);

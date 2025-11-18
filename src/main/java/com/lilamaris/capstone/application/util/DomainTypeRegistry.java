@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.domain.configuration;
+package com.lilamaris.capstone.application.util;
 
 import com.lilamaris.capstone.domain.BaseDomain;
 
@@ -8,7 +8,6 @@ import java.util.Map;
 public class DomainTypeRegistry {
     private final Map<String, Class<? extends BaseDomain<?, ?>>> nameToClass = new HashMap<>();
     private final Map<Class<? extends BaseDomain<?, ?>>, String> classToName = new HashMap<>();
-
 
     public void register(String name, Class<? extends BaseDomain<?, ?>> clazz) {
         nameToClass.put(name, clazz);

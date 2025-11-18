@@ -2,10 +2,9 @@ package com.lilamaris.capstone.domain.timeline;
 
 import com.lilamaris.capstone.domain.BaseDomain;
 import com.lilamaris.capstone.domain.embed.Effective;
-import com.lilamaris.capstone.domain.embed.EffectiveConvertible;
 import lombok.Builder;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 @Builder(toBuilder = true)
@@ -49,22 +48,41 @@ public record Snapshot(
     }
 
     public static Snapshot create(
-            EffectiveConvertible tx,
-            EffectiveConvertible valid,
+            Effective tx,
+            Effective valid,
             Timeline.Id timelineId,
             String description
     ) {
-        return getDefaultBuilder(tx.convert(), valid.convert(), timelineId)
-                .description(description)
-                .build();
+        return getDefaultBuilder(tx, valid, timelineId).description(description).build();
     }
 
-    public Snapshot closeTxAt(LocalDateTime at) {
+    public static Snapshot create(
+            ZonedDateTime txAt,
+            Effective valid,
+            Timeline.Id timelineId,
+            String description
+    ) {
+        var tx = Effective.from(txAt, Effective.MAX);
+        return create(tx, valid, timelineId, description);
+    }
+
+    public static Snapshot create(
+            ZonedDateTime txAt,
+            ZonedDateTime validAt,
+            Timeline.Id timelineId,
+            String description
+    ) {
+        var tx = Effective.from(txAt, Effective.MAX);
+        var valid = Effective.from(validAt, Effective.MAX);
+        return create(tx, valid, timelineId, description);
+    }
+
+    public Snapshot closeTxAt(ZonedDateTime at) {
         var updated = toBuilder().tx(tx.copyBeforeAt(at));
         return buildWithPolicy(updated);
     }
 
-    public Snapshot closeValidAt(LocalDateTime at) {
+    public Snapshot closeValidAt(ZonedDateTime at) {
         var updated = toBuilder().valid(valid.copyBeforeAt(at));
         return buildWithPolicy(updated);
     }

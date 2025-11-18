@@ -1,16 +1,13 @@
 package com.lilamaris.capstone.domain.timeline;
 
 import com.lilamaris.capstone.domain.BaseDomain;
-import com.lilamaris.capstone.domain.configuration.DomainTypeRegistry;
 import com.lilamaris.capstone.domain.embed.Audit;
 import com.lilamaris.capstone.domain.embed.Effective;
-import com.lilamaris.capstone.domain.embed.EffectiveConvertible;
 import lombok.Builder;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -59,38 +56,34 @@ public record Timeline(
         return toBuilder().description(description).build();
     }
 
-    public List<Snapshot> getSnapshotTxAt(LocalDateTime txAt) {
+    public List<Snapshot> getSnapshotTxAt(ZonedDateTime txAt) {
         return snapshotMap.values().stream()
                 .filter(s -> s.tx().contains(txAt))
                 .toList();
     }
 
-    public List<Snapshot> getSnapshotTxAtRange(LocalDateTime txFrom, LocalDateTime txTo) {
-        var range = Effective.from(txFrom, txTo);
+    public List<Snapshot> getSnapshotTxAtRange(Effective range) {
         return snapshotMap.values().stream()
                 .filter(s -> s.tx().isOverlap(range))
                 .toList();
     }
 
-    public List<Snapshot> getSnapshotValidAt(LocalDateTime validAt) {
+    public List<Snapshot> getSnapshotValidAt(ZonedDateTime validAt) {
         return snapshotMap.values().stream()
                 .filter(s -> s.valid().contains(validAt))
                 .toList();
     }
 
-    public List<Snapshot> getSnapshotValidAtRange(LocalDateTime validFrom, LocalDateTime validTo) {
-        var range = Effective.from(validFrom, validTo);
+    public List<Snapshot> getSnapshotValidAtRange(Effective range) {
         return snapshotMap.values().stream()
                 .filter(s -> s.valid().isOverlap(range))
                 .toList();
     }
 
-    public <T extends BaseDomain<? ,?>> Map<BaseDomain.Id<?>, List<DomainDelta>> resolveAllDeltaOf(
-            Class<T> clazz,
+    public Map<BaseDomain.Id<?>, List<DomainDelta>> resolveAllDeltaOf(
             Snapshot.Id snapshotId,
-            DomainTypeRegistry registry
+            String domainType
     ) {
-        String domainType = registry.nameOf(clazz);
         Map<BaseDomain.Id<?>, List<DomainDelta>> bucket = new HashMap<>();
         List<SnapshotLink> descToRoot = buildDescendantToRootChain(snapshotId);
 
@@ -112,15 +105,13 @@ public record Timeline(
         return copyWithSnapshotLink(currentSnapshotLinkMap);
     }
 
-    public Timeline migrateSnapshot(LocalDateTime txAt, LocalDateTime validAt, String description) {
-        var ta = EffectiveConvertible.of(txAt);
-        var va = EffectiveConvertible.of(validAt);
+    public Timeline migrateSnapshot(ZonedDateTime txAt, ZonedDateTime validAt, String description) {
         var currentSnapshotMap = new HashMap<>(snapshotMap);
         var currentSnapshotLinkMap = new HashMap<>(snapshotLinkMap);
 
         if (snapshotMap.isEmpty()) {
-            var initialSnapshot = Snapshot.create(ta, va, this.id(), description);
-            var initialSnapshotLink = SnapshotLink.createRoot(this.id(), initialSnapshot.id());
+            var initialSnapshot = Snapshot.create(txAt, validAt, id, description);
+            var initialSnapshotLink = SnapshotLink.createRoot(id, initialSnapshot.id());
 
             updateSnapshotMap(currentSnapshotMap, List.of(initialSnapshot));
             updateSnapshotLinkMap(currentSnapshotLinkMap, List.of(initialSnapshotLink));
@@ -143,11 +134,11 @@ public record Timeline(
 
         var splitPeriod = source.valid().splitAt(validAt);
 
-        var migratedLeft = Snapshot.create(ta, splitPeriod.left(), this.id(), description);
-        var migratedLeftLink = SnapshotLink.create(this.id(), migratedLeft.id(), closedSource.id());
+        var migratedLeft = Snapshot.create(txAt, splitPeriod.left(), id, description);
+        var migratedLeftLink = SnapshotLink.create(id, migratedLeft.id(), closedSource.id());
 
-        var migratedRight = Snapshot.create(ta, splitPeriod.right(), this.id(), description);
-        var migratedRightLink = SnapshotLink.create(this.id(), migratedRight.id(), migratedLeft.id());
+        var migratedRight = Snapshot.create(txAt, splitPeriod.right(), id, description);
+        var migratedRightLink = SnapshotLink.create(id, migratedRight.id(), migratedLeft.id());
 
         var updateSnapshot = List.of(closedSource, migratedLeft, migratedRight);
         var updateSnapshotLink = List.of(migratedLeftLink, migratedRightLink);
@@ -158,12 +149,11 @@ public record Timeline(
         return copyWithSnapshotContext(currentSnapshotMap, currentSnapshotLinkMap);
     }
 
-    public Timeline mergeSnapshot(LocalDateTime txAt, LocalDateTime validFrom, LocalDateTime validTo, String description) {
-        var ta = EffectiveConvertible.of(txAt);
+    public Timeline mergeSnapshot(ZonedDateTime txAt, Effective validRange, String description) {
         var currentSnapshotMap = new HashMap<>(snapshotMap);
         var currentSnapshotLinkMap = new HashMap<>(snapshotLinkMap);
 
-        var sourceList = getSnapshotValidAtRange(validFrom, validTo).stream()
+        var sourceList = getSnapshotValidAtRange(validRange).stream()
                 .filter(s -> s.tx().isOpen())
                 .sorted(Comparator.comparing(s -> s.tx().from()))
                 .toList();
@@ -175,9 +165,9 @@ public record Timeline(
                 .map(s -> s.closeTxAt(txAt))
                 .toList();
 
-        var mergedValid = Effective.mergeRange(sourceList.stream().map(Snapshot::valid).toList());
+        var mergedValid = sourceList.getFirst().valid().mergeRange(sourceList.getLast().valid());
 
-        var mergedSnapshot = Snapshot.create(ta, mergedValid, this.id(), description);
+        var mergedSnapshot = Snapshot.create(txAt, mergedValid, this.id(), description);
         var mergedSnapshotLink = SnapshotLink.create(this.id(), mergedSnapshot.id(), closedSource.getLast().id());
 
         var updateSnapshotMap = Stream.concat(closedSource.stream(), Stream.of(mergedSnapshot)).toList();

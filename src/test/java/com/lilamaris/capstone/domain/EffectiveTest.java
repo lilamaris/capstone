@@ -1,21 +1,22 @@
 package com.lilamaris.capstone.domain;
 
+import com.lilamaris.capstone.application.configuration.ApplicationContext;
 import com.lilamaris.capstone.domain.embed.Effective;
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class EffectiveTest {
-    private LocalDateTime now;
+    private ZonedDateTime now;
 
     @BeforeEach
     void setup() {
-        this.now = Effective.now();
+        this.now = ZonedDateTime.now(ApplicationContext.getSystemZone());
     }
 
     @Test
@@ -49,7 +50,7 @@ public class EffectiveTest {
         assertThat(b.isOverlap(a)).isEqualTo(expect);
     }
 
-    void assertOverlap(Effective a, LocalDateTime time, Boolean expect) {
+    void assertOverlap(Effective a, ZonedDateTime time, Boolean expect) {
         assertThat(a.contains(time)).isEqualTo(expect);
     }
 
@@ -99,7 +100,7 @@ public class EffectiveTest {
 
     @Test
     void should_detect_closed() {
-        var ef1 = Effective.openAt(now);
+        var ef1 = Effective.from(now, Effective.MAX);
         assertThat(ef1.to()).isEqualTo(Effective.MAX);
         assertThat(ef1.isOpen()).isEqualTo(true);
 

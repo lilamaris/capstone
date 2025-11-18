@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -15,17 +14,21 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SnapshotEntity extends BaseEntity<UUID> {
-    @Column(name = "tx_from", nullable = false)
-    private LocalDateTime txFrom;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "from", column = @Column(name = "tx_from")),
+            @AttributeOverride(name = "to", column = @Column(name = "tx_to")),
+            @AttributeOverride(name = "zoneId", column = @Column(name = "tx_zone_id"))
+    })
+    private EffectiveEmbeddableEntity tx;
 
-    @Column(name = "tx_to", nullable = false)
-    private LocalDateTime txTo;
-
-    @Column(name = "valid_from", nullable = false)
-    private LocalDateTime validFrom;
-
-    @Column(name = "valid_to", nullable = false)
-    private LocalDateTime validTo;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "from", column = @Column(name = "valid_from")),
+            @AttributeOverride(name = "to", column = @Column(name = "valid_to")),
+            @AttributeOverride(name = "zoneId", column = @Column(name = "valid_zone_id"))
+    })
+    private EffectiveEmbeddableEntity valid;
 
     @Column(name = "version_no", nullable = false)
     private Integer versionNo;

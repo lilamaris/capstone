@@ -13,15 +13,15 @@ public class TimelineSpecification {
 
     public static Specification<SnapshotEntity> betweenTx(LocalDateTime txAt) {
         return (root, query, builder) -> builder.and(
-                builder.lessThanOrEqualTo(root.get("txFrom"), txAt),
-                builder.greaterThan(root.get("txTo"), txAt)
+                builder.lessThanOrEqualTo(root.get("tx").get("from"), txAt),
+                builder.greaterThan(root.get("tx").get("to"), txAt)
         );
     }
 
     public static Specification<SnapshotEntity> betweenValid(LocalDateTime validAt) {
         return (root, query, builder) -> builder.and(
-                builder.lessThanOrEqualTo(root.get("validFrom"), validAt),
-                builder.greaterThan(root.get("validTo"), validAt)
+                builder.lessThanOrEqualTo(root.get("valid").get("from"), validAt),
+                builder.greaterThan(root.get("valid").get("to"), validAt)
         );
     }
 }

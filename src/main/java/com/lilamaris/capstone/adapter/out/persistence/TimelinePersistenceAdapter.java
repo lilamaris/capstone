@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,7 +35,7 @@ public class TimelinePersistenceAdapter implements TimelinePort {
 
         spec = spec.and(TimelineSpecification.timelineEqual(condition.timelineId()));
         if (condition.hasTxAt()) spec = spec.and(TimelineSpecification.betweenTx(condition.txAt()));
-//        if (condition.hasValidAt()) spec = spec.and(TimelineSpecification.betweenValid(condition.validAt()));
+        if (condition.hasValidAt()) spec = spec.and(TimelineSpecification.betweenValid(condition.validAt()));
 
         var entities = snapshotRepository.findAll(spec);
 
