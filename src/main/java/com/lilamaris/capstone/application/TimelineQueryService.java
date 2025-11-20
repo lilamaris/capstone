@@ -11,6 +11,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -33,6 +34,9 @@ public class TimelineQueryService implements TimelineQueryUseCase {
     @Override
     public List<SnapshotResult.Query> getSnapshot(SnapshotQueryCondition condition) {
         List<Snapshot> snapshotList = timelinePort.getSnapshot(condition);
-        return snapshotList.stream().map(SnapshotResult.Query::from).toList();
+        return snapshotList.stream()
+                .sorted(Comparator.comparing(snapshot -> snapshot.tx().from()))
+                .map(SnapshotResult.Query::from)
+                .toList();
     }
 }
