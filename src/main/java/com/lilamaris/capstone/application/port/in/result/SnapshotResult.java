@@ -9,8 +9,8 @@ public class SnapshotResult {
     @Builder
     public record Command(
             Snapshot.Id id,
-            Effective tx,
-            Effective valid,
+            EffectiveResult tx,
+            EffectiveResult valid,
             Integer versionNo,
             String description,
             Timeline.Id timelineId
@@ -18,8 +18,8 @@ public class SnapshotResult {
         public static Command from(Snapshot domain) {
             return builder()
                     .id(domain.id())
-                    .tx(domain.tx())
-                    .valid(domain.valid())
+                    .tx(EffectiveResult.from(domain.tx()))
+                    .valid(EffectiveResult.from(domain.valid()))
                     .versionNo(domain.versionNo())
                     .description(domain.description())
                     .timelineId(domain.timelineId())
@@ -30,8 +30,8 @@ public class SnapshotResult {
     @Builder
     public record Query(
             Snapshot.Id id,
-            Effective tx,
-            Effective valid,
+            EffectiveResult tx,
+            EffectiveResult valid,
             Integer versionNo,
             String description,
             Timeline.Id timelineId
@@ -39,8 +39,8 @@ public class SnapshotResult {
         public static Query from(Snapshot domain) {
             return builder()
                     .id(domain.id())
-                    .tx(domain.tx())
-                    .valid(domain.valid())
+                    .tx(EffectiveResult.from(domain.tx()))
+                    .valid(EffectiveResult.from(domain.valid()))
                     .versionNo(domain.versionNo())
                     .description(domain.description())
                     .timelineId(domain.timelineId())
