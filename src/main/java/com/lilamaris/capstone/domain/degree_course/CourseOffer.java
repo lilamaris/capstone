@@ -2,6 +2,7 @@ package com.lilamaris.capstone.domain.degree_course;
 
 import com.lilamaris.capstone.domain.BaseDomain;
 import com.lilamaris.capstone.domain.embed.Audit;
+import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import lombok.Builder;
 
 import java.util.Optional;
@@ -21,11 +22,10 @@ public record CourseOffer(
     }
 
     public CourseOffer {
+        if (courseId == null) throw new DomainIllegalArgumentException("Field 'courseId' must not be null.");
+        if (semester == null) throw new DomainIllegalArgumentException("Field 'semester' must not be null.");
+
         id = Optional.ofNullable(id).orElseGet(Id::random);
-
-        courseId = Optional.ofNullable(courseId).orElseThrow(() -> new IllegalArgumentException("'courseId' of type Course.Id cannot be null"));
-        semester = Optional.ofNullable(semester).orElseThrow(() -> new IllegalArgumentException("'semester' of type Integer cannot be null"));
-
         isRetire = Optional.ofNullable(isRetire).orElse(false);
     }
 

@@ -3,6 +3,9 @@ package com.lilamaris.capstone.domain.timeline;
 import com.lilamaris.capstone.domain.BaseDomain;
 import com.lilamaris.capstone.domain.embed.Audit;
 import com.lilamaris.capstone.domain.embed.Effective;
+import com.lilamaris.capstone.domain.exception.DomainInvariantException;
+import com.lilamaris.capstone.domain.timeline.exception.TimelineDomainException;
+import com.lilamaris.capstone.domain.timeline.exception.TimelineErrorCode;
 import lombok.Builder;
 
 import java.time.Instant;
@@ -123,12 +126,15 @@ public record Timeline(
                 .filter(s -> s.tx().isOpen())
                 .sorted(Comparator.comparing(s -> s.valid().from()))
                 .toList();
+
         if (sourceList.isEmpty()) {
-            throw new IllegalArgumentException("No snapshot exists at that time.");
+            throw new TimelineDomainException(
+                    TimelineErrorCode.NO_AVAILABLE_SNAPSHOT,
+                    "No snapshots match the given range or criteria."
+            );
         }
 
         Snapshot source = sourceList.getFirst();
-        Effective.validate(source.valid().from(), validAt);
 
         var closedSource = source.closeTxAt(txAt);
 
@@ -150,6 +156,19 @@ public record Timeline(
     }
 
     public Timeline mergeSnapshot(Instant txAt, Effective validRange, String description) {
+        if (snapshotMap.isEmpty()) {
+            throw new TimelineDomainException(
+                    TimelineErrorCode.EMPTY_SNAPSHOT,
+                    "Timeline contains no snapshots."
+            );
+        }
+        if (snapshotMap.size() != snapshotLinkMap.size()) {
+            throw new TimelineDomainException(
+                    TimelineErrorCode.SNAPSHOT_LINK_MISSING,
+                    "Snapshot and SnapshotLink counts do not match. Timeline invariant violated."
+            );
+        }
+
         var currentSnapshotMap = new HashMap<>(snapshotMap);
         var currentSnapshotLinkMap = new HashMap<>(snapshotLinkMap);
 
@@ -157,8 +176,12 @@ public record Timeline(
                 .filter(s -> s.tx().isOpen())
                 .sorted(Comparator.comparing(s -> s.tx().from()))
                 .toList();
+
         if (sourceList.isEmpty()) {
-            throw new IllegalArgumentException("No snapshot exists at that time.");
+            throw new TimelineDomainException(
+                    TimelineErrorCode.NO_AVAILABLE_SNAPSHOT,
+                    "No snapshots match the given range or criteria."
+            );
         }
 
         var closedSource = sourceList.stream()
@@ -228,15 +251,27 @@ public record Timeline(
 
     private void updateSnapshotMap(Map<Snapshot.Id, Snapshot> current, List<Snapshot> toUpdate) {
         toUpdate.forEach(s -> {
-            Objects.requireNonNull(s.id(), "Snapshot Id cannot be null");
+            if (s.id() == null) {
+                throw new DomainInvariantException(
+                        "Snapshot ID must not be null. Timeline invariant violated."
+                );
+            }
             current.put(s.id(), s);
         });
     }
 
     private void updateSnapshotLinkMap(Map<SnapshotLink.Id, SnapshotLink> current, List<SnapshotLink> toUpdate) {
         toUpdate.forEach(l -> {
-            Objects.requireNonNull(l.id(), "SnapshotLink Id cannot be null");
-            Objects.requireNonNull(l.descendantSnapshotId(), "SnapshotLink descendant snapshot id cannot be null");
+            if (l.id() == null) {
+                throw new DomainInvariantException(
+                        "SnapshotLink ID must not be null. Timeline invariant violated."
+                );
+            }
+            if (l.descendantSnapshotId() == null) {
+                throw new DomainInvariantException(
+                        "SnapshotLink descendantSnapshotId must not be null. Timeline invariant violated."
+                );
+            }
             current.put(l.id(), l);
         });
     }

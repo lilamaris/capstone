@@ -2,6 +2,7 @@ package com.lilamaris.capstone.domain.timeline;
 
 import com.lilamaris.capstone.domain.BaseDomain;
 import com.lilamaris.capstone.domain.embed.Effective;
+import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import lombok.Builder;
 
 import java.time.Instant;
@@ -23,12 +24,11 @@ public record Snapshot(
     }
 
     public Snapshot {
+        if (tx == null) throw new DomainIllegalArgumentException("Field 'tx' must not be null.");
+        if (valid == null) throw new DomainIllegalArgumentException("Field 'valid' must not be null.");
+        if (timelineId == null) throw new DomainIllegalArgumentException("Field 'timelineId' must not be null.");
+
         id = Optional.ofNullable(id).orElseGet(Id::random);
-
-        tx = Optional.ofNullable(tx).orElseThrow(() -> new IllegalArgumentException("'tx' of type Effective cannot be null"));
-        valid = Optional.ofNullable(valid).orElseThrow(() -> new IllegalArgumentException("'valid' of type Effective cannot be null"));
-        timelineId = Optional.ofNullable(timelineId).orElseThrow(() -> new IllegalArgumentException("'timelineId' of type Timeline.Id cannot be null"));
-
         versionNo = Optional.ofNullable(versionNo).orElse(1);
         description = Optional.ofNullable(description).orElse("No description");
     }
@@ -62,10 +62,6 @@ public record Snapshot(
         var closedValid = tx.closeAt(at);
         return copyWithValid(closedValid);
     }
-
-//    public List<DomainDelta> getDeltaOf(String domainType) {
-//        return domainDeltaList.stream().filter(domainDelta -> domainDelta.domainType().equals(domainType)).toList();
-//    }
 
     private static SnapshotBuilder getDefaultBuilder(Effective tx, Effective valid, Timeline.Id timelineId) {
         return builder().tx(tx).valid(valid).timelineId(timelineId);

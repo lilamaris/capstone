@@ -1,11 +1,11 @@
 package com.lilamaris.capstone.domain.embed;
 
 import com.lilamaris.capstone.application.configuration.ApplicationContext;
+import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import lombok.Builder;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Builder(toBuilder = true)
 public record Effective(
@@ -15,17 +15,10 @@ public record Effective(
     public static final Instant MAX = Instant.parse("9999-12-31T23:59:59Z");
 
     public Effective {
-        Objects.requireNonNull(from, "'from' of type Instant cannot be null");
-        Objects.requireNonNull(to, "'to' of type Instant cannot be null");
-        validate(from, to);
+        if (from == null) throw new DomainIllegalArgumentException("Field 'from' must not be null.");
+        if (to == null) throw new DomainIllegalArgumentException("Field 'to' must not be null.");
+        if (to.isBefore(from)) throw new DomainIllegalArgumentException("Field 'to' must not be before 'from'.");
     }
-
-    public static void validate(Instant from, Instant to) {
-        if (to.isBefore(from)) {
-            throw new IllegalArgumentException("'to' is must be after than 'from'");
-        }
-    }
-
 
     public static Effective from(Instant from, Instant to) {
         return new Effective(from, to);
@@ -50,12 +43,12 @@ public record Effective(
     }
 
     public boolean isOverlap(Effective other) {
-        return from.isBefore(other.to()) && to.isAfter(other.from());
+        return from.isBefore(other.to) && other.from.isBefore(to);
     }
 
 
     public boolean contains(Instant time) {
-        return from.isBefore(time) && to.isAfter(time);
+        return !time.isBefore(from) && time.isBefore(to);
     }
 
     public boolean isOpen() {

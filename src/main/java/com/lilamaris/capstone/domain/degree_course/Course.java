@@ -3,6 +3,7 @@ package com.lilamaris.capstone.domain.degree_course;
 import com.lilamaris.capstone.domain.BaseDomain;
 import com.lilamaris.capstone.domain.embed.Audit;
 import com.lilamaris.capstone.domain.event.CourseOfferDeltaEvent;
+import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import lombok.Builder;
 
 import java.util.ArrayList;
@@ -26,12 +27,11 @@ public record Course(
     }
 
     public Course {
+        if (code == null) throw new DomainIllegalArgumentException("Field 'code' must not be null.");
+        if (name == null) throw new DomainIllegalArgumentException("Field 'name' must not be null.");
+        if (credit == null) throw new DomainIllegalArgumentException("Field 'credit' must not be null.");
+
         id = Optional.ofNullable(id).orElseGet(Id::random);
-
-        code = Optional.ofNullable(code).orElseThrow(() -> new IllegalArgumentException("'code' of type String cannot be null"));
-        name = Optional.ofNullable(name).orElseThrow(() -> new IllegalArgumentException("'name' of type String cannot be null"));
-        credit = Optional.ofNullable(credit).orElseThrow(() -> new IllegalArgumentException("'credit' of type Integer cannot be null"));
-
         courseOfferList = Optional.ofNullable(courseOfferList).orElseGet(ArrayList::new);
         courseOfferEventList = Optional.ofNullable(courseOfferEventList).orElseGet(ArrayList::new);
     }

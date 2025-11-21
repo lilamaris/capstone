@@ -2,6 +2,7 @@ package com.lilamaris.capstone.domain.timeline;
 
 import com.lilamaris.capstone.domain.BaseDomain;
 import com.lilamaris.capstone.domain.embed.Audit;
+import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import lombok.Builder;
 
 import java.util.ArrayList;
@@ -27,11 +28,10 @@ public record SnapshotLink(
     }
 
     public SnapshotLink {
+        if (timelineId == null) throw new DomainIllegalArgumentException("Field 'timelineId' must not be null.");
+        if (descendantSnapshotId == null) throw new DomainIllegalArgumentException("Field 'descendantSnapshotId' must not be null.");
+
         id = Optional.ofNullable(id).orElseGet(Id::random);
-
-        timelineId = Optional.ofNullable(timelineId).orElseThrow(() -> new IllegalArgumentException("'timelineId' of type Timeline.Id cannot be null"));
-        descendantSnapshotId = Optional.ofNullable(descendantSnapshotId).orElseThrow(() -> new IllegalArgumentException("'descendantSnapshotId' of type Snapshot.Id cannot be null"));
-
         isRoot = ancestorSnapshotId == null;
         domainDeltaList = Optional.ofNullable(domainDeltaList).orElseGet(ArrayList::new);
     }

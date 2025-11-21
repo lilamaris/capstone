@@ -4,6 +4,7 @@ import com.lilamaris.capstone.application.util.JsonPatchEngine;
 import com.lilamaris.capstone.domain.BaseDomain;
 import com.lilamaris.capstone.domain.embed.Audit;
 import com.lilamaris.capstone.domain.event.DomainDeltaEventBase;
+import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import lombok.Builder;
 
 import java.util.Optional;
@@ -47,11 +48,12 @@ public record DomainDelta (
     }
 
     public DomainDelta {
+        if (snapshotLinkId == null) throw new DomainIllegalArgumentException("Field 'snapshotLinkId' must not be null.");
+        if (domainType == null) throw new DomainIllegalArgumentException("Field 'domainType' must not be null.");
+        if (domainId == null) throw new DomainIllegalArgumentException("Field 'domainId' must not be null.");
+        if (patch == null) throw new DomainIllegalArgumentException("Field 'patch' must not be null.");
+
         id = Optional.ofNullable(id).orElseGet(Id::random);
-        snapshotLinkId = Optional.ofNullable(snapshotLinkId).orElseThrow(() -> new IllegalArgumentException("'snapshotLinkId' of type SnapshotLink.Id cannot be null"));
-        domainType = Optional.ofNullable(domainType).orElseThrow(() -> new IllegalArgumentException("'domainType' of type String cannot be null"));
-        domainId = Optional.ofNullable(domainId).orElseThrow(() -> new IllegalArgumentException("'domainId' of type BaseDomain.Id<?> cannot be null"));
-        patch = Optional.ofNullable(patch).orElseThrow(() -> new IllegalArgumentException("'patch' of type 'Patch' cannot be null"));
     }
 
     public static DomainDelta from(Id id, SnapshotLink.Id snapshotLinkId, String domainName, BaseDomain.Id<?> domainId, Patch patch, Audit audit) {
