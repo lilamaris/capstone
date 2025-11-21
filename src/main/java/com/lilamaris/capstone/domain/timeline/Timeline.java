@@ -164,7 +164,7 @@ public record Timeline(
         }
         if (snapshotMap.size() != snapshotLinkMap.size()) {
             throw new TimelineDomainException(
-                    TimelineErrorCode.SNAPSHOT_LINK_MISSING,
+                    TimelineErrorCode.SNAPSHOT_LINK_INCONSISTENT,
                     "Snapshot and SnapshotLink counts do not match. Timeline invariant violated."
             );
         }
@@ -242,11 +242,41 @@ public record Timeline(
     }
 
     private List<SnapshotLink> buildDescendantToRootChain(Snapshot.Id startSnapshotId) {
-        return Stream.iterate(
-                snapshotLinkByDescendant.get(startSnapshotId),
-                Objects::isNull,
-                link -> snapshotLinkByDescendant.get(link.ancestorSnapshotId())
-        ).toList();
+        List<SnapshotLink> chain = new ArrayList<>();
+        Set<Snapshot.Id> visited = new HashSet<>();
+        var current = startSnapshotId;
+
+        while (true) {
+            if (!visited.add(current)) {
+                throw new TimelineDomainException(
+                        TimelineErrorCode.SNAPSHOT_LINK_CYCLE,
+                        String.format(
+                                "SnapshotLink cycle detected: descendant snapshot id %s forms a cyclic reference. Timeline invariant violated.",
+                                current
+                        )
+                );
+            }
+
+            var link = snapshotLinkByDescendant.get(current);
+
+            if (link == null) {
+                throw new TimelineDomainException(
+                        TimelineErrorCode.SNAPSHOT_LINK_INCONSISTENT,
+                        String.format(
+                                "Inconsistent SnapshotLink structure: no SnapshotLink found for descendant snapshot id %s. Timeline invariant violated.",
+                                current
+                        )
+                );
+            }
+
+            chain.add(link);
+
+            if (link.ancestorSnapshotId() == null) {
+                return chain;
+            }
+
+            current = link.ancestorSnapshotId();
+        }
     }
 
     private void updateSnapshotMap(Map<Snapshot.Id, Snapshot> current, List<Snapshot> toUpdate) {
