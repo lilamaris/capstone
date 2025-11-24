@@ -1,5 +1,6 @@
 package com.lilamaris.capstone.application;
 
+import com.lilamaris.capstone.application.exception.ResourceNotFoundException;
 import com.lilamaris.capstone.application.port.in.TimelineCommandUseCase;
 import com.lilamaris.capstone.application.port.in.result.TimelineResult;
 import com.lilamaris.capstone.application.port.out.TimelinePort;
@@ -22,8 +23,6 @@ import java.time.LocalDateTime;
 public class TimelineCommandService implements TimelineCommandUseCase {
     private final TimelinePort timelinePort;
 
-    private final UniversityClock clock;
-
     @Override
     public TimelineResult.Command create(String description) {
         var domain = Timeline.create(description);
@@ -34,7 +33,10 @@ public class TimelineCommandService implements TimelineCommandUseCase {
 
     @Override
     public TimelineResult.Command update(Timeline.Id id, String description) {
-        var timeline = timelinePort.getById(id).orElseThrow(EntityNotFoundException::new);
+        var timeline = timelinePort.getById(id).orElseThrow(() -> new ResourceNotFoundException(
+                String.format("Timeline with id '%s' not found.", id.value())
+        ));
+
         var updated = timeline.copyWithDescription(description);
         var saved = timelinePort.save(updated);
 
@@ -43,7 +45,10 @@ public class TimelineCommandService implements TimelineCommandUseCase {
 
     @Override
     public TimelineResult.Command migrate(Timeline.Id id, LocalDateTime validAt, String description) {
-        var timeline = timelinePort.getById(id).orElseThrow(EntityNotFoundException::new);
+        var timeline = timelinePort.getById(id).orElseThrow(() -> new ResourceNotFoundException(
+                String.format("Timeline with id '%s' not found.", id.value())
+        ));
+
         var updated = timeline.migrateSnapshot(UniversityClock.now(), UniversityClock.at(validAt), description);
         var saved = timelinePort.save(updated);
 
@@ -52,8 +57,11 @@ public class TimelineCommandService implements TimelineCommandUseCase {
 
     @Override
     public TimelineResult.Command merge(Timeline.Id id, LocalDateTime validFrom, LocalDateTime validTo, String description) {
+        var timeline = timelinePort.getById(id).orElseThrow(() -> new ResourceNotFoundException(
+                String.format("Timeline with id '%s' not found.", id.value())
+        ));
+
         var validRange = Effective.from(validFrom, validTo);
-        var timeline = timelinePort.getById(id).orElseThrow(EntityNotFoundException::new);
         var updated = timeline.mergeSnapshot(UniversityClock.now(), validRange, description);
         var saved = timelinePort.save(updated);
 
@@ -74,7 +82,13 @@ public class TimelineCommandService implements TimelineCommandUseCase {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleSnapshotDeltaEvent(SnapshotDeltaEvent event) {
-        var timeline = timelinePort.getById(event.timelineId()).orElseThrow(EntityNotFoundException::new);
+        // TODO: We expect all fields of SnapshotDeltaEvent to be non-null. The structure must be changed.
+        var id = event.timelineId();
+
+        var timeline = timelinePort.getById(id).orElseThrow(() -> new ResourceNotFoundException(
+                String.format("Timeline with id '%s' not found.", id.value())
+        ));
+
         var updated = timeline.updateDomainDelta(event.snapshotId(), event.domainType(), event.domainId(), event.toPatch());
         timelinePort.save(updated);
     }
