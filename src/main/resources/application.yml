@@ -1,0 +1,54 @@
+university:
+  timezone: Asia/Seoul
+
+spring:
+  application:
+    name: capstone
+
+
+  output:
+    ansi:
+      enabled: ALWAYS
+
+  logging:
+    level:
+      org.springframework.security: INFO
+      org.springframework.web: INFO
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/capstone
+    username: lilamaris
+    driver-class-name: org.postgresql.Driver
+
+  security:
+    jwt:
+      secret: ${JWT_SECRET}
+      accessTokenExpiration: ${JWT_ACCESS_TOKEN_EXPIRATION:900000}
+      refreshTokenExpiration: ${JWT_ACCESS_TOKEN_EXPIRATION:604800000}
+
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_SECRET}
+            scope:
+              - read:user
+              - user:email
+            redirect-uri: "{baseUrl}/login/oauth2/code/github"
+            client-name: GitHub
+        provider:
+          github:
+            authorization-uri: https://github.com/login/oauth/authorize
+            token-uri: https://github.com/login/oauth/access_token
+            user-info-uri: https://api.github.com/user
+            user-name-attribute: id
