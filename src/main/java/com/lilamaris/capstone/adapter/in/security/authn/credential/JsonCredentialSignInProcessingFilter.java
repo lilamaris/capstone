@@ -18,12 +18,14 @@ import java.io.IOException;
 
 @Component
 public class JsonCredentialSignInProcessingFilter extends AbstractAuthenticationProcessingFilter {
-
     private static final RequestMatcher DEFAULT_ANT_PATH_REQUEST_MATCHER = PathPatternRequestMatcher.withDefaults()
             .matcher(HttpMethod.POST, "/api/v1/auth/signIn");
 
-    public JsonCredentialSignInProcessingFilter() {
+    private final ObjectMapper mapper;
+
+    public JsonCredentialSignInProcessingFilter(ObjectMapper mapper) {
         super(DEFAULT_ANT_PATH_REQUEST_MATCHER);
+        this.mapper = mapper;
     }
 
     @Override
@@ -32,7 +34,6 @@ public class JsonCredentialSignInProcessingFilter extends AbstractAuthentication
             HttpServletResponse response
     ) throws AuthenticationException, IOException, ServletException {
         try {
-            var mapper = new ObjectMapper();
             var signInRequest = mapper.readValue(request.getInputStream(), CredentialRequest.SignIn.class);
 
             var authToken = new UsernamePasswordAuthenticationToken(

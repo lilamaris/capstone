@@ -2,6 +2,7 @@ package com.lilamaris.capstone.adapter.in.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -11,28 +12,36 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class ResponseWriter {
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper mapper;
 
-    public static void sendError(HttpServletResponse response, HttpStatus code, String message) throws IOException {
-        Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("success", false);
-        responseBody.put("data", null);
-        responseBody.put("error", Map.of("message", message));
+    public void sendError(HttpServletResponse response, HttpStatus code, String message) throws IOException {
+        var body = Map.of(
+                "success", false,
+                "data", null,
+                "error", Map.of("message", message)
+        );
 
+        write(response, code, body);
+    }
+
+    public void sendToken(HttpServletResponse response, String accessToken, String refreshToken) throws IOException {
+        var body = Map.of(
+                "success", true,
+                "data", Map.of(
+                        "access_token", accessToken,
+                        "refresh_token", refreshToken
+                )
+        );
+
+        write(response, HttpStatus.OK, body);
+    }
+
+    private void write(HttpServletResponse response, HttpStatus code, Object body) throws IOException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
         response.setStatus(code.value());
-        response.getWriter().write(objectMapper.writeValueAsString(responseBody));
-    }
-
-    public static void sendToken(HttpServletResponse response, String accessToken, String refreshToken) throws IOException {
-        Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("success", false);
-        responseBody.put("data", Map.of("access_token", accessToken, "refresh_token", refreshToken));
-
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(objectMapper.writeValueAsString(responseBody));
+        response.getWriter().write(mapper.writeValueAsString(body));
     }
 }

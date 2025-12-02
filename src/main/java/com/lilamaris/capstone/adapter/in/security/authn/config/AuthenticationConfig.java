@@ -1,5 +1,6 @@
 package com.lilamaris.capstone.adapter.in.security.authn.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lilamaris.capstone.adapter.in.security.authn.credential.CredentialAuthenticationProvider;
 import com.lilamaris.capstone.adapter.in.security.authn.credential.JsonCredentialSignInProcessingFilter;
 import com.lilamaris.capstone.adapter.in.security.authn.oidc.CustomOidcUserService;
@@ -38,14 +39,16 @@ public class AuthenticationConfig {
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
+    private final ObjectMapper mapper;
+
     @Bean
     AuthenticationManager authenticationManager() {
         return new ProviderManager(Collections.singletonList(credentialAuthenticationProvider));
     }
 
     @Bean
-    JsonCredentialSignInProcessingFilter jsonCredentialSignInProcessingFilter() throws Exception {
-        var filter = new JsonCredentialSignInProcessingFilter();
+    JsonCredentialSignInProcessingFilter jsonCredentialSignInProcessingFilter() {
+        var filter = new JsonCredentialSignInProcessingFilter(mapper);
         filter.setAuthenticationManager(authenticationManager());
         return filter;
     }
