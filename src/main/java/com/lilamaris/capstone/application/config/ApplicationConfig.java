@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.application.configuration;
+package com.lilamaris.capstone.application.config;
 
 import com.lilamaris.capstone.application.util.DomainTypeRegistry;
 import com.lilamaris.capstone.domain.degree_course.Course;

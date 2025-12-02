@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.application.configuration;
+package com.lilamaris.capstone.application.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

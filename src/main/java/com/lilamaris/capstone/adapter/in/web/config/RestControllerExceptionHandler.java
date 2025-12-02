@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.adapter.in.web.configuration;
+package com.lilamaris.capstone.adapter.in.web.config;
 
 import com.lilamaris.capstone.adapter.in.web.response.ExceptionResponse;
 import com.lilamaris.capstone.application.exception.ApplicationInvariantException;
