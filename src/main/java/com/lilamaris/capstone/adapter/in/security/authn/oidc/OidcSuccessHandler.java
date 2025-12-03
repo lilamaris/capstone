@@ -24,13 +24,14 @@ public class OidcSuccessHandler implements AuthenticationSuccessHandler {
     private final AuthCommandUseCase authCommandUseCase;
 
     private final JwtProvider jwtProvider;
+    private final ResponseWriter writer;
 
     @Override
     public void onAuthenticationSuccess(
             HttpServletRequest request,
             HttpServletResponse response,
             Authentication authentication
-    ) throws IOException, ServletException {
+    ) throws IOException {
         SecurityUserDetails oidcDetails = (SecurityUserDetails) authentication.getPrincipal();
 
         Authentication existAuth = SecurityContextHolder.getContext().getAuthentication();
@@ -88,6 +89,6 @@ public class OidcSuccessHandler implements AuthenticationSuccessHandler {
         String accessToken = jwtProvider.createAccessToken(principal);
         String refreshToken = jwtProvider.createRefreshToken(principal);
 
-        ResponseWriter.sendToken(response, accessToken, refreshToken);
+        writer.sendToken(response, accessToken, refreshToken);
     }
 }
