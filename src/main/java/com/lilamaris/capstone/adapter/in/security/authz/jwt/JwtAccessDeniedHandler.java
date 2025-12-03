@@ -1,7 +1,6 @@
 package com.lilamaris.capstone.adapter.in.security.authz.jwt;
 
-import com.lilamaris.capstone.adapter.in.security.ResponseWriter;
-import jakarta.servlet.ServletException;
+import com.lilamaris.capstone.adapter.in.security.util.ResponseWriter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +15,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     private final ResponseWriter writer;
+
     @Override
     public void handle(
             HttpServletRequest request,

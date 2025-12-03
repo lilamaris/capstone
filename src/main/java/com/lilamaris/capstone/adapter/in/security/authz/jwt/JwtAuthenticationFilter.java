@@ -1,6 +1,7 @@
 package com.lilamaris.capstone.adapter.in.security.authz.jwt;
 
-import com.lilamaris.capstone.adapter.in.security.SecurityUserDetailsMapper;
+import com.lilamaris.capstone.adapter.in.security.util.JwtUtil;
+import com.lilamaris.capstone.adapter.in.security.util.SecurityUserDetailsMapper;
 import com.lilamaris.capstone.adapter.in.security.exception.SecurityException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -22,7 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String AUTH_HEADER = "Authorization";
     private static final String AUTH_HEADER_PREFIX = "Bearer ";
 
-    private final JwtProvider jwtProvider;
+    private final JwtUtil jwtUtil;
 
     @Override
     protected void doFilterInternal(
@@ -34,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             var token = resolveToken(request);
 
             if (StringUtils.hasText(token)) {
-                var claims = jwtProvider.parseToken(token);
+                var claims = jwtUtil.parseToken(token);
                 var principal = SecurityUserDetailsMapper.fromClaims(claims);
                 var authentication = new UsernamePasswordAuthenticationToken(principal, token, principal.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);

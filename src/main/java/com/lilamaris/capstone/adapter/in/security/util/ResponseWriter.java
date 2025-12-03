@@ -1,6 +1,7 @@
-package com.lilamaris.capstone.adapter.in.security;
+package com.lilamaris.capstone.adapter.in.security.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lilamaris.capstone.adapter.in.security.SecurityUserDetails;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -8,13 +9,13 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
 public class ResponseWriter {
     private final ObjectMapper mapper;
+    private final JwtUtil jwtUtil;
 
     public void sendError(HttpServletResponse response, HttpStatus code, String message) throws IOException {
         var body = Map.of(
@@ -26,7 +27,10 @@ public class ResponseWriter {
         write(response, code, body);
     }
 
-    public void sendToken(HttpServletResponse response, String accessToken, String refreshToken) throws IOException {
+    public void sendToken(HttpServletResponse response, SecurityUserDetails principal) throws IOException {
+        String accessToken = jwtUtil.createAccessToken(principal);
+        String refreshToken = jwtUtil.createRefreshToken(principal);
+
         var body = Map.of(
                 "success", true,
                 "data", Map.of(

@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.adapter.in.security.authz.jwt;
+package com.lilamaris.capstone.adapter.in.security.util;
 
 import com.lilamaris.capstone.adapter.in.security.SecurityUserDetails;
 import com.lilamaris.capstone.adapter.in.security.exception.ExpiredTokenException;
@@ -18,7 +18,7 @@ import java.util.Date;
 
 @Slf4j
 @Component
-public class JwtProvider {
+public class JwtUtil {
     public static final String DISPLAY_NAME_KEY = "display";
     public static final String AUTHORITIES_KEY = "role";
 
@@ -30,7 +30,7 @@ public class JwtProvider {
 
     private final SecretKey key;
 
-    public JwtProvider(@Value("${spring.security.jwt.secret}") String secret) {
+    public JwtUtil(@Value("${spring.security.jwt.secret}") String secret) {
         key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
     }
 

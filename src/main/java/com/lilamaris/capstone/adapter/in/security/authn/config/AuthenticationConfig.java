@@ -32,6 +32,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuthenticationConfig {
     private final CorsConfigurationSource corsConfigurationSource;
+    private final ObjectMapper mapper;
+
     private final CustomOidcUserService customOidcUserService;
     private final OidcSuccessHandler oidcSuccessHandler;
     private final CredentialAuthenticationProvider credentialAuthenticationProvider;
@@ -39,8 +41,6 @@ public class AuthenticationConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
-    private final ObjectMapper mapper;
 
     @Bean
     AuthenticationManager authenticationManager() {

@@ -1,7 +1,6 @@
 package com.lilamaris.capstone.adapter.in.security.authz.jwt;
 
-import com.lilamaris.capstone.adapter.in.security.ResponseWriter;
-import jakarta.servlet.ServletException;
+import com.lilamaris.capstone.adapter.in.security.util.ResponseWriter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

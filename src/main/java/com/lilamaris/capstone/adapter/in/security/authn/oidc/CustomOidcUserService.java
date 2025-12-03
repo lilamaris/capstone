@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.adapter.in.security.authn.oidc;
 
-import com.lilamaris.capstone.adapter.in.security.SecurityUserDetailsMapper;
+import com.lilamaris.capstone.adapter.in.security.util.SecurityUserDetailsMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CustomOidcUserService extends OidcUserService {
     private final ProviderProfileMapperRegistry registry;
+
     @Override
     public OidcUser loadUser(OidcUserRequest request) throws OAuth2AuthenticationException {
         OidcUser oidcUser = super.loadUser(request);

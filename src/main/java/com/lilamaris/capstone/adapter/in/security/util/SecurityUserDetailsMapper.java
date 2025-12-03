@@ -1,7 +1,7 @@
-package com.lilamaris.capstone.adapter.in.security;
+package com.lilamaris.capstone.adapter.in.security.util;
 
+import com.lilamaris.capstone.adapter.in.security.SecurityUserDetails;
 import com.lilamaris.capstone.adapter.in.security.authn.oidc.NormalizedProfile;
-import com.lilamaris.capstone.adapter.in.security.authz.jwt.JwtProvider;
 import com.lilamaris.capstone.application.port.in.result.AccountResult;
 import com.lilamaris.capstone.application.port.in.result.UserResult;
 import com.lilamaris.capstone.domain.user.Provider;
@@ -12,8 +12,8 @@ import io.jsonwebtoken.Claims;
 public class SecurityUserDetailsMapper {
     public static SecurityUserDetails fromClaims(Claims claims) {
         String userIdValue = claims.getSubject();
-        String displayName = claims.get(JwtProvider.DISPLAY_NAME_KEY, String.class);
-        String roleValue = claims.get(JwtProvider.AUTHORITIES_KEY, String.class);
+        String displayName = claims.get(JwtUtil.DISPLAY_NAME_KEY, String.class);
+        String roleValue = claims.get(JwtUtil.AUTHORITIES_KEY, String.class);
         Role role = Role.valueOf(roleValue);
 
         return SecurityUserDetails.builder().userId(userIdValue).displayName(displayName).role(role).build();

@@ -1,7 +1,6 @@
 package com.lilamaris.capstone.adapter.in.security.authn.credential.provider;
 
-import com.lilamaris.capstone.adapter.in.security.SecurityUserDetails;
-import com.lilamaris.capstone.adapter.in.security.SecurityUserDetailsMapper;
+import com.lilamaris.capstone.adapter.in.security.util.SecurityUserDetailsMapper;
 import com.lilamaris.capstone.application.port.in.AuthCommandUseCase;
 import com.lilamaris.capstone.application.port.in.result.AuthResult;
 import lombok.RequiredArgsConstructor;
