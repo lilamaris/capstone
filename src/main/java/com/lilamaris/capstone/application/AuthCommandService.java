@@ -13,6 +13,7 @@ import com.lilamaris.capstone.domain.user.Role;
 import com.lilamaris.capstone.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.function.Function;
 
@@ -23,6 +24,7 @@ public class AuthCommandService implements AuthCommandUseCase {
     private final UserPort userPort;
 
     @Override
+    @Transactional
     public AuthResult.Link linkAccount(AuthCommand.LinkOidc command) {
         var user = userPort.getById(command.userId()).orElseThrow(() -> new ResourceNotFoundException(
                 String.format("User with id '%s' not found.", command.userId())
@@ -36,6 +38,7 @@ public class AuthCommandService implements AuthCommandUseCase {
     }
 
     @Override
+    @Transactional
     public AuthResult.Login createOrLogin(AuthCommand.CreateOrLoginOidc command) {
         User user;
         Account account;
@@ -59,6 +62,7 @@ public class AuthCommandService implements AuthCommandUseCase {
     }
 
     @Override
+    @Transactional
     public AuthResult.Login credentialLogin(String email, Function<String, Boolean> challengeFunction) {
         var account = authPort.getBy(Provider.LOCAL, email).orElseThrow(() -> new ResourceNotFoundException(
                 String.format("Account with email '%s' not found.", email)
