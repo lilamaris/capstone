@@ -50,7 +50,8 @@ public record User(
     }
 
     public User linkAccount(Account account) {
-        var newAccountSet = Stream.concat(accountSet.stream(), Stream.of(account)).collect(Collectors.toUnmodifiableSet());
+        var linkedAccount = account.assignUser(id);
+        var newAccountSet = Stream.concat(accountSet.stream(), Stream.of(linkedAccount)).collect(Collectors.toUnmodifiableSet());
         return copyWithAccount(newAccountSet);
     }
 
