@@ -76,4 +76,14 @@ public class AuthCommandService implements AuthCommandUseCase {
         return AuthResult.Login.from(false, user, account);
     }
 
+    @Override
+    public AuthResult.Register credentialRegister(String email, String passwordHash, String displayName) {
+        var account = Account.createCredential(displayName, email, passwordHash);
+        var user = User.create(displayName, Role.USER);
+        user = user.linkAccount(account);
+        user = userPort.save(user);
+
+        return AuthResult.Register.from(user, account);
+    }
+
 }

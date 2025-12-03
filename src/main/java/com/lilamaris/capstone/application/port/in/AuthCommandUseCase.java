@@ -7,6 +7,7 @@ import java.util.function.Function;
 
 public interface AuthCommandUseCase {
     AuthResult.Login credentialLogin(String email, Function<String, Boolean> challengeFunction);
+    AuthResult.Register credentialRegister(String email, String passwordHash, String displayName);
     AuthResult.Login createOrLogin(AuthCommand.CreateOrLoginOidc command);
     AuthResult.Link linkAccount(AuthCommand.LinkOidc command);
 }

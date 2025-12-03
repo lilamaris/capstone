@@ -21,6 +21,19 @@ public class AuthResult {
     }
 
     @Builder
+    public record Register(
+            UserResult.Query user,
+            AccountResult.Query account
+    ) {
+        public static Register from(User user, Account account) {
+            return builder()
+                    .user(UserResult.Query.from(user))
+                    .account(AccountResult.Query.from(account))
+                    .build();
+        }
+    }
+
+    @Builder
     public record Link(
             UserResult.Query user,
             AccountResult.Query account

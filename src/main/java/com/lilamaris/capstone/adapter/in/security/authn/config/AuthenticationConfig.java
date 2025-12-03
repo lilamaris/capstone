@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lilamaris.capstone.adapter.in.security.authn.credential.provider.CredentialAuthenticationProvider;
 import com.lilamaris.capstone.adapter.in.security.authn.credential.filter.JsonCredentialRegisterProcessingFilter;
 import com.lilamaris.capstone.adapter.in.security.authn.credential.filter.JsonCredentialSignInProcessingFilter;
+import com.lilamaris.capstone.adapter.in.security.authn.credential.provider.CredentialRegisterProvider;
 import com.lilamaris.capstone.adapter.in.security.authn.oidc.CustomOidcUserService;
 import com.lilamaris.capstone.adapter.in.security.authn.oidc.OidcSuccessHandler;
 import com.lilamaris.capstone.adapter.in.security.authz.jwt.JwtAccessDeniedHandler;
@@ -25,7 +26,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-import java.util.Collections;
+import java.util.List;
 
 @Slf4j
 @Configuration
@@ -36,6 +37,7 @@ public class AuthenticationConfig {
     private final CustomOidcUserService customOidcUserService;
     private final OidcSuccessHandler oidcSuccessHandler;
     private final CredentialAuthenticationProvider credentialAuthenticationProvider;
+    private final CredentialRegisterProvider credentialRegisterProvider;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -44,7 +46,7 @@ public class AuthenticationConfig {
 
     @Bean
     AuthenticationManager authenticationManager() {
-        return new ProviderManager(Collections.singletonList(credentialAuthenticationProvider));
+        return new ProviderManager(List.of(credentialAuthenticationProvider, credentialRegisterProvider));
     }
 
     @Bean
@@ -74,8 +76,11 @@ public class AuthenticationConfig {
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
 
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jsonCredentialRegisterProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jsonCredentialSignInProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
-                .authenticationProvider(credentialAuthenticationProvider)
+
+                .authenticationManager(authenticationManager())
+
                 .oauth2Login(oauth -> oauth
                         .userInfoEndpoint(u -> u.oidcUserService(customOidcUserService))
                         .successHandler(oidcSuccessHandler))
