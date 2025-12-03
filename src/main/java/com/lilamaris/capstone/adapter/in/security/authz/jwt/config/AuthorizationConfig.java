@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.adapter.in.security.authz.jwt.config;
 
-import com.lilamaris.capstone.adapter.in.security.authn.credential.CredentialAuthenticationProvider;
+import com.lilamaris.capstone.adapter.in.security.authn.credential.provider.CredentialAuthenticationProvider;
 import com.lilamaris.capstone.adapter.in.security.authz.jwt.JwtAccessDeniedHandler;
 import com.lilamaris.capstone.adapter.in.security.authz.jwt.JwtAuthenticationEntryPoint;
 import com.lilamaris.capstone.adapter.in.security.authz.jwt.JwtAuthenticationFilter;

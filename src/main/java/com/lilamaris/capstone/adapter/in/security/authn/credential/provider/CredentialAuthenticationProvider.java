@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.adapter.in.security.authn.credential;
+package com.lilamaris.capstone.adapter.in.security.authn.credential.provider;
 
 import com.lilamaris.capstone.adapter.in.security.SecurityUserDetailsMapper;
 import com.lilamaris.capstone.application.port.in.AuthCommandUseCase;
@@ -43,6 +43,6 @@ public class CredentialAuthenticationProvider implements AuthenticationProvider 
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return authentication.equals(UsernamePasswordAuthenticationToken.class);
+        return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
     }
 }

@@ -1,8 +1,9 @@
 package com.lilamaris.capstone.adapter.in.security.authn.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lilamaris.capstone.adapter.in.security.authn.credential.CredentialAuthenticationProvider;
-import com.lilamaris.capstone.adapter.in.security.authn.credential.JsonCredentialSignInProcessingFilter;
+import com.lilamaris.capstone.adapter.in.security.authn.credential.provider.CredentialAuthenticationProvider;
+import com.lilamaris.capstone.adapter.in.security.authn.credential.filter.JsonCredentialRegisterProcessingFilter;
+import com.lilamaris.capstone.adapter.in.security.authn.credential.filter.JsonCredentialSignInProcessingFilter;
 import com.lilamaris.capstone.adapter.in.security.authn.oidc.CustomOidcUserService;
 import com.lilamaris.capstone.adapter.in.security.authn.oidc.OidcSuccessHandler;
 import com.lilamaris.capstone.adapter.in.security.authz.jwt.JwtAccessDeniedHandler;
@@ -49,6 +50,13 @@ public class AuthenticationConfig {
     @Bean
     JsonCredentialSignInProcessingFilter jsonCredentialSignInProcessingFilter() {
         var filter = new JsonCredentialSignInProcessingFilter(mapper);
+        filter.setAuthenticationManager(authenticationManager());
+        return filter;
+    }
+
+    @Bean
+    JsonCredentialRegisterProcessingFilter jsonCredentialRegisterProcessingFilter() {
+        var filter = new JsonCredentialRegisterProcessingFilter(mapper);
         filter.setAuthenticationManager(authenticationManager());
         return filter;
     }

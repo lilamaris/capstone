@@ -1,7 +1,7 @@
-package com.lilamaris.capstone.adapter.in.security.authn.credential;
+package com.lilamaris.capstone.adapter.in.security.authn.credential.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
+import com.lilamaris.capstone.adapter.in.security.authn.credential.CredentialRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpMethod;
@@ -32,16 +32,16 @@ public class JsonCredentialSignInProcessingFilter extends AbstractAuthentication
     public Authentication attemptAuthentication(
             HttpServletRequest request,
             HttpServletResponse response
-    ) throws AuthenticationException, IOException, ServletException {
+    ) throws AuthenticationException  {
         try {
             var signInRequest = mapper.readValue(request.getInputStream(), CredentialRequest.SignIn.class);
 
-            var authToken = new UsernamePasswordAuthenticationToken(
+            var token = new UsernamePasswordAuthenticationToken(
                     signInRequest.email(),
                     signInRequest.password()
             );
 
-            return this.getAuthenticationManager().authenticate(authToken);
+            return this.getAuthenticationManager().authenticate(token);
         } catch (IOException e) {
             throw new AuthenticationServiceException("Invalid Request Body");
         }
