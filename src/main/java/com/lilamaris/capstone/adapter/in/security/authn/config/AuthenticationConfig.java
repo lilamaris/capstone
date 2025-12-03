@@ -1,12 +1,14 @@
 package com.lilamaris.capstone.adapter.in.security.authn.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lilamaris.capstone.adapter.in.security.authn.credential.handler.CredentialFailureHandler;
+import com.lilamaris.capstone.adapter.in.security.authn.credential.handler.CredentialSuccessHandler;
 import com.lilamaris.capstone.adapter.in.security.authn.credential.provider.CredentialAuthenticationProvider;
 import com.lilamaris.capstone.adapter.in.security.authn.credential.filter.JsonCredentialRegisterProcessingFilter;
 import com.lilamaris.capstone.adapter.in.security.authn.credential.filter.JsonCredentialSignInProcessingFilter;
 import com.lilamaris.capstone.adapter.in.security.authn.credential.provider.CredentialRegisterProvider;
 import com.lilamaris.capstone.adapter.in.security.authn.oidc.CustomOidcUserService;
-import com.lilamaris.capstone.adapter.in.security.authn.oidc.OidcSuccessHandler;
+import com.lilamaris.capstone.adapter.in.security.authn.oidc.handler.OidcSuccessHandler;
 import com.lilamaris.capstone.adapter.in.security.authz.jwt.JwtAccessDeniedHandler;
 import com.lilamaris.capstone.adapter.in.security.authz.jwt.JwtAuthenticationEntryPoint;
 import com.lilamaris.capstone.adapter.in.security.authz.jwt.JwtAuthenticationFilter;
@@ -36,8 +38,12 @@ public class AuthenticationConfig {
 
     private final CustomOidcUserService customOidcUserService;
     private final OidcSuccessHandler oidcSuccessHandler;
+
     private final CredentialAuthenticationProvider credentialAuthenticationProvider;
     private final CredentialRegisterProvider credentialRegisterProvider;
+    private final CredentialSuccessHandler credentialSuccessHandler;
+    private final CredentialFailureHandler credentialFailureHandler;
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -51,6 +57,8 @@ public class AuthenticationConfig {
     JsonCredentialSignInProcessingFilter jsonCredentialSignInProcessingFilter() {
         var filter = new JsonCredentialSignInProcessingFilter(mapper);
         filter.setAuthenticationManager(authenticationManager());
+        filter.setAuthenticationSuccessHandler(credentialSuccessHandler);
+        filter.setAuthenticationFailureHandler(credentialFailureHandler);
         return filter;
     }
 
@@ -58,6 +66,8 @@ public class AuthenticationConfig {
     JsonCredentialRegisterProcessingFilter jsonCredentialRegisterProcessingFilter() {
         var filter = new JsonCredentialRegisterProcessingFilter(mapper);
         filter.setAuthenticationManager(authenticationManager());
+        filter.setAuthenticationSuccessHandler(credentialSuccessHandler);
+        filter.setAuthenticationFailureHandler(credentialFailureHandler);
         return filter;
     }
 

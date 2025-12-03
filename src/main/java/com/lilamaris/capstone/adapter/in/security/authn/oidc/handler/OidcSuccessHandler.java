@@ -1,13 +1,11 @@
-package com.lilamaris.capstone.adapter.in.security.authn.oidc;
+package com.lilamaris.capstone.adapter.in.security.authn.oidc.handler;
 
-import com.lilamaris.capstone.adapter.in.security.ResponseWriter;
+import com.lilamaris.capstone.adapter.in.security.util.ResponseWriter;
 import com.lilamaris.capstone.adapter.in.security.SecurityUserDetails;
-import com.lilamaris.capstone.adapter.in.security.SecurityUserDetailsMapper;
-import com.lilamaris.capstone.adapter.in.security.authz.jwt.JwtProvider;
+import com.lilamaris.capstone.adapter.in.security.util.SecurityUserDetailsMapper;
 import com.lilamaris.capstone.application.port.in.AuthCommandUseCase;
 import com.lilamaris.capstone.application.port.in.command.AuthCommand;
 import com.lilamaris.capstone.domain.user.User;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +21,6 @@ import java.io.IOException;
 public class OidcSuccessHandler implements AuthenticationSuccessHandler {
     private final AuthCommandUseCase authCommandUseCase;
 
-    private final JwtProvider jwtProvider;
     private final ResponseWriter writer;
 
     @Override
@@ -64,7 +61,7 @@ public class OidcSuccessHandler implements AuthenticationSuccessHandler {
         var accountResult = linkResult.account();
         var principal = SecurityUserDetailsMapper.from(userResult, accountResult);
 
-        sendTokenResponse(response, principal);
+        writer.sendToken(response, principal);
     }
 
     public void handleOidcLogin(
@@ -82,13 +79,6 @@ public class OidcSuccessHandler implements AuthenticationSuccessHandler {
         var accountResult = loginResult.account();
         var principal = SecurityUserDetailsMapper.from(userResult, accountResult);
 
-        sendTokenResponse(response, principal);
-    }
-
-    private void sendTokenResponse(HttpServletResponse response, SecurityUserDetails principal) throws IOException {
-        String accessToken = jwtProvider.createAccessToken(principal);
-        String refreshToken = jwtProvider.createRefreshToken(principal);
-
-        writer.sendToken(response, accessToken, refreshToken);
+        writer.sendToken(response, principal);
     }
 }
