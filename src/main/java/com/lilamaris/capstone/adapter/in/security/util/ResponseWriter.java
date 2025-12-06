@@ -18,12 +18,7 @@ public class ResponseWriter {
     private final JwtUtil jwtUtil;
 
     public void sendError(HttpServletResponse response, HttpStatus code, String message) throws IOException {
-        var body = Map.of(
-                "success", false,
-                "data", null,
-                "error", Map.of("message", message)
-        );
-
+        var body = Map.of("error", message);
         write(response, code, body);
     }
 
@@ -31,13 +26,7 @@ public class ResponseWriter {
         String accessToken = jwtUtil.createAccessToken(principal);
         String refreshToken = jwtUtil.createRefreshToken(principal);
 
-        var body = Map.of(
-                "success", true,
-                "data", Map.of(
-                        "access_token", accessToken,
-                        "refresh_token", refreshToken
-                )
-        );
+        var body = Map.of("access_token", accessToken, "refresh_token", refreshToken);
 
         write(response, HttpStatus.OK, body);
     }
