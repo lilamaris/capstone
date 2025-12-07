@@ -68,14 +68,13 @@ public class JwtUtil {
                 .compact();
     }
 
-    public Claims parseToken(String token) {
+    public Claims parseToken(String token) throws SecurityException {
         try {
             var claims = Jwts.parser()
                     .verifyWith(key)
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
-
             if (claims.get(AUTHORITIES_KEY) == null) {
                 throw new IllegalArgumentException("Empty authorities field.");
             }
