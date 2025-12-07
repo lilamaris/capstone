@@ -1,7 +1,6 @@
 package com.lilamaris.capstone.adapter.in.security.authn.credential.handler;
 
 import com.lilamaris.capstone.adapter.in.security.util.ResponseWriter;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

@@ -14,8 +14,6 @@ import org.springframework.security.web.servlet.util.matcher.PathPatternRequestM
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
 @Component
 public class JsonCredentialSignInProcessingFilter extends AbstractAuthenticationProcessingFilter {
     private static final RequestMatcher DEFAULT_ANT_PATH_REQUEST_MATCHER = PathPatternRequestMatcher.withDefaults()
@@ -33,17 +31,17 @@ public class JsonCredentialSignInProcessingFilter extends AbstractAuthentication
             HttpServletRequest request,
             HttpServletResponse response
     ) throws AuthenticationException  {
+        UsernamePasswordAuthenticationToken token;
         try {
             var signInRequest = mapper.readValue(request.getInputStream(), CredentialRequest.SignIn.class);
-
-            var token = new UsernamePasswordAuthenticationToken(
+            token = new UsernamePasswordAuthenticationToken(
                     signInRequest.email(),
                     signInRequest.password()
             );
-
-            return this.getAuthenticationManager().authenticate(token);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new AuthenticationServiceException("Invalid Request Body");
         }
+
+        return this.getAuthenticationManager().authenticate(token);
     }
 }

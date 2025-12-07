@@ -33,18 +33,19 @@ public class JsonCredentialRegisterProcessingFilter extends AbstractAuthenticati
             HttpServletRequest request,
             HttpServletResponse response
     ) throws AuthenticationException {
+        RegisterAuthenticationToken token;
         try {
             var registerRequest = mapper.readValue(request.getInputStream(), CredentialRequest.Register.class);
-
-            var token = new RegisterAuthenticationToken(
+            token = new RegisterAuthenticationToken(
                     registerRequest.email(),
                     registerRequest.password(),
                     registerRequest.displayName()
             );
 
-            return this.getAuthenticationManager().authenticate(token);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new AuthenticationServiceException("Invalid Request Body");
         }
+
+        return this.getAuthenticationManager().authenticate(token);
     }
 }
