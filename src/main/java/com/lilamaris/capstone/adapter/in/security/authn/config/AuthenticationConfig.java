@@ -8,10 +8,8 @@ import com.lilamaris.capstone.adapter.in.security.authn.credential.filter.JsonCr
 import com.lilamaris.capstone.adapter.in.security.authn.credential.filter.JsonCredentialSignInProcessingFilter;
 import com.lilamaris.capstone.adapter.in.security.authn.credential.provider.CredentialRegisterProvider;
 import com.lilamaris.capstone.adapter.in.security.authn.oidc.CustomOidcUserService;
+import com.lilamaris.capstone.adapter.in.security.authn.oidc.handler.OidcFailureHandler;
 import com.lilamaris.capstone.adapter.in.security.authn.oidc.handler.OidcSuccessHandler;
-import com.lilamaris.capstone.adapter.in.security.authz.jwt.JwtAccessDeniedHandler;
-import com.lilamaris.capstone.adapter.in.security.authz.jwt.JwtAuthenticationEntryPoint;
-import com.lilamaris.capstone.adapter.in.security.authz.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -34,69 +32,78 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuthenticationConfig {
     private final CorsConfigurationSource corsConfigurationSource;
-    private final ObjectMapper mapper;
-
-    private final CustomOidcUserService customOidcUserService;
-    private final OidcSuccessHandler oidcSuccessHandler;
-
-    private final CredentialAuthenticationProvider credentialAuthenticationProvider;
-    private final CredentialRegisterProvider credentialRegisterProvider;
-    private final CredentialSuccessHandler credentialSuccessHandler;
-    private final CredentialFailureHandler credentialFailureHandler;
-
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
-    @Bean
-    AuthenticationManager authenticationManager() {
-        return new ProviderManager(List.of(credentialAuthenticationProvider, credentialRegisterProvider));
-    }
-
-    @Bean
-    JsonCredentialSignInProcessingFilter jsonCredentialSignInProcessingFilter() {
-        var filter = new JsonCredentialSignInProcessingFilter(mapper);
-        filter.setAuthenticationManager(authenticationManager());
-        filter.setAuthenticationSuccessHandler(credentialSuccessHandler);
-        filter.setAuthenticationFailureHandler(credentialFailureHandler);
-        return filter;
-    }
-
-    @Bean
-    JsonCredentialRegisterProcessingFilter jsonCredentialRegisterProcessingFilter() {
-        var filter = new JsonCredentialRegisterProcessingFilter(mapper);
-        filter.setAuthenticationManager(authenticationManager());
-        filter.setAuthenticationSuccessHandler(credentialSuccessHandler);
-        filter.setAuthenticationFailureHandler(credentialFailureHandler);
-        return filter;
-    }
 
     @Bean
     @Order(1)
-    SecurityFilterChain authenticationSecurityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain oidcAuthenticationSecurityFilterChain(
+            HttpSecurity http,
+            CustomOidcUserService customOidcUserService,
+            OidcSuccessHandler oidcSuccessHandler,
+            OidcFailureHandler oidcFailureHandler
+    ) throws Exception {
+        configureCommonChain(http);
+
         http
-                .securityMatcher("/api/v1/auth/**", "/oauth2/**")
+                .securityMatcher("/oauth2/**", "/login/**")
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(jsonCredentialRegisterProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(jsonCredentialSignInProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
-
-                .authenticationManager(authenticationManager())
 
                 .oauth2Login(oauth -> oauth
                         .userInfoEndpoint(u -> u.oidcUserService(customOidcUserService))
-                        .successHandler(oidcSuccessHandler))
-                .exceptionHandling(e -> e
-                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                        .accessDeniedHandler(jwtAccessDeniedHandler)
-                )
+                        .successHandler(oidcSuccessHandler)
+                        .failureHandler(oidcFailureHandler)
+                );
 
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
+    SecurityFilterChain credentialAuthenticationSecurityFilterChain(
+            HttpSecurity http,
+            ObjectMapper mapper,
+            AuthenticationManager credentialAuthenticationManager,
+            CredentialSuccessHandler credentialSuccessHandler,
+            CredentialFailureHandler credentialFailureHandler
+    ) throws Exception {
+        configureCommonChain(http);
+
+        JsonCredentialRegisterProcessingFilter jsonCredentialRegisterProcessingFilter =
+                new JsonCredentialRegisterProcessingFilter(mapper);
+        jsonCredentialRegisterProcessingFilter.setAuthenticationManager(credentialAuthenticationManager);
+        jsonCredentialRegisterProcessingFilter.setAuthenticationSuccessHandler(credentialSuccessHandler);
+        jsonCredentialRegisterProcessingFilter.setAuthenticationFailureHandler(credentialFailureHandler);
+
+        JsonCredentialSignInProcessingFilter jsonCredentialSignInProcessingFilter =
+                new JsonCredentialSignInProcessingFilter(mapper);
+        jsonCredentialSignInProcessingFilter.setAuthenticationManager(credentialAuthenticationManager);
+        jsonCredentialSignInProcessingFilter.setAuthenticationSuccessHandler(credentialSuccessHandler);
+        jsonCredentialSignInProcessingFilter.setAuthenticationFailureHandler(credentialFailureHandler);
+
+        http
+                .securityMatcher("/api/v1/auth/**")
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+
+                .addFilterBefore(jsonCredentialRegisterProcessingFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jsonCredentialSignInProcessingFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+
+    @Bean
+    AuthenticationManager credentialAuthenticationManager(
+            CredentialRegisterProvider credentialRegisterProvider,
+            CredentialAuthenticationProvider credentialAuthenticationProvider
+    ) {
+        return new ProviderManager(
+                List.of(credentialRegisterProvider, credentialAuthenticationProvider)
+        );
+    }
+
+    private void configureCommonChain(HttpSecurity http) throws Exception {
+        http
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource));
-
-        return http.build();
     }
 }

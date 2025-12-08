@@ -1,6 +1,5 @@
 package com.lilamaris.capstone.adapter.in.security.authz.jwt.config;
 
-import com.lilamaris.capstone.adapter.in.security.authn.credential.provider.CredentialAuthenticationProvider;
 import com.lilamaris.capstone.adapter.in.security.authz.jwt.JwtAccessDeniedHandler;
 import com.lilamaris.capstone.adapter.in.security.authz.jwt.JwtAuthenticationEntryPoint;
 import com.lilamaris.capstone.adapter.in.security.authz.jwt.JwtAuthenticationFilter;
@@ -21,20 +20,19 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @EnableWebSecurity(debug = true)
 @RequiredArgsConstructor
 public class AuthorizationConfig {
-    private final CorsConfigurationSource corsConfigurationSource;
-    private final CredentialAuthenticationProvider credentialAuthenticationProvider;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
     @Bean
     @Order(2)
-    SecurityFilterChain authorizationSecurityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain authorizationSecurityFilterChain(
+            HttpSecurity http,
+            CorsConfigurationSource corsConfigurationSource,
+            JwtAccessDeniedHandler jwtAccessDeniedHandler,
+            JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
+            JwtAuthenticationFilter jwtAuthenticationFilter
+    ) throws Exception {
         http
                 .securityMatcher("/api/**")
                 .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
 
-                .authenticationProvider(credentialAuthenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
