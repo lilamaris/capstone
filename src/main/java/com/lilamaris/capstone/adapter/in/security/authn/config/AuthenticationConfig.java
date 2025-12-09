@@ -7,6 +7,7 @@ import com.lilamaris.capstone.adapter.in.security.authn.credential.provider.Cred
 import com.lilamaris.capstone.adapter.in.security.authn.credential.filter.JsonCredentialRegisterProcessingFilter;
 import com.lilamaris.capstone.adapter.in.security.authn.credential.filter.JsonCredentialSignInProcessingFilter;
 import com.lilamaris.capstone.adapter.in.security.authn.credential.provider.CredentialRegisterProvider;
+import com.lilamaris.capstone.adapter.in.security.authn.oidc.CustomOAuth2UserService;
 import com.lilamaris.capstone.adapter.in.security.authn.oidc.CustomOidcUserService;
 import com.lilamaris.capstone.adapter.in.security.authn.oidc.handler.OidcFailureHandler;
 import com.lilamaris.capstone.adapter.in.security.authn.oidc.handler.OidcSuccessHandler;
@@ -38,6 +39,7 @@ public class AuthenticationConfig {
     SecurityFilterChain oidcAuthenticationSecurityFilterChain(
             HttpSecurity http,
             CustomOidcUserService customOidcUserService,
+            CustomOAuth2UserService customOAuth2UserService,
             OidcSuccessHandler oidcSuccessHandler,
             OidcFailureHandler oidcFailureHandler
     ) throws Exception {
@@ -48,7 +50,11 @@ public class AuthenticationConfig {
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
 
                 .oauth2Login(oauth -> oauth
-                        .userInfoEndpoint(u -> u.oidcUserService(customOidcUserService))
+                        .userInfoEndpoint(
+                                u -> u
+                                         .oidcUserService(customOidcUserService)
+                                        .userService(customOAuth2UserService)
+                        )
                         .successHandler(oidcSuccessHandler)
                         .failureHandler(oidcFailureHandler)
                 );

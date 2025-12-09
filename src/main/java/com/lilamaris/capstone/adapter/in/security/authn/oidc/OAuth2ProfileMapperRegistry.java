@@ -7,10 +7,10 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class ProviderProfileMapperRegistry {
-    private final List<ProviderProfileMapper> mappers;
+public class OAuth2ProfileMapperRegistry {
+    private final List<OAuth2ProfileMapper> mappers;
 
-    public ProviderProfileMapper findBy(String registrationId) {
+    public OAuth2ProfileMapper findBy(String registrationId) {
         return mappers.stream()
                 .filter(m -> m.supports(registrationId))
                 .findFirst()

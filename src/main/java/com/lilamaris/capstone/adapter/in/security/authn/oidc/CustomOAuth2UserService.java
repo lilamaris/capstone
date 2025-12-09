@@ -6,26 +6,26 @@ import com.lilamaris.capstone.application.port.in.command.AuthCommand;
 import com.lilamaris.capstone.application.port.in.result.AuthResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
-import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CustomOidcUserService extends OidcUserService {
-    private final OidcProfileMapperRegistry registry;
+public class CustomOAuth2UserService extends DefaultOAuth2UserService {
+    private final OAuth2ProfileMapperRegistry registry;
     private final AuthCommandUseCase authCommandUseCase;
 
     @Override
-    public OidcUser loadUser(OidcUserRequest request) throws OAuth2AuthenticationException {
-        OidcUser oidcUser = super.loadUser(request);
+    public OAuth2User loadUser(OAuth2UserRequest request) throws OAuth2AuthenticationException {
+        OAuth2User oAuth2User = super.loadUser(request);
         String registrationId = request.getClientRegistration().getRegistrationId();
 
-        OidcProfileMapper mapper = registry.findBy(registrationId);
-        NormalizedProfile profile = mapper.map(oidcUser, registrationId);
+        OAuth2ProfileMapper mapper = registry.findBy(registrationId);
+        NormalizedProfile profile = mapper.map(oAuth2User, registrationId);
 
         var command = AuthCommand.CreateOrLoginOidc.builder()
                 .provider(profile.provider())
