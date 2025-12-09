@@ -27,10 +27,10 @@ public class SecurityUserDetails implements UserDetails, OidcUser, OAuth2User {
     private Provider provider;
     private String providerId;
 
-    // OAuth2 specific
+    // OAuth2 spec
     private Map<String, Object> attributes;
 
-    // OIDC specific
+    // OIDC spec
     private OidcIdToken idToken;
     private Map<String, Object> claims;
     private OidcUserInfo userInfo;

@@ -1,7 +1,6 @@
 package com.lilamaris.capstone.adapter.in.security.util;
 
 import com.lilamaris.capstone.adapter.in.security.SecurityUserDetails;
-import com.lilamaris.capstone.adapter.in.security.authn.oidc.NormalizedProfile;
 import com.lilamaris.capstone.application.port.in.result.AccountResult;
 import com.lilamaris.capstone.application.port.in.result.UserResult;
 import com.lilamaris.capstone.domain.user.Provider;
@@ -17,20 +16,6 @@ public class SecurityUserDetailsMapper {
         Role role = Role.valueOf(roleValue);
 
         return SecurityUserDetails.builder().userId(userIdValue).displayName(displayName).role(role).build();
-    }
-
-    public static SecurityUserDetails fromProfile(NormalizedProfile profile) {
-        return SecurityUserDetails.builder()
-                .userId(null)
-                .displayName(profile.displayName())
-                .role(Role.USER)
-                .provider(profile.provider())
-                .providerId(profile.providerId())
-                .attributes(profile.attributes())
-                .idToken(profile.idToken())
-                .claims(profile.claims())
-                .userInfo(profile.userInfo())
-                .build();
     }
 
     public static SecurityUserDetails from(UserResult.Query user, AccountResult.Query account) {

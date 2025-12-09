@@ -29,40 +29,40 @@ public class OidcSuccessHandler implements AuthenticationSuccessHandler {
             HttpServletResponse response,
             Authentication authentication
     ) throws IOException {
-        SecurityUserDetails oidcDetails = (SecurityUserDetails) authentication.getPrincipal();
-
-        Authentication existAuth = SecurityContextHolder.getContext().getAuthentication();
-        SecurityUserDetails existUserDetails =
-                 (existAuth != null && existAuth.getPrincipal() instanceof SecurityUserDetails)
-                ? (SecurityUserDetails) existAuth.getPrincipal()
-                : null;
-
-        if (existUserDetails != null) {
-            handleAccountLink(response, existUserDetails, oidcDetails);
-        } else {
-            handleOidcLogin(response, oidcDetails);
-        }
-    }
-
-    public void handleAccountLink(
-            HttpServletResponse response,
-            SecurityUserDetails existUser,
-            SecurityUserDetails oidcDetails
-    ) throws IOException {
-        var command = AuthCommand.LinkOidc.builder()
-                .userId(User.Id.from(existUser.getUserId()))
-                .provider(oidcDetails.getProvider())
-                .providerId(oidcDetails.getProviderId())
-                .displayName(oidcDetails.getDisplayName())
-                .build();
-        var linkResult = authCommandUseCase.linkAccount(command);
-
-        var userResult = linkResult.user();
-        var accountResult = linkResult.account();
-        var principal = SecurityUserDetailsMapper.from(userResult, accountResult);
-
+        SecurityUserDetails principal = (SecurityUserDetails) authentication.getPrincipal();
         writer.sendToken(response, principal);
+//        Authentication existAuth = SecurityContextHolder.getContext().getAuthentication();
+//        SecurityUserDetails existUserDetails =
+//                 (existAuth != null && existAuth.getPrincipal() instanceof SecurityUserDetails)
+//                ? (SecurityUserDetails) existAuth.getPrincipal()
+//                : null;
+//
+//        if (existUserDetails != null) {
+//            handleAccountLink(response, existUserDetails, oidcDetails);
+//        } else {
+//            handleOidcLogin(response, oidcDetails);
+//        }
     }
+
+//    public void handleAccountLink(
+//            HttpServletResponse response,
+//            SecurityUserDetails existUser,
+//            SecurityUserDetails oidcDetails
+//    ) throws IOException {
+//        var command = AuthCommand.LinkOidc.builder()
+//                .userId(User.Id.from(existUser.getUserId()))
+//                .provider(oidcDetails.getProvider())
+//                .providerId(oidcDetails.getProviderId())
+//                .displayName(oidcDetails.getDisplayName())
+//                .build();
+//        var linkResult = authCommandUseCase.linkAccount(command);
+//
+//        var userResult = linkResult.user();
+//        var accountResult = linkResult.account();
+//        var principal = SecurityUserDetailsMapper.from(userResult, accountResult);
+//
+//        writer.sendToken(response, principal);
+//    }
 
     public void handleOidcLogin(
             HttpServletResponse response,
