@@ -21,6 +21,11 @@ public class UserPersistenceAdapter implements UserPort, AuthPort {
     private final AccountRepository accountRepository;
 
     @Override
+    public boolean isExists(Provider provider, String providerId) {
+        return accountRepository.existsByProviderAndProviderId(provider, providerId);
+    }
+
+    @Override
     public Optional<Account> getBy(Provider provider, String providerId) {
         return accountRepository.findByProviderAndProviderId(provider, providerId).map(AccountEntityMapper::toDomain);
     }

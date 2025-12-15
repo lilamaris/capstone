@@ -82,6 +82,10 @@ public class AuthCommandService implements AuthCommandUseCase {
 
     @Override
     public AuthResult.Register credentialRegister(String email, String passwordHash, String displayName) {
+        if (authPort.isExists(Provider.LOCAL, email)) {
+            throw new ConflictException("Account already exists.");
+        }
+
         var account = Account.createCredential(displayName, email, passwordHash);
         var user = User.create(displayName, Role.USER);
         user = user.linkAccount(account);
