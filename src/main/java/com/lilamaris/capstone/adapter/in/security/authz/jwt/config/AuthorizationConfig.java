@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.adapter.in.security.authz.jwt.config;
 
-import com.lilamaris.capstone.adapter.in.security.authz.jwt.JwtAccessDeniedHandler;
-import com.lilamaris.capstone.adapter.in.security.authz.jwt.JwtAuthenticationEntryPoint;
+import com.lilamaris.capstone.adapter.in.security.authz.jwt.handler.JwtAccessDeniedHandler;
+import com.lilamaris.capstone.adapter.in.security.authz.jwt.handler.JwtAuthenticationEntryPoint;
 import com.lilamaris.capstone.adapter.in.security.authz.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

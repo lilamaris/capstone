@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.adapter.in.security.authz.jwt;
+package com.lilamaris.capstone.adapter.in.security.authz.jwt.handler;
 
 import com.lilamaris.capstone.adapter.in.security.util.ResponseWriter;
 import jakarta.servlet.http.HttpServletRequest;

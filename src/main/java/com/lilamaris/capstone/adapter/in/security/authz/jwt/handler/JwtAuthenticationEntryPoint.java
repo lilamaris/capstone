@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.adapter.in.security.authz.jwt;
+package com.lilamaris.capstone.adapter.in.security.authz.jwt.handler;
 
 import com.lilamaris.capstone.adapter.in.security.util.ResponseWriter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,6 +10,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
             HttpServletResponse response,
             AuthenticationException authException
     ) throws IOException {
-        writer.sendError(response, HttpStatus.UNAUTHORIZED, authException.getMessage());
+        var e = (Exception) Optional.ofNullable(request.getAttribute("jwtException")).orElse(authException);
+        writer.sendError(response, HttpStatus.UNAUTHORIZED, e.getMessage());
     }
 }
