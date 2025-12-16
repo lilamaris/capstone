@@ -21,7 +21,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @RequiredArgsConstructor
 public class AuthorizationConfig {
     @Bean
-    @Order(2)
+    @Order(3)
     SecurityFilterChain authorizationSecurityFilterChain(
             HttpSecurity http,
             CorsConfigurationSource corsConfigurationSource,
