@@ -15,6 +15,9 @@ spring:
       org.springframework.security: INFO
       org.springframework.web: INFO
 
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
   jpa:
     hibernate:
       ddl-auto: update
@@ -25,8 +28,9 @@ spring:
 
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/capstone
-    username: lilamaris
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_SCHEMA}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   security:
