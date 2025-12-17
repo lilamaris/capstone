@@ -12,16 +12,22 @@ public class GoogleProfileMapper implements OidcProfileMapper {
     public NormalizedProfile map(OidcUser oidcUser, String registrationId) {
         var claims = oidcUser.getClaims();
 
-        return new NormalizedProfile(
-                Provider.GOOGLE,
-                oidcUser.getSubject(),
-                (String) claims.get("email"),
-                (String) claims.getOrDefault("name", ""),
-                oidcUser.getAttributes(),
-                oidcUser.getIdToken(),
-                oidcUser.getUserInfo(),
-                claims
-        );
+        var providerId = oidcUser.getSubject();
+        var email = (String) claims.get("email");
+        var displayName = (String) claims.getOrDefault("name", "");
+        var attributes = oidcUser.getAttributes();
+        var idToken = oidcUser.getIdToken();
+        var userInfo = oidcUser.getUserInfo();
+
+        return NormalizedProfile.builder()
+                .provider(Provider.GOOGLE)
+                .providerId(providerId)
+                .email(email)
+                .displayName(displayName)
+                .attributes(attributes)
+                .idToken(idToken)
+                .userInfo(userInfo)
+                .build();
     }
 
     @Override

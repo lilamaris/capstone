@@ -1,8 +1,7 @@
-package com.lilamaris.capstone.adapter.in.security.authn.credential.handler;
+package com.lilamaris.capstone.adapter.in.security.authn.handler;
 
 import com.lilamaris.capstone.adapter.in.security.util.ResponseWriter;
-import com.lilamaris.capstone.adapter.in.security.SecurityUserDetails;
-import jakarta.servlet.ServletException;
+import com.lilamaris.capstone.application.port.in.result.AuthResult;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -14,12 +13,12 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-public class CredentialSuccessHandler implements AuthenticationSuccessHandler {
+public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
     private final ResponseWriter writer;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
-        SecurityUserDetails principal = (SecurityUserDetails) authentication.getPrincipal();
-        writer.sendToken(response, principal);
+        var tokenResult = (AuthResult.Token) authentication.getDetails();
+        writer.token(response, tokenResult);
     }
 }

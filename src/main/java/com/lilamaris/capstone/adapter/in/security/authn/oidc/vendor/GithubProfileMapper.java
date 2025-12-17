@@ -10,22 +10,19 @@ import org.springframework.stereotype.Component;
 public class GithubProfileMapper implements OAuth2ProfileMapper {
     @Override
     public NormalizedProfile map(OAuth2User oAuth2User, String registrationId) {
-        var attrs = oAuth2User.getAttributes();
+        var attributes = oAuth2User.getAttributes();
 
-        String id = String.valueOf(attrs.get("id"));
-        String email = (String) attrs.get("email");
-        String name = (String) attrs.getOrDefault("name", "");
+        var providerId = (String) attributes.get("id");
+        var email = (String) attributes.get("email");
+        var displayName = (String) attributes.getOrDefault("name", "");
 
-        return new NormalizedProfile(
-                Provider.GITHUB,
-                id,
-                email,
-                name,
-                attrs,
-                null,
-                null,
-                null
-        );
+        return NormalizedProfile.builder()
+                .provider(Provider.GITHUB)
+                .providerId(providerId)
+                .email(email)
+                .displayName(displayName)
+                .attributes(attributes)
+                .build();
     }
 
     @Override

@@ -26,11 +26,11 @@ public record Account(
 
     public Account {
         if (provider == null) throw new DomainIllegalArgumentException("Field 'provider' must not be null.");
+        if (email == null) throw new DomainIllegalArgumentException("Field 'email' in the local provider based account must not be null.");
 
         if (provider.equals(Provider.LOCAL)) {
-            if (email == null) throw new DomainIllegalArgumentException("Field 'email' in the local provider based account must not be null.");
             if (passwordHash == null) throw new DomainIllegalArgumentException("Field 'passwordHash' in the local provider based account must not be null.");
-            providerId = email;
+            providerId = Provider.LOCAL.name() + ":" + email;
         } else {
             if (providerId == null) throw new DomainIllegalArgumentException("Field 'providerId' in the third party provider based account must not be null.");
         }
@@ -53,10 +53,11 @@ public record Account(
                 .build();
     }
 
-    public static Account createOidc(Provider provider, String providerId, String displayName) {
+    public static Account createOidc(Provider provider, String providerId, String email, String displayName) {
         return getDefaultBuilder()
                 .provider(provider)
                 .providerId(providerId)
+                .email(email)
                 .displayName(displayName)
                 .build();
     }

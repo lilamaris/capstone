@@ -1,7 +1,6 @@
-package com.lilamaris.capstone.adapter.in.security.authn.oidc.handler;
+package com.lilamaris.capstone.adapter.in.security.authn.handler;
 
 import com.lilamaris.capstone.adapter.in.security.util.ResponseWriter;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -14,11 +13,11 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-public class OidcFailureHandler implements AuthenticationFailureHandler {
+public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
     private final ResponseWriter writer;
 
     @Override
-    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        writer.sendError(response, HttpStatus.UNAUTHORIZED, exception.getMessage());
+    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException {
+        writer.error(response, HttpStatus.UNAUTHORIZED, exception.getMessage());
     }
 }

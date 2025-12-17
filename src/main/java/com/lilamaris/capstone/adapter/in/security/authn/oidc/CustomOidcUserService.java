@@ -1,9 +1,5 @@
 package com.lilamaris.capstone.adapter.in.security.authn.oidc;
 
-import com.lilamaris.capstone.adapter.in.security.util.SecurityUserDetailsMapper;
-import com.lilamaris.capstone.application.port.in.AuthCommandUseCase;
-import com.lilamaris.capstone.application.port.in.command.AuthCommand;
-import com.lilamaris.capstone.application.port.in.result.AuthResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
@@ -17,7 +13,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CustomOidcUserService extends OidcUserService {
     private final OidcProfileMapperRegistry registry;
-    private final AuthCommandUseCase authCommandUseCase;
 
     @Override
     public OidcUser loadUser(OidcUserRequest request) throws OAuth2AuthenticationException {
@@ -25,15 +20,6 @@ public class CustomOidcUserService extends OidcUserService {
         String registrationId = request.getClientRegistration().getRegistrationId();
 
         OidcProfileMapper mapper = registry.findBy(registrationId);
-        NormalizedProfile profile = mapper.map(oidcUser, registrationId);
-
-        var command = AuthCommand.CreateOrLoginOidc.builder()
-                .provider(profile.provider())
-                .providerId(profile.providerId())
-                .displayName(profile.displayName())
-                .build();
-        AuthResult.Login result = authCommandUseCase.createOrLogin(command);
-
-        return SecurityUserDetailsMapper.from(result.user(), result.account());
+        return mapper.map(oidcUser, registrationId);
     }
 }

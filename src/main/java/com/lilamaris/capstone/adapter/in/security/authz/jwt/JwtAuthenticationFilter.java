@@ -2,7 +2,7 @@ package com.lilamaris.capstone.adapter.in.security.authz.jwt;
 
 import com.lilamaris.capstone.adapter.in.security.exception.ExpiredTokenException;
 import com.lilamaris.capstone.adapter.in.security.exception.InvalidTokenException;
-import com.lilamaris.capstone.adapter.in.security.util.JwtUtil;
+import com.lilamaris.capstone.application.util.JwtUtil;
 import com.lilamaris.capstone.adapter.in.security.util.SecurityUserDetailsMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

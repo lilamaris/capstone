@@ -1,16 +1,17 @@
 package com.lilamaris.capstone.adapter.in.security.authn.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lilamaris.capstone.adapter.in.security.authn.credential.handler.CredentialFailureHandler;
-import com.lilamaris.capstone.adapter.in.security.authn.credential.handler.CredentialSuccessHandler;
-import com.lilamaris.capstone.adapter.in.security.authn.credential.provider.CredentialAuthenticationProvider;
+import com.lilamaris.capstone.adapter.in.security.authn.credential.filter.RefreshTokenProcessingFilter;
+import com.lilamaris.capstone.adapter.in.security.authn.credential.provider.CredentialSignInProvider;
 import com.lilamaris.capstone.adapter.in.security.authn.credential.filter.JsonCredentialRegisterProcessingFilter;
 import com.lilamaris.capstone.adapter.in.security.authn.credential.filter.JsonCredentialSignInProcessingFilter;
 import com.lilamaris.capstone.adapter.in.security.authn.credential.provider.CredentialRegisterProvider;
+import com.lilamaris.capstone.adapter.in.security.authn.credential.provider.RefreshTokenProvider;
+import com.lilamaris.capstone.adapter.in.security.authn.handler.CustomAuthenticationFailureHandler;
+import com.lilamaris.capstone.adapter.in.security.authn.handler.CustomAuthenticationSuccessHandler;
 import com.lilamaris.capstone.adapter.in.security.authn.oidc.CustomOAuth2UserService;
 import com.lilamaris.capstone.adapter.in.security.authn.oidc.CustomOidcUserService;
-import com.lilamaris.capstone.adapter.in.security.authn.oidc.handler.OidcFailureHandler;
-import com.lilamaris.capstone.adapter.in.security.authn.oidc.handler.OidcSuccessHandler;
+import com.lilamaris.capstone.adapter.in.security.authn.oidc.handler.CustomOidcSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +34,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuthenticationConfig {
     private final CorsConfigurationSource corsConfigurationSource;
+    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+    private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 
     @Bean
     @Order(1)
@@ -40,8 +43,7 @@ public class AuthenticationConfig {
             HttpSecurity http,
             CustomOidcUserService customOidcUserService,
             CustomOAuth2UserService customOAuth2UserService,
-            OidcSuccessHandler oidcSuccessHandler,
-            OidcFailureHandler oidcFailureHandler
+            CustomOidcSuccessHandler customOidcSuccessHandler
     ) throws Exception {
         configureCommonChain(http);
 
@@ -55,8 +57,8 @@ public class AuthenticationConfig {
                                          .oidcUserService(customOidcUserService)
                                         .userService(customOAuth2UserService)
                         )
-                        .successHandler(oidcSuccessHandler)
-                        .failureHandler(oidcFailureHandler)
+                        .successHandler(customOidcSuccessHandler)
+                        .failureHandler(customAuthenticationFailureHandler)
                 );
 
         return http.build();
@@ -67,30 +69,32 @@ public class AuthenticationConfig {
     SecurityFilterChain credentialAuthenticationSecurityFilterChain(
             HttpSecurity http,
             ObjectMapper mapper,
-            AuthenticationManager credentialAuthenticationManager,
-            CredentialSuccessHandler credentialSuccessHandler,
-            CredentialFailureHandler credentialFailureHandler
+            AuthenticationManager credentialAuthenticationManager
     ) throws Exception {
         configureCommonChain(http);
 
-        JsonCredentialRegisterProcessingFilter jsonCredentialRegisterProcessingFilter =
-                new JsonCredentialRegisterProcessingFilter(mapper);
-        jsonCredentialRegisterProcessingFilter.setAuthenticationManager(credentialAuthenticationManager);
-        jsonCredentialRegisterProcessingFilter.setAuthenticationSuccessHandler(credentialSuccessHandler);
-        jsonCredentialRegisterProcessingFilter.setAuthenticationFailureHandler(credentialFailureHandler);
+        var registerFilter = new JsonCredentialRegisterProcessingFilter(mapper);
+        registerFilter.setAuthenticationManager(credentialAuthenticationManager);
+        registerFilter.setAuthenticationSuccessHandler(customAuthenticationSuccessHandler);
+        registerFilter.setAuthenticationFailureHandler(customAuthenticationFailureHandler);
 
-        JsonCredentialSignInProcessingFilter jsonCredentialSignInProcessingFilter =
-                new JsonCredentialSignInProcessingFilter(mapper);
-        jsonCredentialSignInProcessingFilter.setAuthenticationManager(credentialAuthenticationManager);
-        jsonCredentialSignInProcessingFilter.setAuthenticationSuccessHandler(credentialSuccessHandler);
-        jsonCredentialSignInProcessingFilter.setAuthenticationFailureHandler(credentialFailureHandler);
+        var signInFilter = new JsonCredentialSignInProcessingFilter(mapper);
+        signInFilter.setAuthenticationManager(credentialAuthenticationManager);
+        signInFilter.setAuthenticationSuccessHandler(customAuthenticationSuccessHandler);
+        signInFilter.setAuthenticationFailureHandler(customAuthenticationFailureHandler);
+
+        var refreshFilter = new RefreshTokenProcessingFilter();
+        refreshFilter.setAuthenticationManager(credentialAuthenticationManager);
+        refreshFilter.setAuthenticationSuccessHandler(customAuthenticationSuccessHandler);
+        refreshFilter.setAuthenticationFailureHandler(customAuthenticationFailureHandler);
 
         http
                 .securityMatcher("/api/v1/auth/**")
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
 
-                .addFilterBefore(jsonCredentialRegisterProcessingFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(jsonCredentialSignInProcessingFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(registerFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(signInFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(refreshFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -98,10 +102,11 @@ public class AuthenticationConfig {
     @Bean
     AuthenticationManager credentialAuthenticationManager(
             CredentialRegisterProvider credentialRegisterProvider,
-            CredentialAuthenticationProvider credentialAuthenticationProvider
+            CredentialSignInProvider credentialSignInProvider,
+            RefreshTokenProvider refreshTokenProvider
     ) {
         return new ProviderManager(
-                List.of(credentialRegisterProvider, credentialAuthenticationProvider)
+                List.of(credentialRegisterProvider, credentialSignInProvider, refreshTokenProvider)
         );
     }
 

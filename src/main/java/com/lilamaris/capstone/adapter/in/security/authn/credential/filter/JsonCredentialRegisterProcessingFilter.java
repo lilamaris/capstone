@@ -1,8 +1,7 @@
 package com.lilamaris.capstone.adapter.in.security.authn.credential.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lilamaris.capstone.adapter.in.security.authn.credential.CredentialRequest;
-import com.lilamaris.capstone.adapter.in.security.authn.credential.provider.RegisterAuthenticationToken;
+import com.lilamaris.capstone.adapter.in.security.authn.credential.token.CredentialRegisterAuthenticationToken;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpMethod;
@@ -29,15 +28,13 @@ public class JsonCredentialRegisterProcessingFilter extends AbstractAuthenticati
             HttpServletRequest request,
             HttpServletResponse response
     ) throws AuthenticationException {
-        RegisterAuthenticationToken token;
+        CredentialRegisterAuthenticationToken token;
         try {
-            var registerRequest = mapper.readValue(request.getInputStream(), CredentialRequest.Register.class);
-            token = new RegisterAuthenticationToken(
-                    registerRequest.email(),
-                    registerRequest.password(),
-                    registerRequest.displayName()
-            );
-
+            var body = mapper.readValue(request.getInputStream(), CredentialRequest.Register.class);
+            var email = body.email();
+            var rawPassword = body.password();
+            var displayName = body.displayName();
+            token = new CredentialRegisterAuthenticationToken(email, rawPassword, displayName);
         } catch (Exception e) {
             throw new AuthenticationServiceException("Invalid Request Body");
         }

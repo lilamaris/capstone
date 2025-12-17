@@ -10,7 +10,6 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -23,7 +22,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
             HttpServletResponse response,
             AuthenticationException authException
     ) throws IOException {
-        var e = (Exception) Optional.ofNullable(request.getAttribute("jwtException")).orElse(authException);
-        writer.sendError(response, HttpStatus.UNAUTHORIZED, e.getMessage());
+        var e = (Exception) request.getAttribute("jwtException");
+        writer.error(response, HttpStatus.UNAUTHORIZED, e != null ? e.getMessage() : "Failed.");
     }
 }

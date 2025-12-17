@@ -1,13 +1,15 @@
 package com.lilamaris.capstone.application.port.in;
 
-import com.lilamaris.capstone.application.port.in.command.AuthCommand;
 import com.lilamaris.capstone.application.port.in.result.AuthResult;
+import com.lilamaris.capstone.domain.user.Provider;
 
 import java.util.function.Function;
 
 public interface AuthCommandUseCase {
-    AuthResult.Login credentialLogin(String email, Function<String, Boolean> challengeFunction);
-    AuthResult.Register credentialRegister(String email, String passwordHash, String displayName);
-    AuthResult.Login createOrLogin(AuthCommand.CreateOrLoginOidc command);
-    AuthResult.Link linkAccount(AuthCommand.LinkOidc command);
+    AuthResult.Token credentialSignIn(String email, Function<String, Boolean> challengeFunction);
+    AuthResult.Token oidcSignIn(Provider provider, String providerId, String email, String displayName);
+
+    AuthResult.Token credentialRegister(String email, String passwordHash, String displayName);
+
+    AuthResult.Token refresh(String refreshToken);
 }
