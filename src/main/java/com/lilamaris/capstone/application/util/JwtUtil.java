@@ -1,7 +1,6 @@
 package com.lilamaris.capstone.application.util;
 
-import com.lilamaris.capstone.adapter.in.security.exception.ExpiredTokenException;
-import com.lilamaris.capstone.application.exception.DomainViolationException;
+import com.lilamaris.capstone.application.exception.ApplicationInvariantException;
 import com.lilamaris.capstone.domain.user.Role;
 import com.lilamaris.capstone.domain.user.User;
 import io.jsonwebtoken.*;
@@ -79,11 +78,9 @@ public class JwtUtil {
             }
             return claims;
         } catch (ExpiredJwtException e) {
-            log.debug("Expired jwt", e);
-            throw new ExpiredTokenException("Expired token.");
+            throw new ApplicationInvariantException("EXPIRED_TOKEN", "Expired token.");
         } catch (Exception e) {
-            log.debug("Invalid jwt", e);
-            throw new DomainViolationException("INVALID_TOKEN", "Invalid token.");
+            throw new ApplicationInvariantException("INVALID_TOKEN", "Invalid token.");
         }
     }
 

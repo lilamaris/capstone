@@ -1,7 +1,6 @@
 package com.lilamaris.capstone.adapter.in.security.authz.jwt;
 
-import com.lilamaris.capstone.adapter.in.security.exception.ExpiredTokenException;
-import com.lilamaris.capstone.adapter.in.security.exception.InvalidTokenException;
+import com.lilamaris.capstone.application.exception.ApplicationInvariantException;
 import com.lilamaris.capstone.application.util.JwtUtil;
 import com.lilamaris.capstone.adapter.in.security.util.SecurityUserDetailsMapper;
 import jakarta.servlet.FilterChain;
@@ -41,9 +40,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 var authentication = new UsernamePasswordAuthenticationToken(principal, token, principal.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-        } catch (InvalidTokenException | ExpiredTokenException e) {
+        } catch (ApplicationInvariantException e) {
             request.setAttribute("jwtException", e);
         }
+
         filterChain.doFilter(request, response);
     }
 

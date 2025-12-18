@@ -2,7 +2,6 @@ package com.lilamaris.capstone.adapter.in.security.authn.oidc.vendor;
 
 import com.lilamaris.capstone.adapter.in.security.authn.oidc.NormalizedProfile;
 import com.lilamaris.capstone.adapter.in.security.authn.oidc.OidcProfileMapper;
-import com.lilamaris.capstone.application.exception.ApplicationInvariantException;
 import com.lilamaris.capstone.domain.user.Provider;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -26,10 +25,6 @@ public class NaverProfileMapper implements OidcProfileMapper {
                 .header("Authorization", "Bearer " + accessToken)
                 .retrieve()
                 .body(new ParameterizedTypeReference<>() {});
-
-        if (response == null) {
-            throw new ApplicationInvariantException("Failed to fetch userInfo.");
-        }
 
         additionalUserInfo = (Map<String, Object>) response.get("response");
 

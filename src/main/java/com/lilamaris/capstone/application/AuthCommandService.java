@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.application;
 
-import com.lilamaris.capstone.application.exception.ConflictException;
+import com.lilamaris.capstone.application.exception.ResourceAlreadyExistsException;
 import com.lilamaris.capstone.application.port.in.AuthCommandUseCase;
 import com.lilamaris.capstone.application.port.in.result.AuthResult;
 import com.lilamaris.capstone.application.port.out.AuthPort;
@@ -53,7 +53,7 @@ public class AuthCommandService implements AuthCommandUseCase {
     @Override
     public AuthResult.Token credentialRegister(String email, String passwordHash, String displayName) {
         if (authPort.isExists(Provider.LOCAL, email)) {
-            throw new ConflictException("Account already exists.");
+            throw new ResourceAlreadyExistsException("Account already exists.");
         }
 
         var account = Account.createCredential(displayName, email, passwordHash);

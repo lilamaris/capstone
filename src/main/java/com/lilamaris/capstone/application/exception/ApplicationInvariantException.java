@@ -1,7 +1,13 @@
 package com.lilamaris.capstone.application.exception;
 
+import lombok.Getter;
+
+@Getter
 public class ApplicationInvariantException extends ApplicationException {
-    public ApplicationInvariantException(String message) {
-        super("APPLICATION_INVARIANT_VIOLATION", message);
+    private final String code;
+
+    public ApplicationInvariantException(String code, String message) {
+        super("APPLICATION_INVARIANT", message);
+        this.code = code;
     }
 }

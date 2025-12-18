@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.application.resolver.auth;
 
-import com.lilamaris.capstone.application.exception.ConflictException;
+import com.lilamaris.capstone.application.exception.ApplicationInvariantException;
 import com.lilamaris.capstone.application.exception.ResourceNotFoundException;
 import com.lilamaris.capstone.application.port.out.AuthPort;
 import com.lilamaris.capstone.application.port.out.UserPort;
@@ -23,7 +23,7 @@ public class DefaultCredentialResolver implements CredentialIdentityResolver {
         ));
 
         if (!challengeFunction.apply(account.passwordHash())) {
-            throw new ConflictException("Challenge failed.");
+            throw new ApplicationInvariantException("RESOLVER_FAILURE", "Challenge failed.");
         }
 
         var userId = account.userId();
