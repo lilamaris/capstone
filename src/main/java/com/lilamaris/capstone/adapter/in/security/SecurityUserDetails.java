@@ -20,9 +20,6 @@ public class SecurityUserDetails implements UserDetails {
     private String displayName;
     private Role role;
 
-    private Provider provider;
-    private String providerId;
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority(role.name()));
