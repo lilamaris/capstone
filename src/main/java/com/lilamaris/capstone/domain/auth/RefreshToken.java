@@ -1,6 +1,7 @@
 package com.lilamaris.capstone.domain.auth;
 
-import com.lilamaris.capstone.domain.BaseDomain;
+import com.lilamaris.capstone.domain.AbstractStringDomainId;
+import com.lilamaris.capstone.domain.DomainType;
 import com.lilamaris.capstone.domain.user.User;
 import lombok.Builder;
 
@@ -8,8 +9,24 @@ import lombok.Builder;
 public record RefreshToken(
         Id id,
         User.Id userId
-) implements BaseDomain<RefreshToken.Id, RefreshToken> {
-    public record Id(String value) implements BaseDomain.Id<String> {
-        public static Id from(String value) { return new Id(value); }
+) {
+    public enum Type implements DomainType {
+        INSTANCE;
+
+        @Override
+        public String getName() {
+            return "refresh-token";
+        }
+    }
+
+    public static class Id extends AbstractStringDomainId<Type> {
+        public Id(String value) {
+            super(value);
+        }
+
+        @Override
+        public Type getDomainType() {
+            return Type.INSTANCE;
+        }
     }
 }

@@ -31,7 +31,7 @@ public class AuthCommandService implements AuthCommandUseCase {
     @Override
     @Transactional
     public AuthResult.Token refresh(String refreshToken) {
-        var identity = tokenIdentityResolver.resolve(RefreshToken.Id.from(refreshToken));
+        var identity = tokenIdentityResolver.resolve(new RefreshToken.Id(refreshToken));
         return sessionIssuer.issue(identity);
 
     }

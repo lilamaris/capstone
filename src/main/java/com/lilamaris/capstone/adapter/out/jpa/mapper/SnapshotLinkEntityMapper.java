@@ -9,10 +9,10 @@ import java.util.Optional;
 
 public class SnapshotLinkEntityMapper {
     public static SnapshotLink toDomain(SnapshotLinkEntity entity) {
-        var id = SnapshotLink.Id.from(entity.getId());
-        var descendantSnapshotId = Snapshot.Id.from(entity.getDescendantSnapshotId());
-        var timelineId = Timeline.Id.from(entity.getTimelineId());
-        var ancestorSnapshotId = Snapshot.Id.from(entity.getAncestorSnapshotId());
+        var id = new SnapshotLink.Id(entity.getId());
+        var descendantSnapshotId = new Snapshot.Id(entity.getDescendantSnapshotId());
+        var timelineId = new Timeline.Id(entity.getTimelineId());
+        var ancestorSnapshotId = entity.getAncestorSnapshotId() != null ? new Snapshot.Id(entity.getAncestorSnapshotId()) : null;
         var domainDeltaList = entity.getDomainDeltaList().stream().map(DomainDeltaEntityMapper::toDomain).toList();
         var audit = AuditEmbeddableEntityMapper.toDomain(entity);
 
@@ -21,11 +21,11 @@ public class SnapshotLinkEntityMapper {
 
     public static SnapshotLinkEntity toEntity(SnapshotLink domain) {
         var domainDeltaList = domain.domainDeltaList().stream().map(DomainDeltaEntityMapper::toEntity).toList();
-        var ancestorSnapshotId = Optional.ofNullable(domain.ancestorSnapshotId()).map(Snapshot.Id::value).orElse(null);
+        var ancestorSnapshotId = Optional.ofNullable(domain.ancestorSnapshotId()).map(Snapshot.Id::getValue).orElse(null);
         return SnapshotLinkEntity.builder()
-                .id(domain.id().value())
-                .descendantSnapshotId(domain.descendantSnapshotId().value())
-                .timelineId(domain.timelineId().value())
+                .id(domain.id().getValue())
+                .descendantSnapshotId(domain.descendantSnapshotId().getValue())
+                .timelineId(domain.timelineId().getValue())
                 .ancestorSnapshotId(ancestorSnapshotId)
                 .domainDeltaList(domainDeltaList)
                 .build();

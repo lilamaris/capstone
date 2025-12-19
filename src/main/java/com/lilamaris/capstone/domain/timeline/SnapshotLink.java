@@ -1,7 +1,8 @@
 package com.lilamaris.capstone.domain.timeline;
 
-import com.lilamaris.capstone.domain.BaseDomain;
 import com.lilamaris.capstone.domain.embed.Audit;
+import com.lilamaris.capstone.domain.DomainType;
+import com.lilamaris.capstone.domain.AbstractUUIDDomainId;
 import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import lombok.Builder;
 
@@ -21,17 +22,36 @@ public record SnapshotLink(
         Boolean isRoot,
         List<DomainDelta> domainDeltaList,
         Audit audit
-) implements BaseDomain<SnapshotLink.Id, SnapshotLink> {
-    public record Id(UUID value) implements BaseDomain.Id<UUID> {
-        public static Id random() { return new Id(UUID.randomUUID()); }
-        public static Id from(UUID value) { return new Id(value); }
+) {
+    public enum Type implements DomainType {
+        INSTANCE;
+
+        @Override
+        public String getName() {
+            return "timeline.snapshot-link";
+        }
+    }
+
+    public static class Id extends AbstractUUIDDomainId<Type> {
+        public Id() {
+            super();
+        }
+
+        public Id(UUID uuid) {
+            super(uuid);
+        }
+
+        @Override
+        public Type getDomainType() {
+            return Type.INSTANCE;
+        }
     }
 
     public SnapshotLink {
         if (timelineId == null) throw new DomainIllegalArgumentException("Field 'timelineId' must not be null.");
         if (descendantSnapshotId == null) throw new DomainIllegalArgumentException("Field 'descendantSnapshotId' must not be null.");
 
-        id = Optional.ofNullable(id).orElseGet(Id::random);
+        id = Optional.ofNullable(id).orElseGet(Id::new);
         isRoot = ancestorSnapshotId == null;
         domainDeltaList = Optional.ofNullable(domainDeltaList).orElseGet(ArrayList::new);
     }

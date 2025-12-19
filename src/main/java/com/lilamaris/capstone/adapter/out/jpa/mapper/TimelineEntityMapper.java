@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class TimelineEntityMapper {
     public static Timeline toDomain(TimelineEntity entity) {
-        var id = Timeline.Id.from(entity.getId());
+        var id = new Timeline.Id(entity.getId());
         var snapshotMap = entity.getSnapshotList()
                 .stream()
                 .map(SnapshotEntityMapper::toDomain)
@@ -34,7 +34,7 @@ public class TimelineEntityMapper {
         var updatedAt = Optional.ofNullable(domain.audit()).map(Audit::updatedAt).orElse(null);
 
         return TimelineEntity.builder()
-                .id(domain.id().value())
+                .id(domain.id().getValue())
                 .description(domain.description())
                 .snapshotList(snapshotList)
                 .snapshotLinkList(snapshotLinkList)

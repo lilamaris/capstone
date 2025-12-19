@@ -9,7 +9,7 @@ import java.time.Instant;
 
 public class TimelineSpecification {
     public static Specification<SnapshotEntity> timelineEqual(Timeline.Id timelineId) {
-        return (root, query, builder) -> builder.equal(root.get("timelineId"), timelineId.value());
+        return (root, query, builder) -> builder.equal(root.get("timelineId"), timelineId.getValue());
     }
 
     public static Specification<SnapshotEntity> betweenTx(Instant txAt) {

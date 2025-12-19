@@ -28,7 +28,7 @@ public class DefaultCredentialResolver implements CredentialIdentityResolver {
 
         var userId = account.userId();
         var user = userPort.getById(userId).orElseThrow(() -> new ResourceNotFoundException(
-                String.format("User with id '%s' not found.", userId.value())
+                String.format("User with id '%s' not found.", userId.getValue())
         ));
 
         return new AuthIdentity(user, account, false);

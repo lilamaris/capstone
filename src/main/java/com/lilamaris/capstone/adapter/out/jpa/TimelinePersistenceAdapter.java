@@ -46,12 +46,12 @@ public class TimelinePersistenceAdapter implements TimelinePort {
 
     @Override
     public Optional<Timeline> getById(Timeline.Id id) {
-        return timelineRepository.findById(id.value()).map(TimelineEntityMapper::toDomain);
+        return timelineRepository.findById(id.getValue()).map(TimelineEntityMapper::toDomain);
     }
 
     @Override
     public List<Timeline> getByIds(List<Timeline.Id> ids) {
-        return timelineRepository.findAllById(ids.stream().map(Timeline.Id::value).toList()).stream().map(TimelineEntityMapper::toDomain).toList();
+        return timelineRepository.findAllById(ids.stream().map(Timeline.Id::getValue).toList()).stream().map(TimelineEntityMapper::toDomain).toList();
     }
 
     @Override

@@ -1,32 +1,39 @@
 package com.lilamaris.capstone.domain.degree;
 
+import com.lilamaris.capstone.domain.AbstractUUIDDomainId;
+import com.lilamaris.capstone.domain.DomainType;
 import com.lilamaris.capstone.domain.degree_organization.Organization;
 import lombok.Builder;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Builder(toBuilder = true)
 public record OrganizationTree(
-    Organization root,
-    Map<Organization.Id, List<Organization>> children
+        Id id,
+        Organization root,
+        Map<Organization.Id, List<Organization>> children
 ) {
-    public List<Organization> childrenOf(Organization.Id id) {
-        return children.getOrDefault(id, List.of());
+    public enum Type implements DomainType {
+        INSTANCE;
+
+        @Override
+        public String getName() {
+            return "course-offer";
+        }
     }
 
-    public Organization find(Organization.Id id) {
-        if (root.id().equals(id)) return root;
-        return children.values().stream().flatMap(List::stream)
-                .filter(o -> o.id().equals(id))
-                .findFirst().orElseThrow();
-    }
+    public static class Id extends AbstractUUIDDomainId<Type> {
+        public Id(UUID value) {
+            super(value);
+        }
 
-    public OrganizationTree addChild(Organization parent, Organization child) {
-        var newChildren = new HashMap<>(children);
-        newChildren.computeIfAbsent(parent.id(), k -> new ArrayList<>()).add(child);
-        return new OrganizationTree(root, newChildren);
+        public Id() {
+            super();
+        }
+
+        @Override
+        public Type getDomainType() {
+            return Type.INSTANCE;
+        }
     }
 }

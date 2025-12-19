@@ -1,7 +1,8 @@
 package com.lilamaris.capstone.domain.timeline;
 
-import com.lilamaris.capstone.domain.BaseDomain;
-import com.lilamaris.capstone.domain.embed.Effective;
+import com.lilamaris.capstone.domain.AbstractUUIDDomainId;
+import com.lilamaris.capstone.domain.DomainType;
+import com.lilamaris.capstone.domain.embed.*;
 import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import lombok.Builder;
 
@@ -17,10 +18,29 @@ public record Snapshot(
         Timeline.Id timelineId,
         Integer versionNo,
         String description
-) implements BaseDomain<Snapshot.Id, Snapshot> {
-    public record Id(UUID value) implements BaseDomain.Id<UUID> {
-        public static Id random() { return new Id(UUID.randomUUID()); }
-        public static Id from(UUID value) { return new Id(value); }
+) {
+    public enum Type implements DomainType {
+        INSTANCE;
+
+        @Override
+        public String getName() {
+            return "timeline.snapshot";
+        }
+    }
+
+    public static class Id extends AbstractUUIDDomainId<Type> {
+        public Id() {
+            super();
+        }
+
+        public Id(UUID uuid) {
+            super(uuid);
+        }
+
+        @Override
+        public Type getDomainType() {
+            return Type.INSTANCE;
+        }
     }
 
     public Snapshot {
@@ -28,7 +48,7 @@ public record Snapshot(
         if (valid == null) throw new DomainIllegalArgumentException("Field 'valid' must not be null.");
         if (timelineId == null) throw new DomainIllegalArgumentException("Field 'timelineId' must not be null.");
 
-        id = Optional.ofNullable(id).orElseGet(Id::random);
+        id = Optional.ofNullable(id).orElseGet(Id::new);
         versionNo = Optional.ofNullable(versionNo).orElse(1);
         description = Optional.ofNullable(description).orElse("No description");
     }

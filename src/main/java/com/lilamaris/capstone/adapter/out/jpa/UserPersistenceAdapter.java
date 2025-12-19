@@ -32,7 +32,7 @@ public class UserPersistenceAdapter implements UserPort, AuthPort {
 
     @Override
     public Optional<User> getById(User.Id id) {
-        return userRepository.findById(id.value()).map(UserEntityMapper::toDomain);
+        return userRepository.findById(id.getValue()).map(UserEntityMapper::toDomain);
     }
 
     @Override

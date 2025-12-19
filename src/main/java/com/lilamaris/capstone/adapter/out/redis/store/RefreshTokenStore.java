@@ -9,6 +9,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -17,7 +18,7 @@ public class RefreshTokenStore implements RefreshTokenPort {
 
     @Override
     public RefreshToken consume(RefreshToken.Id id) {
-        var entry = consume(id.value());
+        var entry = consume(id.getValue());
         if (entry == null) {
             throw new ResourceNotFoundException("Refresh token is invalid or expired.");
         }
@@ -26,7 +27,7 @@ public class RefreshTokenStore implements RefreshTokenPort {
 
     @Override
     public void save(RefreshToken domain, Duration ttl) {
-        save(domain.id().value(), fromDomain(domain), ttl);
+        save(domain.id().getValue(), fromDomain(domain), ttl);
     }
 
     public void save(String token, RefreshTokenEntry entry, Duration ttl) {
@@ -42,10 +43,11 @@ public class RefreshTokenStore implements RefreshTokenPort {
     }
 
     private RefreshTokenEntry fromDomain(RefreshToken domain) {
-        return new RefreshTokenEntry(domain.userId().asString());
+        return new RefreshTokenEntry(domain.userId().getValue().toString());
     }
 
     private RefreshToken fromEntry(RefreshToken.Id id, RefreshTokenEntry entry) {
-        return RefreshToken.builder().id(id).userId(User.Id.from(entry.userId())).build();
+        var userId = new User.Id(UUID.fromString(entry.userId()));
+        return RefreshToken.builder().id(id).userId(userId).build();
     }
 }

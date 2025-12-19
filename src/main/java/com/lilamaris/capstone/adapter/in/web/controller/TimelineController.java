@@ -33,7 +33,8 @@ public class TimelineController {
     public ResponseEntity<?> getCompressedById(
         @PathVariable("id") UUID id
     ) {
-        var result = timelineQueryUseCase.getCompressedById(Timeline.Id.from(id));
+        var timelineId = new Timeline.Id(id);
+        var result = timelineQueryUseCase.getCompressedById(timelineId);
         return ResponseEntity.ok(result);
     }
 
@@ -43,7 +44,8 @@ public class TimelineController {
             @RequestParam(name = "txAt", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime txAt,
             @RequestParam(name = "validAt", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  LocalDateTime validAt
     ) {
-        var condition = SnapshotQueryCondition.create(Timeline.Id.from(id), txAt, validAt);
+        var timelineId = new Timeline.Id(id);
+        var condition = SnapshotQueryCondition.create(timelineId, txAt, validAt);
         var result = timelineQueryUseCase.getSnapshot(condition);
         return ResponseEntity.ok(result);
     }
@@ -61,7 +63,8 @@ public class TimelineController {
             @PathVariable("id") UUID id,
             @RequestBody TimelineRequest.Migrate body
     ) {
-        var result = timelineCommandUseCase.migrate(Timeline.Id.from(id), body.validAt(), body.description());
+        var timelineId = new Timeline.Id(id);
+        var result = timelineCommandUseCase.migrate(timelineId, body.validAt(), body.description());
         return ResponseEntity.ok(result);
     }
 
@@ -70,7 +73,8 @@ public class TimelineController {
         @PathVariable("id") UUID id,
         @RequestBody TimelineRequest.Merge body
     ) {
-        var result = timelineCommandUseCase.merge(Timeline.Id.from(id), body.validFrom(), body.validTo(), body.description());
+        var timelineId = new Timeline.Id(id);
+        var result = timelineCommandUseCase.merge(timelineId, body.validFrom(), body.validTo(), body.description());
         return ResponseEntity.ok(result);
     }
 
@@ -88,7 +92,8 @@ public class TimelineController {
             @PathVariable("id") UUID id,
             @RequestBody TimelineRequest.Update body
     ) {
-        var result = timelineCommandUseCase.update(Timeline.Id.from(id), body.description());
+        var timelineId = new Timeline.Id(id);
+        var result = timelineCommandUseCase.update(timelineId, body.description());
         return ResponseEntity.ok(result);
     }
 }

@@ -25,7 +25,7 @@ public class DefaultSessionIssuer implements SessionIssuer{
         String refreshTokenValue = jwtUtil.createRefreshToken();
 
         var refreshToken = RefreshToken.builder()
-                .id(RefreshToken.Id.from(refreshTokenValue))
+                .id(new RefreshToken.Id(refreshTokenValue))
                 .userId(userId)
                 .build();
 

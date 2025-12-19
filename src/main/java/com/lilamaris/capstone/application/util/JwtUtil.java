@@ -53,7 +53,7 @@ public class JwtUtil {
         var expiredAt = new Date(now + accessTokenExpiration.toMillis());
 
         return Jwts.builder()
-                .subject(userId.asString())
+                .subject(userId.getValue().toString())
                 .claim(DISPLAY_NAME_KEY, displayName)
                 .claim(AUTHORITIES_KEY, role.name())
                 .issuedAt(issuedAt)

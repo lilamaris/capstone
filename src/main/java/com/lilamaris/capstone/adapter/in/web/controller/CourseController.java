@@ -30,7 +30,10 @@ public class CourseController {
             @PathVariable("id") UUID id,
             @RequestBody CourseRequest.CreateOffer body
     ) {
-        var result = courseCommandUseCase.createOffer(Course.Id.from(id), body.semester(), Timeline.Id.from(body.timelineId()), Snapshot.Id.from(body.snapshotId()));
+        var timelineId = new Timeline.Id(body.timelineId());
+        var snapshotId = new Snapshot.Id(body.snapshotId());
+        var courseId = new Course.Id(id);
+        var result = courseCommandUseCase.createOffer(courseId, body.semester(), timelineId, snapshotId);
         return ResponseEntity.ok(result);
     }
 }

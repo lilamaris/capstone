@@ -5,7 +5,7 @@ import com.lilamaris.capstone.domain.degree_course.Course;
 
 public class CourseEntityMapper {
     public static Course toDomain(CourseEntity entity) {
-        var id = Course.Id.from(entity.getId());
+        var id = new Course.Id(entity.getId());
         var courseOfferList = entity.getCourseOfferList().stream().map(CourseOfferEntityMapper::toDomain).toList();
         var audit = AuditEmbeddableEntityMapper.toDomain(entity);
 
@@ -14,7 +14,7 @@ public class CourseEntityMapper {
 
     public static CourseEntity toEntity(Course domain) {
         return CourseEntity.builder()
-                .id(domain.id().value())
+                .id(domain.id().getValue())
                 .code(domain.code())
                 .name(domain.name())
                 .credit(domain.credit())

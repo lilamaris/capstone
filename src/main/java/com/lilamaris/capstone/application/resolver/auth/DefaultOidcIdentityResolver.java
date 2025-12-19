@@ -27,7 +27,7 @@ public class DefaultOidcIdentityResolver implements OidcIdentityResolver {
         if (accountOptional.isPresent()) {
             account = accountOptional.get();
             user = userPort.getById(account.userId()).orElseThrow(() -> new ResourceNotFoundException(
-                    String.format("User with id '%s' not found.", account.userId().value())
+                    String.format("User with id '%s' not found.", account.userId().getValue())
             ));
         } else {
             account = Account.createOidc(provider, providerId, email, displayName);

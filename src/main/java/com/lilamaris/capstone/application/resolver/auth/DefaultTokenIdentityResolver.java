@@ -17,7 +17,7 @@ public class DefaultTokenIdentityResolver implements TokenIdentityResolver {
     public AuthIdentity resolve(RefreshToken.Id id) {
         var consumed = refreshTokenPort.consume(id);
         var user = userPort.getById(consumed.userId()).orElseThrow(() -> new ResourceNotFoundException(
-                String.format("User with id '%s' not found.", consumed.userId().value())
+                String.format("User with id '%s' not found.", consumed.userId().getValue())
         ));
 
         return new AuthIdentity(user, null, false);

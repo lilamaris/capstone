@@ -1,7 +1,8 @@
 package com.lilamaris.capstone.domain.user;
 
-import com.lilamaris.capstone.domain.BaseDomain;
 import com.lilamaris.capstone.domain.embed.Audit;
+import com.lilamaris.capstone.domain.DomainType;
+import com.lilamaris.capstone.domain.AbstractUUIDDomainId;
 import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import lombok.Builder;
 
@@ -19,18 +20,36 @@ public record User(
         Role role,
         Set<Account> accountSet,
         Audit audit
-) implements BaseDomain<User.Id, User> {
-    public record Id(UUID value) implements BaseDomain.Id<UUID> {
-        public static Id random() { return new Id(UUID.randomUUID()); }
-        public static Id from(UUID value) { return new Id(value); }
-        public static Id from(String value) { return new Id(UUID.fromString(value)); }
+) {
+    public enum Type implements DomainType {
+        INSTANCE;
+
+        @Override
+        public String getName() {
+            return "user";
+        }
+    }
+
+    public static class Id extends AbstractUUIDDomainId<Type> {
+        public Id() {
+            super();
+        }
+
+        public Id(UUID uuid) {
+            super(uuid);
+        }
+
+        @Override
+        public Type getDomainType() {
+            return Type.INSTANCE;
+        }
     }
 
     public User {
         if (role == null) throw new DomainIllegalArgumentException("Field 'role' must not be null.");
         if (displayName == null) throw new DomainIllegalArgumentException("Field 'displayName' must not be null.");
 
-        id = Optional.ofNullable(id).orElseGet(Id::random);
+        id = Optional.ofNullable(id).orElseGet(Id::new);
         accountSet = Optional.ofNullable(accountSet).orElseGet(HashSet::new);
 
         var curId = id;
@@ -60,6 +79,6 @@ public record User(
     }
 
     private static UserBuilder getDefaultBuilder() {
-        return builder().id(Id.random());
+        return builder();
     }
 }

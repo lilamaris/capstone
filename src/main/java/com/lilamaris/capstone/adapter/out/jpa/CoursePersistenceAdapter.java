@@ -18,12 +18,12 @@ public class CoursePersistenceAdapter implements CoursePort {
 
     @Override
     public Optional<Course> getById(Course.Id id) {
-        return repository.findById(id.value()).map(CourseEntityMapper::toDomain);
+        return repository.findById(id.getValue()).map(CourseEntityMapper::toDomain);
     }
 
     @Override
     public List<Course> getByIds(List<Course.Id> ids) {
-        return repository.findAllById(ids.stream().map(Course.Id::value).toList()).stream().map(CourseEntityMapper::toDomain).toList();
+        return repository.findAllById(ids.stream().map(Course.Id::getValue).toList()).stream().map(CourseEntityMapper::toDomain).toList();
     }
 
     @Override

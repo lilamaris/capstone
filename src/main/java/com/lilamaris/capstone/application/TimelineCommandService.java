@@ -34,7 +34,7 @@ public class TimelineCommandService implements TimelineCommandUseCase {
     @Override
     public TimelineResult.Command update(Timeline.Id id, String description) {
         var timeline = timelinePort.getById(id).orElseThrow(() -> new ResourceNotFoundException(
-                String.format("Timeline with id '%s' not found.", id.value())
+                String.format("Timeline with id '%s' not found.", id.getValue())
         ));
 
         var updated = timeline.copyWithDescription(description);
@@ -46,7 +46,7 @@ public class TimelineCommandService implements TimelineCommandUseCase {
     @Override
     public TimelineResult.Command migrate(Timeline.Id id, LocalDateTime validAt, String description) {
         var timeline = timelinePort.getById(id).orElseThrow(() -> new ResourceNotFoundException(
-                String.format("Timeline with id '%s' not found.", id.value())
+                String.format("Timeline with id '%s' not found.", id.getValue())
         ));
 
         var updated = timeline.migrateSnapshot(UniversityClock.now(), UniversityClock.at(validAt), description);
@@ -58,7 +58,7 @@ public class TimelineCommandService implements TimelineCommandUseCase {
     @Override
     public TimelineResult.Command merge(Timeline.Id id, LocalDateTime validFrom, LocalDateTime validTo, String description) {
         var timeline = timelinePort.getById(id).orElseThrow(() -> new ResourceNotFoundException(
-                String.format("Timeline with id '%s' not found.", id.value())
+                String.format("Timeline with id '%s' not found.", id.getValue())
         ));
 
         var validRange = Effective.from(validFrom, validTo);
@@ -86,7 +86,7 @@ public class TimelineCommandService implements TimelineCommandUseCase {
         var id = event.timelineId();
 
         var timeline = timelinePort.getById(id).orElseThrow(() -> new ResourceNotFoundException(
-                String.format("Timeline with id '%s' not found.", id.value())
+                String.format("Timeline with id '%s' not found.", id.getValue())
         ));
 
         var updated = timeline.updateDomainDelta(event.snapshotId(), event.domainType(), event.domainId(), event.toPatch());

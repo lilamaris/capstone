@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 public class UserEntityMapper {
     public static User toDomain(UserEntity entity) {
-        var id = User.Id.from(entity.getId());
+        var id = new User.Id(entity.getId());
         var accountSet = entity.getAccountSet().stream().map(AccountEntityMapper::toDomain).collect(Collectors.toSet());
         var audit = AuditEmbeddableEntityMapper.toDomain(entity);
 
@@ -17,7 +17,7 @@ public class UserEntityMapper {
     public static UserEntity toEntity(User domain) {
         var accountSet = domain.accountSet().stream().map(AccountEntityMapper::toEntity).collect(Collectors.toSet());
         return UserEntity.builder()
-                .id(domain.id().value())
+                .id(domain.id().getValue())
                 .displayName(domain.displayName())
                 .accountSet(accountSet)
                 .role(domain.role())

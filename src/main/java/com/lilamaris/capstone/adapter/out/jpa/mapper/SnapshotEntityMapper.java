@@ -6,10 +6,10 @@ import com.lilamaris.capstone.domain.timeline.Timeline;
 
 public class SnapshotEntityMapper {
     public static Snapshot toDomain(SnapshotEntity entity) {
-        var id = Snapshot.Id.from(entity.getId());
+        var id = new Snapshot.Id(entity.getId());
         var tx = EffectiveEmbeddableEntityMapper.toDomain(entity.getTx());
         var valid = EffectiveEmbeddableEntityMapper.toDomain(entity.getValid());
-        var timelineId = Timeline.Id.from(entity.getTimelineId());
+        var timelineId = new Timeline.Id(entity.getTimelineId());
 
         return Snapshot.builder()
                 .id(id)
@@ -23,12 +23,12 @@ public class SnapshotEntityMapper {
 
     public static SnapshotEntity toEntity(Snapshot domain) {
         return SnapshotEntity.builder()
-                .id(domain.id().value())
+                .id(domain.id().getValue())
                 .tx(EffectiveEmbeddableEntityMapper.toEntity(domain.tx()))
                 .valid(EffectiveEmbeddableEntityMapper.toEntity(domain.valid()))
                 .versionNo(domain.versionNo())
                 .description(domain.description())
-                .timelineId(domain.timelineId().value())
+                .timelineId(domain.timelineId().getValue())
                 .build();
     }
 }

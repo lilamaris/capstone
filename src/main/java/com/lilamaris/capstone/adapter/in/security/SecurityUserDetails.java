@@ -32,6 +32,6 @@ public class SecurityUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return userId.asString();
+        return userId.getValue().toString();
     }
 }

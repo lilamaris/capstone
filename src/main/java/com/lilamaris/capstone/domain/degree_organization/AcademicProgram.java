@@ -1,6 +1,7 @@
 package com.lilamaris.capstone.domain.degree_organization;
 
-import com.lilamaris.capstone.domain.BaseDomain;
+import com.lilamaris.capstone.domain.AbstractUUIDDomainId;
+import com.lilamaris.capstone.domain.DomainType;
 import com.lilamaris.capstone.domain.degree_course.Course;
 import lombok.Builder;
 
@@ -16,10 +17,29 @@ public record AcademicProgram (
         ProgramType programType,
         List<CourseOffer> courseOfferList,
         Organization.Id organizationId
-) implements BaseDomain<AcademicProgram.Id, AcademicProgram> {
-    public record Id(UUID value) implements BaseDomain.Id<UUID> {
-        public static Id random() { return new Id(UUID.randomUUID()); }
-        public static Id from(UUID value) { return new Id(value); }
+) {
+    public enum Type implements DomainType {
+        INSTANCE;
+
+        @Override
+        public String getName() {
+            return "academic-program";
+        }
+    }
+
+    public static class Id extends AbstractUUIDDomainId<Type> {
+        public Id(UUID value) {
+            super(value);
+        }
+
+        public Id() {
+            super();
+        }
+
+        @Override
+        public Type getDomainType() {
+            return Type.INSTANCE;
+        }
     }
 
     public AcademicProgram {

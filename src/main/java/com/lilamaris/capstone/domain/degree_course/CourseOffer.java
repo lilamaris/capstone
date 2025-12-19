@@ -1,6 +1,7 @@
 package com.lilamaris.capstone.domain.degree_course;
 
-import com.lilamaris.capstone.domain.BaseDomain;
+import com.lilamaris.capstone.domain.AbstractUUIDDomainId;
+import com.lilamaris.capstone.domain.DomainType;
 import com.lilamaris.capstone.domain.embed.Audit;
 import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import lombok.Builder;
@@ -15,17 +16,36 @@ public record CourseOffer(
         Integer semester,
         Boolean isRetire,
         Audit audit
-) implements BaseDomain<CourseOffer.Id, CourseOffer> {
-    public record Id(UUID value) implements BaseDomain.Id<UUID> {
-        public static Id random() { return new Id(UUID.randomUUID()); }
-        public static Id from(UUID value) { return new Id(value); }
+) {
+    public enum Type implements DomainType {
+        INSTANCE;
+
+        @Override
+        public String getName() {
+            return "course-offer";
+        }
+    }
+
+    public static class Id extends AbstractUUIDDomainId<Type> {
+        public Id(UUID value) {
+            super(value);
+        }
+
+        public Id() {
+            super();
+        }
+
+        @Override
+        public Type getDomainType() {
+            return Type.INSTANCE;
+        }
     }
 
     public CourseOffer {
         if (courseId == null) throw new DomainIllegalArgumentException("Field 'courseId' must not be null.");
         if (semester == null) throw new DomainIllegalArgumentException("Field 'semester' must not be null.");
 
-        id = Optional.ofNullable(id).orElseGet(Id::random);
+        id = Optional.ofNullable(id).orElseGet(Id::new);
         isRetire = Optional.ofNullable(isRetire).orElse(false);
     }
 

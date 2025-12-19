@@ -6,8 +6,8 @@ import com.lilamaris.capstone.domain.user.User;
 
 public class AccountEntityMapper {
     public static Account toDomain(AccountEntity entity) {
-        var id = Account.Id.from(entity.getId());
-        var userId = User.Id.from(entity.getUserId());
+        var id = new Account.Id(entity.getId());
+        var userId = new User.Id(entity.getUserId());
         var audit = AuditEmbeddableEntityMapper.toDomain(entity);
 
         return Account.from(
@@ -24,8 +24,8 @@ public class AccountEntityMapper {
 
     public static AccountEntity toEntity(Account domain) {
         return AccountEntity.builder()
-                .id(domain.id().value())
-                .userId(domain.userId().value())
+                .id(domain.id().getValue())
+                .userId(domain.userId().getValue())
                 .provider(domain.provider())
                 .providerId(domain.providerId())
                 .displayName(domain.displayName())

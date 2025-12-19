@@ -1,8 +1,9 @@
 package com.lilamaris.capstone.domain.timeline;
 
-import com.lilamaris.capstone.domain.BaseDomain;
-import com.lilamaris.capstone.domain.embed.Audit;
-import com.lilamaris.capstone.domain.embed.Effective;
+import com.lilamaris.capstone.domain.AbstractUUIDDomainId;
+import com.lilamaris.capstone.domain.DomainId;
+import com.lilamaris.capstone.domain.DomainType;
+import com.lilamaris.capstone.domain.embed.*;
 import com.lilamaris.capstone.domain.exception.DomainInvariantException;
 import com.lilamaris.capstone.domain.timeline.exception.TimelineDomainException;
 import com.lilamaris.capstone.domain.timeline.exception.TimelineErrorCode;
@@ -23,14 +24,33 @@ public record Timeline(
         Map<Snapshot.Id, SnapshotLink> snapshotLinkByAncestor,
         Map<Snapshot.Id, SnapshotLink> snapshotLinkByDescendant,
         Audit audit
-) implements BaseDomain<Timeline.Id, Timeline> {
-    public record Id(UUID value) implements BaseDomain.Id<UUID> {
-        public static Id random() { return new Id(UUID.randomUUID()); }
-        public static Id from(UUID value) { return new Id(value); }
+) {
+    public enum Type implements DomainType {
+        INSTANCE;
+
+        @Override
+        public String getName() {
+            return "timeline";
+        }
+    }
+    
+    public static class Id extends AbstractUUIDDomainId<Type> {
+        public Id() {
+            super();
+        }
+
+        public Id(UUID uuid) {
+            super(uuid);
+        }
+
+        @Override
+        public Type getDomainType() {
+            return Type.INSTANCE;
+        }
     }
 
     public Timeline {
-        id = Optional.ofNullable(id).orElseGet(Id::random);
+        id = Optional.ofNullable(id).orElseGet(Id::new);
         description = Optional.ofNullable(description).orElse("No description");
         snapshotMap = Optional.ofNullable(snapshotMap).orElse(new HashMap<>());
         snapshotLinkMap = Optional.ofNullable(snapshotLinkMap).orElse(new HashMap<>());
@@ -41,7 +61,7 @@ public record Timeline(
                 .collect(Collectors.toMap(SnapshotLink::descendantSnapshotId, Function.identity()));
     }
 
-    public static Timeline from(Timeline.Id id, String description, Map<Snapshot.Id, Snapshot> snapshotMap, Map<SnapshotLink.Id, SnapshotLink> snapshotLinkMap, Audit audit) {
+    public static Timeline from(Id id, String description, Map<Snapshot.Id, Snapshot> snapshotMap, Map<SnapshotLink.Id, SnapshotLink> snapshotLinkMap, Audit audit) {
         return getDefaultBuilder()
                 .id(id)
                 .description(description)
@@ -83,11 +103,11 @@ public record Timeline(
                 .toList();
     }
 
-    public Map<BaseDomain.Id<?>, List<DomainDelta>> resolveAllDeltaOf(
+    public Map<DomainId<?, ?>, List<DomainDelta>> resolveAllDeltaOf(
             Snapshot.Id snapshotId,
             String domainType
     ) {
-        Map<BaseDomain.Id<?>, List<DomainDelta>> bucket = new HashMap<>();
+        Map<DomainId<?, ?>, List<DomainDelta>> bucket = new HashMap<>();
         List<SnapshotLink> descToRoot = buildDescendantToRootChain(snapshotId);
 
         descToRoot.stream()
@@ -98,7 +118,7 @@ public record Timeline(
         return bucket;
     }
 
-    public Timeline updateDomainDelta(Snapshot.Id targetSnapshotId, String domainType, BaseDomain.Id<?> domainId, DomainDelta.Patch patch) {
+    public Timeline updateDomainDelta(Snapshot.Id targetSnapshotId, String domainType, DomainId<?, ?> domainId, DomainDelta.Patch patch) {
         var currentSnapshotLinkMap = new HashMap<>(snapshotLinkMap);
         var targetSnapshotLink = snapshotLinkByDescendant.get(targetSnapshotId);
         var domainDelta = DomainDelta.create(targetSnapshotLink.id(), domainType, domainId, patch);
