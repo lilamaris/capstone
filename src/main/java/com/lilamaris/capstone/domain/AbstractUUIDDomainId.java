@@ -20,6 +20,11 @@ public abstract class AbstractUUIDDomainId<D extends DomainType> implements Doma
     }
 
     @Override
+    public String asString() {
+        return value.toString();
+    }
+
+    @Override
     public abstract D getDomainType();
 
     @Override

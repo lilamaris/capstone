@@ -15,6 +15,11 @@ public abstract class AbstractStringDomainId<D extends DomainType> implements Do
     }
 
     @Override
+    public String asString() {
+        return value;
+    }
+
+    @Override
     public abstract D getDomainType();
 
 
