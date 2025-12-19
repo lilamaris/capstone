@@ -1,19 +1,24 @@
 package com.lilamaris.capstone.domain.access_control;
 
 import com.lilamaris.capstone.domain.AbstractUUIDDomainId;
-import com.lilamaris.capstone.domain.DomainId;
 import com.lilamaris.capstone.domain.DomainType;
+import com.lilamaris.capstone.domain.embed.Audit;
+import com.lilamaris.capstone.domain.embed.DomainRef;
+import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.domain.user.User;
+import lombok.AccessLevel;
 import lombok.Builder;
 
+import java.util.Optional;
 import java.util.UUID;
 
-@Builder(toBuilder = true)
+@Builder(access = AccessLevel.PRIVATE)
 public record AccessControl (
         Id id,
         User.Id userId,
-        DomainId<?, ?> resourceId,
-        String role
+        DomainRef resource,
+        String scopedRole,
+        Audit audit
 ) {
     public enum Type implements DomainType {
         INSTANCE;
