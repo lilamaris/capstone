@@ -43,4 +43,16 @@ public record AccessControl (
             return Type.INSTANCE;
         }
     }
+
+    public AccessControl {
+        if (userId == null) throw new DomainIllegalArgumentException("Field 'userId' must not be null.'");
+        if (resource == null) throw new DomainIllegalArgumentException("Field 'resource' must not be null.");
+        if (scopedRole == null) throw new DomainIllegalArgumentException("Field 'scopedRole' must not be null.");
+
+        id = Optional.ofNullable(id).orElseGet(Id::new);
+    }
+
+    public static AccessControl create(User.Id userId, DomainRef resource, String scopedRole) {
+        return AccessControl.builder().userId(userId).resource(resource).scopedRole(scopedRole).build();
+    }
 }
