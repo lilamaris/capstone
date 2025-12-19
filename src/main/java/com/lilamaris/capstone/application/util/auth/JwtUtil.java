@@ -1,6 +1,7 @@
-package com.lilamaris.capstone.application.util;
+package com.lilamaris.capstone.application.util.auth;
 
 import com.lilamaris.capstone.application.exception.ApplicationInvariantException;
+import com.lilamaris.capstone.application.util.UniversityClock;
 import com.lilamaris.capstone.domain.user.Role;
 import com.lilamaris.capstone.domain.user.User;
 import io.jsonwebtoken.*;

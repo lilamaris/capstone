@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.adapter.in.security.util;
 
 import com.lilamaris.capstone.adapter.in.security.SecurityUserDetails;
-import com.lilamaris.capstone.application.util.JwtUtil;
+import com.lilamaris.capstone.application.util.auth.JwtUtil;
 import com.lilamaris.capstone.domain.user.Role;
 import com.lilamaris.capstone.domain.user.User;
 import io.jsonwebtoken.Claims;

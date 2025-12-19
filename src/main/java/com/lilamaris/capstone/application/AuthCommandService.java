@@ -5,7 +5,7 @@ import com.lilamaris.capstone.application.port.in.AuthCommandUseCase;
 import com.lilamaris.capstone.application.port.in.result.AuthResult;
 import com.lilamaris.capstone.application.port.out.AuthPort;
 import com.lilamaris.capstone.application.port.out.UserPort;
-import com.lilamaris.capstone.application.resolver.auth.*;
+import com.lilamaris.capstone.application.util.auth.*;
 import com.lilamaris.capstone.domain.auth.RefreshToken;
 import com.lilamaris.capstone.domain.user.Account;
 import com.lilamaris.capstone.domain.user.Provider;

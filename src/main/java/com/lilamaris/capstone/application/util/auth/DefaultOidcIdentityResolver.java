@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.application.resolver.auth;
+package com.lilamaris.capstone.application.util.auth;
 
 import com.lilamaris.capstone.application.exception.ResourceNotFoundException;
 import com.lilamaris.capstone.application.port.out.AuthPort;
