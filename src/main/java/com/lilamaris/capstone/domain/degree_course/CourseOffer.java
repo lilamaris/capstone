@@ -22,7 +22,7 @@ public record CourseOffer(
 
         @Override
         public String getName() {
-            return "course-offer";
+            return "course.course-offer";
         }
     }
 

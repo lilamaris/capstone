@@ -11,8 +11,8 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 public record AccessControl (
         Id id,
-        DomainId<?, ?> resourceId,
         User.Id userId,
+        DomainId<?, ?> resourceId,
         String role
 ) {
     public enum Type implements DomainType {
@@ -20,7 +20,7 @@ public record AccessControl (
 
         @Override
         public String getName() {
-            return "course-offer";
+            return "access-control";
         }
     }
 

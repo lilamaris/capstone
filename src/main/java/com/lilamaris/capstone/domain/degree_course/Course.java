@@ -27,7 +27,7 @@ public record Course(
 
         @Override
         public String getName() {
-            return "course-offer";
+            return "course";
         }
     }
 

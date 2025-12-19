@@ -27,7 +27,7 @@ public record DomainDelta (
 
         @Override
         public String getName() {
-            return "domain-delta";
+            return "timeline.snapshot-link.domain-delta";
         }
     }
 

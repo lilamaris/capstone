@@ -23,7 +23,7 @@ public record AcademicProgram (
 
         @Override
         public String getName() {
-            return "academic-program";
+            return "organization.academic-program";
         }
     }
 
