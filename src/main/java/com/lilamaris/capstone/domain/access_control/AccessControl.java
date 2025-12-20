@@ -12,7 +12,7 @@ import lombok.Builder;
 import java.util.Optional;
 import java.util.UUID;
 
-@Builder(access = AccessLevel.PRIVATE)
+@Builder(access = AccessLevel.PRIVATE, toBuilder = true)
 public record AccessControl (
         Id id,
         User.Id userId,
@@ -54,5 +54,9 @@ public record AccessControl (
 
     public static AccessControl create(User.Id userId, DomainRef resource, String scopedRole) {
         return AccessControl.builder().userId(userId).resource(resource).scopedRole(scopedRole).build();
+    }
+
+    public  AccessControl regrant(String scopedRole) {
+        return toBuilder().scopedRole(scopedRole).build();
     }
 }
