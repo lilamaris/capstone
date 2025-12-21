@@ -37,8 +37,9 @@ public class Snapshot extends DefaultAuditableDomain implements Identifiable<Sna
     private Effective valid;
 
     @Embedded
-    @AttributeOverride(name = "id", column = @Column(name = "timeline_id"))
+    @AttributeOverride(name = "id", column = @Column(name = "timeline_id", insertable = false, updatable = false))
     private TimelineId timelineId;
+
     private String description;
     private Integer versionNo;
 
@@ -59,6 +60,14 @@ public class Snapshot extends DefaultAuditableDomain implements Identifiable<Sna
     protected Snapshot closeValidAndNext(Instant at) {
         var next = valid.closeAndNext(at);
         return Snapshot.create(tx, next, timelineId, description);
+    }
+
+    protected void close(EffectiveSelector selector, Instant at) {
+        if (selector == EffectiveSelector.TX) {
+            tx.close(at);
+        } else {
+            valid.close(at);
+        }
     }
 
     private void upgrade() {

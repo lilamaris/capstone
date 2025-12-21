@@ -97,30 +97,41 @@ public class TimelineTest {
 
         // start validate snapshot link invariants
         var closedSnapshot = closed.getFirst();
-        var newSnapshotLeft = opened.getFirst();
-        var newSnapshotRight = opened.getLast();
+        var leftSnapshot = opened.stream()
+                .filter(s -> s.getValid().equals(leftValid))
+                .findFirst()
+                .orElseThrow();
+        var rightSnapshot = opened.stream()
+                .filter(s -> s.getValid().equals(rightValid))
+                .findFirst()
+                .orElseThrow();
 
-        assertThat(t.getSnapshotLinkByDescendant())
-                .hasEntrySatisfying(closedSnapshot.id(), l -> {
-                    assertThat(l.getAncestorSnapshotId()).isNull();
-                })
-                .hasEntrySatisfying(newSnapshotLeft.id(), l -> {
-                    assertThat(l.getAncestorSnapshotId()).isEqualTo(closedSnapshot.id());
-                })
-                .hasEntrySatisfying(newSnapshotRight.id(), l -> {
-                    assertThat(l.getAncestorSnapshotId()).isEqualTo(newSnapshotLeft.id());
-                });
+        var linkByDesc = t.getSnapshotLinkByDescendant();
+        var rootLink = linkByDesc.get(closedSnapshot.id());
+        var leftLink = linkByDesc.get(leftSnapshot.id());
+        var rightLink = linkByDesc.get(rightSnapshot.id());
 
-        assertThat(t.getSnapshotLinkByAncestor())
-                .hasEntrySatisfying(closedSnapshot.id(), l -> {
-                    assertThat(l.getAncestorSnapshotId()).isEqualTo(closedSnapshot.id());
-                    assertThat(l.getDescendantSnapshotId()).isEqualTo(newSnapshotLeft.id());
-                })
-                .hasEntrySatisfying(newSnapshotLeft.id(), l -> {
-                    assertThat(l.getAncestorSnapshotId()).isEqualTo(newSnapshotLeft.id());
-                    assertThat(l.getDescendantSnapshotId()).isEqualTo(newSnapshotRight.id());
-                });
+        assertThat(linkByDesc).hasSize(3);
 
-        log.info("timeline: {}", t);
+        assertThat(rootLink.getAncestorSnapshotId()).isNull();
+        assertThat(rootLink.getDescendantSnapshotId()).isEqualTo(closedSnapshot.id());
+
+        assertThat(leftLink.getAncestorSnapshotId()).isEqualTo(closedSnapshot.id());
+        assertThat(leftLink.getDescendantSnapshotId()).isEqualTo(leftSnapshot.id());
+
+        assertThat(rightLink.getAncestorSnapshotId()).isEqualTo(leftSnapshot.id());
+        assertThat(rightLink.getDescendantSnapshotId()).isEqualTo(rightSnapshot.id());
+
+        var linkByAncestor = t.getSnapshotLinkByAncestor();
+
+        assertThat(linkByAncestor).containsKey(closedSnapshot.id());
+        assertThat(linkByAncestor.get(closedSnapshot.id()).getDescendantSnapshotId())
+                .isEqualTo(leftSnapshot.id());
+
+        assertThat(linkByAncestor).containsKey(leftSnapshot.id());
+        assertThat(linkByAncestor.get(leftSnapshot.id()).getDescendantSnapshotId())
+                .isEqualTo(rightSnapshot.id());
+
+        assertThat(linkByAncestor).doesNotContainKey(rightSnapshot.id());
     }
 }

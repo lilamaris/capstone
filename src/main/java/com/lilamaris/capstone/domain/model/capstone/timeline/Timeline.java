@@ -19,6 +19,7 @@ import lombok.ToString;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -33,10 +34,12 @@ public class Timeline extends DefaultAuditableDomain implements Identifiable<Tim
     @EmbeddedId
     private TimelineId id;
 
-    @OneToMany(mappedBy = "timelineId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "timeline_id", referencedColumnName = "id")
     private List<Snapshot> snapshotList;
 
-    @OneToMany(mappedBy = "timelineId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "timeline_id", referencedColumnName = "id")
     private List<SnapshotLink> snapshotLinkList;
 
     @Transient
@@ -50,6 +53,11 @@ public class Timeline extends DefaultAuditableDomain implements Identifiable<Tim
 
     @Transient
     private Map<SnapshotId, SnapshotLink> snapshotLinkByAncestor;
+
+    @PostLoad
+    private void onLoad() {
+        propagateToTransient();
+    }
 
     public static Timeline create() {
         return new Timeline(TimelineId.newId(), new ArrayList<>(), new ArrayList<>());
@@ -74,10 +82,21 @@ public class Timeline extends DefaultAuditableDomain implements Identifiable<Tim
             return;
         }
 
-        var sourceSnapshot = filterSnapshotValid(validAt).orElseThrow(() -> new TimelineDomainException(
+        var maybeOneSnapshot = snapshotList.stream()
+                .filter(ifEffectiveOpen(EffectiveSelector.TX, true))
+                .filter(ifEffective(EffectiveSelector.VALID, validAt))
+                .toList();
+
+        if (maybeOneSnapshot.size() > 1) {
+            throw new DomainIllegalStateException(
+                    String.format("Invalid snapshot state: more then one snapshot exists for the same valid at: '%s'", validAt)
+            );
+        }
+
+        var sourceSnapshot = maybeOneSnapshot.stream().findFirst().orElseThrow(() -> new TimelineDomainException(
                 TimelineErrorCode.NO_AVAILABLE_SNAPSHOT,
                 String.format(
-                        "Invalid filter argument: no snapshot match the given criteria valid '%s'", validAt
+                        "Invalid argument: no snapshot match the given criteria valid '%s'", validAt
                 )
         ));
 
@@ -95,6 +114,36 @@ public class Timeline extends DefaultAuditableDomain implements Identifiable<Tim
         propagateToTransient();
     }
 
+    public void mergeValidRange(Instant txAt, Effective validRange, String description) {
+        var sourceSnapshots = snapshotList.stream()
+                .filter(ifEffectiveOpen(EffectiveSelector.TX, true))
+                .filter(ifEffective(EffectiveSelector.VALID, validRange))
+                .sorted(sortAsc(EffectiveSelector.VALID))
+                .toList();
+
+        if (sourceSnapshots.isEmpty()) {
+            throw new TimelineDomainException(TimelineErrorCode.NO_AVAILABLE_SNAPSHOT, String.format(
+                    "Invalid argument: no snapshot match the given criteria valid range '%s'", validRange
+            ));
+        }
+
+        sourceSnapshots.forEach(s -> s.close(EffectiveSelector.TX, txAt));
+        var earliestSnapshot = sourceSnapshots.getFirst();
+        var latestSnapshot = sourceSnapshots.getLast();
+
+        var startValidAt = earliestSnapshot.getValid().getFrom();
+        var endValidAt = latestSnapshot.getValid().getTo();
+        var mergedSnapshotValid = Effective.create(startValidAt, endValidAt);
+        var mergedSnapshotTx = Effective.create(txAt, Effective.MAX);
+
+        var mergedSnapshot = Snapshot.create(mergedSnapshotTx, mergedSnapshotValid, id, description);
+        var mergedSnapshotLink = SnapshotLink.create(id, earliestSnapshot.id(), mergedSnapshot.id());
+
+        snapshotList.add(mergedSnapshot);
+        snapshotLinkList.add(mergedSnapshotLink);
+        propagateToTransient();
+    }
+
     private void createInitialSnapshot(Instant txAt, Instant validAt, String description) {
         var tx = Effective.create(txAt, Effective.MAX);
         var valid = Effective.create(validAt, Effective.MAX);
@@ -106,25 +155,27 @@ public class Timeline extends DefaultAuditableDomain implements Identifiable<Tim
         propagateToTransient();
     }
 
-    private Optional<Snapshot> filterSnapshotValid(Instant at) {
-        var result = snapshotList.stream()
-                .filter(s -> s.getTx().isOpen())
-                .filter(s -> s.getValid().contains(at))
-                .toList();
-        if (result.size() > 1) {
-            throw new DomainIllegalStateException(
-                    String.format("Invalid snapshot state: more then one snapshot exists for the same valid at: '%s'", at)
-            );
-        }
-
-        return result.stream().findFirst();
+    private Comparator<Snapshot> sortAsc(EffectiveSelector selector) {
+        return selector == EffectiveSelector.TX
+                ? Comparator.comparing(s -> s.getTx().getFrom())
+                : Comparator.comparing(s -> s.getValid().getFrom());
+    }
+    private Predicate<Snapshot> ifEffectiveOpen(EffectiveSelector selector, boolean state) {
+        return selector == EffectiveSelector.TX
+                ? s -> s.getTx().isOpen() == state
+                : s -> s.getValid().isOpen() == state;
     }
 
-    private List<Snapshot> filterSnapshotValid(Effective range) {
-        return snapshotList.stream()
-                .filter(s -> s.getTx().isOpen())
-                .filter(s -> s.getValid().isOverlap(range))
-                .toList();
+    private Predicate<Snapshot> ifEffective(EffectiveSelector selector, Instant at) {
+        return selector == EffectiveSelector.TX
+                ? s -> s.getTx().contains(at)
+                : s -> s.getValid().contains(at);
+    }
+
+    private Predicate<Snapshot> ifEffective(EffectiveSelector selector, Effective range) {
+        return selector == EffectiveSelector.TX
+                ? s -> s.getTx().isOverlap(range)
+                : s -> s.getValid().isOverlap(range);
     }
 
     private void checkFieldInvariants() {

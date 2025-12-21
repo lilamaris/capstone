@@ -14,7 +14,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @Entity
-@Table(name = "timeline_snapshot-link")
+@Table(name = "timeline_snapshot_link")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SnapshotLink implements Identifiable<SnapshotLinkId> {
     @Getter(AccessLevel.NONE)
@@ -22,7 +22,7 @@ public class SnapshotLink implements Identifiable<SnapshotLinkId> {
     private SnapshotLinkId id;
 
     @Embedded
-    @AttributeOverride(name = "id", column = @Column(name = "timeline_id"))
+    @AttributeOverride(name = "id", column = @Column(name = "timeline_id", insertable = false, updatable = false))
     private TimelineId timelineId;
 
     @Embedded

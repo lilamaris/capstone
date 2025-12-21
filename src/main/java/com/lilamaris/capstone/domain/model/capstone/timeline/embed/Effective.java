@@ -42,6 +42,10 @@ public class Effective {
         return split.right();
     }
 
+    public void close(Instant at) {
+        this.to = at;
+    }
+
     public void apply(Effective other) {
         from = other.from;
         to = other.to;
