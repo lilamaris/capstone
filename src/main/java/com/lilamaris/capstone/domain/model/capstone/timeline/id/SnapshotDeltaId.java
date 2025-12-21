@@ -7,17 +7,17 @@ import lombok.ToString;
 import java.util.UUID;
 
 @Embeddable
-public class SnapshotLinkId extends DefaultUuidDomainId {
-    public SnapshotLinkId() {
+public class SnapshotDeltaId extends DefaultUuidDomainId {
+    public SnapshotDeltaId() {
         super();
     }
 
-    public SnapshotLinkId(UUID value) {
+    public SnapshotDeltaId(UUID value) {
         super(value);
     }
 
-    public static SnapshotLinkId newId() {
-        return new SnapshotLinkId();
+    public static SnapshotDeltaId newId() {
+        return new SnapshotDeltaId();
     }
 
     @Override

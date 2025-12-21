@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Objects;
 
 @Getter
@@ -22,6 +24,12 @@ public class Effective {
 
     public static Effective create(Instant from, Instant to) {
         return new Effective(from, to);
+    }
+
+    public static Effective create(LocalDateTime from, LocalDateTime to, ZoneId zoneId) {
+        var parsedFrom = from.atZone(zoneId).toInstant();
+        var parsedTo = to.atZone(zoneId).toInstant();
+        return new Effective(parsedFrom, parsedTo);
     }
 
     public boolean isOpen() {

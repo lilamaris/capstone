@@ -20,7 +20,7 @@ public class AccessControlResult {
                     .userId(domain.userId())
                     .resource(domain.resource())
                     .scopedRole(domain.scopedRole())
-                    .audit(AuditResult.from(domain.audit()))
+//                    .audit(AuditResult.from(domain.audit()))
                     .build();
         }
     }
@@ -39,7 +39,7 @@ public class AccessControlResult {
                     .userId(domain.userId())
                     .resource(domain.resource())
                     .scopedRole(domain.scopedRole())
-                    .audit(AuditResult.from(domain.audit()))
+//                    .audit(AuditResult.from(domain.audit()))
                     .build();
         }
     }

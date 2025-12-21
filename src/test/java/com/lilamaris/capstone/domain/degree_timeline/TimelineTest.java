@@ -24,7 +24,7 @@ public class TimelineTest {
         initialTxAt = Instant.parse("2025-01-01T00:00:00Z");
         initialValidAt = Instant.parse("2025-01-01T00:00:00Z");
 
-        t = Timeline.create();
+        t = Timeline.create("Timeline Test");
     }
 
     @Test

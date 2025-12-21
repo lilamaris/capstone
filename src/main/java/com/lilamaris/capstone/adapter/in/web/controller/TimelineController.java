@@ -5,7 +5,7 @@ import com.lilamaris.capstone.application.port.in.TimelineCommandUseCase;
 import com.lilamaris.capstone.application.port.in.TimelineQueryUseCase;
 import com.lilamaris.capstone.application.port.in.condition.SnapshotQueryCondition;
 import com.lilamaris.capstone.application.port.in.result.TimelineResult;
-import com.lilamaris.capstone.domain.timeline.Timeline;
+import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +33,7 @@ public class TimelineController {
     public ResponseEntity<?> getCompressedById(
         @PathVariable("id") UUID id
     ) {
-        var timelineId = new Timeline.Id(id);
+        var timelineId = new TimelineId(id);
         var result = timelineQueryUseCase.getCompressedById(timelineId);
         return ResponseEntity.ok(result);
     }
@@ -44,7 +44,7 @@ public class TimelineController {
             @RequestParam(name = "txAt", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime txAt,
             @RequestParam(name = "validAt", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  LocalDateTime validAt
     ) {
-        var timelineId = new Timeline.Id(id);
+        var timelineId = new TimelineId(id);
         var condition = SnapshotQueryCondition.create(timelineId, txAt, validAt);
         var result = timelineQueryUseCase.getSnapshot(condition);
         return ResponseEntity.ok(result);
@@ -63,7 +63,7 @@ public class TimelineController {
             @PathVariable("id") UUID id,
             @RequestBody TimelineRequest.Migrate body
     ) {
-        var timelineId = new Timeline.Id(id);
+        var timelineId = new TimelineId(id);
         var result = timelineCommandUseCase.migrate(timelineId, body.validAt(), body.description());
         return ResponseEntity.ok(result);
     }
@@ -73,7 +73,7 @@ public class TimelineController {
         @PathVariable("id") UUID id,
         @RequestBody TimelineRequest.Merge body
     ) {
-        var timelineId = new Timeline.Id(id);
+        var timelineId = new TimelineId(id);
         var result = timelineCommandUseCase.merge(timelineId, body.validFrom(), body.validTo(), body.description());
         return ResponseEntity.ok(result);
     }
@@ -92,7 +92,7 @@ public class TimelineController {
             @PathVariable("id") UUID id,
             @RequestBody TimelineRequest.Update body
     ) {
-        var timelineId = new Timeline.Id(id);
+        var timelineId = new TimelineId(id);
         var result = timelineCommandUseCase.update(timelineId, body.description());
         return ResponseEntity.ok(result);
     }

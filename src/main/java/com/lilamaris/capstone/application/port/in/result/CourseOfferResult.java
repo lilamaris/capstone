@@ -18,7 +18,7 @@ public class CourseOfferResult {
                     .id(domain.id())
                     .courseId(domain.courseId())
                     .semester(domain.semester())
-                    .audit(AuditResult.from(domain.audit()))
+//                    .audit(AuditResult.from(domain.audit()))
                     .build();
         }
     }
@@ -36,7 +36,7 @@ public class CourseOfferResult {
                     .id(domain.id())
                     .courseId(domain.courseId())
                     .semester(domain.semester())
-                    .audit(AuditResult.from(domain.audit()))
+//                    .audit(AuditResult.from(domain.audit()))
                     .build();
         }
     }

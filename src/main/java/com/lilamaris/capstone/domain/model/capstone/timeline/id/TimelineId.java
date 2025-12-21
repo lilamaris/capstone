@@ -6,7 +6,6 @@ import lombok.ToString;
 
 import java.util.UUID;
 
-@ToString(callSuper = true)
 @Embeddable
 public class TimelineId extends DefaultUuidDomainId {
     public TimelineId() {
@@ -19,5 +18,10 @@ public class TimelineId extends DefaultUuidDomainId {
 
     public static TimelineId newId() {
         return new TimelineId();
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
     }
 }

@@ -54,12 +54,15 @@ public class Snapshot extends DefaultAuditableDomain implements Identifiable<Sna
 
     protected Snapshot closeTxAndNext(Instant at) {
         var next = tx.closeAndNext(at);
+        upgrade();
         return Snapshot.create(next, valid, timelineId, description);
     }
 
     protected Snapshot closeValidAndNext(Instant at) {
         var next = valid.closeAndNext(at);
+        upgrade();
         return Snapshot.create(tx, next, timelineId, description);
+
     }
 
     protected void close(EffectiveSelector selector, Instant at) {
@@ -68,6 +71,7 @@ public class Snapshot extends DefaultAuditableDomain implements Identifiable<Sna
         } else {
             valid.close(at);
         }
+        upgrade();
     }
 
     private void upgrade() {

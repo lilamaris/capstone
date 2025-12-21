@@ -5,8 +5,9 @@ import com.lilamaris.capstone.application.port.in.condition.SnapshotQueryConditi
 import com.lilamaris.capstone.application.port.in.result.SnapshotResult;
 import com.lilamaris.capstone.application.port.in.result.TimelineResult;
 import com.lilamaris.capstone.application.port.out.TimelinePort;
-import com.lilamaris.capstone.domain.timeline.Snapshot;
-import com.lilamaris.capstone.domain.timeline.Timeline;
+import com.lilamaris.capstone.domain.model.capstone.timeline.Snapshot;
+import com.lilamaris.capstone.domain.model.capstone.timeline.Timeline;
+import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,12 +22,11 @@ public class TimelineQueryService implements TimelineQueryUseCase {
 
     @Override
     public List<TimelineResult.QueryCompressed> getAll() {
-        List<Timeline> timelineList = timelinePort.getAll();
-        return timelineList.stream().map(TimelineResult.QueryCompressed::from).toList();
+        return timelinePort.getAll().stream().map(TimelineResult.QueryCompressed::from).toList();
     }
 
     @Override
-    public TimelineResult.QueryCompressed getCompressedById(Timeline.Id timelineId) {
+    public TimelineResult.QueryCompressed getCompressedById(TimelineId timelineId) {
         Timeline timeline = timelinePort.getById(timelineId).orElseThrow(EntityNotFoundException::new);
         return TimelineResult.QueryCompressed.from(timeline);
     }
@@ -35,7 +35,7 @@ public class TimelineQueryService implements TimelineQueryUseCase {
     public List<SnapshotResult.Query> getSnapshot(SnapshotQueryCondition condition) {
         List<Snapshot> snapshotList = timelinePort.getSnapshot(condition);
         return snapshotList.stream()
-                .sorted(Comparator.comparing(snapshot -> snapshot.tx().from()))
+                .sorted(Comparator.comparing(snapshot -> snapshot.getTx().getFrom()))
                 .map(SnapshotResult.Query::from)
                 .toList();
     }

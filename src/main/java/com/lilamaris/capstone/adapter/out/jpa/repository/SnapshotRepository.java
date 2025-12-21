@@ -1,10 +1,10 @@
 package com.lilamaris.capstone.adapter.out.jpa.repository;
 
-import com.lilamaris.capstone.adapter.out.jpa.entity.SnapshotEntity;
+import com.lilamaris.capstone.domain.model.capstone.timeline.Snapshot;
+import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import java.util.UUID;
 
-public interface SnapshotRepository extends JpaRepository<SnapshotEntity, UUID>, JpaSpecificationExecutor<SnapshotEntity> {
+public interface SnapshotRepository extends JpaRepository<Snapshot, SnapshotId>, JpaSpecificationExecutor<Snapshot> {
 }

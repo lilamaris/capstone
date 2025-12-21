@@ -11,10 +11,7 @@ import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
 import com.lilamaris.capstone.domain.timeline.exception.TimelineDomainException;
 import com.lilamaris.capstone.domain.timeline.exception.TimelineErrorCode;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.*;
@@ -28,19 +25,20 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "timeline_root")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Timeline extends DefaultAuditableDomain implements Identifiable<TimelineId>
-{
+public class Timeline extends DefaultAuditableDomain implements Identifiable<TimelineId> {
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     private TimelineId id;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "timeline_id", referencedColumnName = "id")
+    @JoinColumn(name = "timeline_id", nullable = false)
     private List<Snapshot> snapshotList;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "timeline_id", referencedColumnName = "id")
+    @JoinColumn(name = "timeline_id", nullable = false)
     private List<SnapshotLink> snapshotLinkList;
+
+    private String description;
 
     @Transient
     private Map<SnapshotId, Snapshot> snapshotMap;
@@ -59,8 +57,8 @@ public class Timeline extends DefaultAuditableDomain implements Identifiable<Tim
         propagateToTransient();
     }
 
-    public static Timeline create() {
-        return new Timeline(TimelineId.newId(), new ArrayList<>(), new ArrayList<>());
+    public static Timeline create(String description) {
+        return new Timeline(TimelineId.newId(), new ArrayList<>(), new ArrayList<>(), description);
     }
 
     @Override
@@ -273,14 +271,16 @@ public class Timeline extends DefaultAuditableDomain implements Identifiable<Tim
         }
     }
 
-    private Timeline(TimelineId id, List<Snapshot> snapshotList, List<SnapshotLink> snapshotLinkList) {
+    private Timeline(TimelineId id, List<Snapshot> snapshotList, List<SnapshotLink> snapshotLinkList, String description) {
         if (id == null) throw new DomainIllegalArgumentException("Field 'id' must not be null.");
         if (snapshotList == null) throw new DomainIllegalArgumentException("Field 'snapshotList' must not be null.");
         if (snapshotLinkList == null) throw new DomainIllegalArgumentException("Field 'snapshotLinkList' must not be null.");
+        if (description == null) throw new DomainIllegalArgumentException("Field 'description' must not be null.");
 
         this.id = id;
         this.snapshotList = snapshotList;
         this.snapshotLinkList = snapshotLinkList;
+        this.description = description;
 
         checkFieldInvariants();
     }

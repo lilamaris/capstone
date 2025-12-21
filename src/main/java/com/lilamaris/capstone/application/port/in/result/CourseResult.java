@@ -20,7 +20,7 @@ public class CourseResult {
                     .code(domain.code())
                     .name(domain.name())
                     .credit(domain.credit())
-                    .audit(AuditResult.from(domain.audit()))
+//                    .audit(AuditResult.from(domain.audit()))
                     .build();
         }
     }
@@ -40,7 +40,7 @@ public class CourseResult {
                     .code(domain.code())
                     .name(domain.name())
                     .credit(domain.credit())
-                    .audit(AuditResult.from(domain.audit()))
+//                    .audit(AuditResult.from(domain.audit()))
                     .build();
         }
     }

@@ -18,7 +18,8 @@ public class DefaultCredentialResolver implements CredentialIdentityResolver {
 
     @Override
     public AuthIdentity resolve(String email, Function<String, Boolean> challengeFunction) {
-        var account = authPort.getBy(Provider.LOCAL, email).orElseThrow(() -> new ResourceNotFoundException(
+        var providerId = Provider.LOCAL.name() + ":" + email;
+        var account = authPort.getBy(Provider.LOCAL, providerId).orElseThrow(() -> new ResourceNotFoundException(
                 String.format("Account with email '%s' not found.", email)
         ));
 

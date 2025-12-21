@@ -1,6 +1,7 @@
 package com.lilamaris.capstone.application.port.in.result;
 
-import com.lilamaris.capstone.domain.timeline.Timeline;
+import com.lilamaris.capstone.domain.model.capstone.timeline.Timeline;
+import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
 import lombok.Builder;
 
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.List;
 public class TimelineResult {
     @Builder
     public record Command(
-            Timeline.Id id,
+            TimelineId id,
             String description,
             List<SnapshotResult.Command> snapshotList,
             AuditResult audit
@@ -16,16 +17,16 @@ public class TimelineResult {
         public static Command from(Timeline domain) {
             return builder()
                     .id(domain.id())
-                    .description(domain.description())
-                    .snapshotList(domain.snapshotMap().values().stream().map(SnapshotResult.Command::from).toList())
-                    .audit(AuditResult.from(domain.audit()))
+                    .description(domain.getDescription())
+                    .snapshotList(domain.getSnapshotList().stream().map(SnapshotResult.Command::from).toList())
+                    .audit(AuditResult.from(domain))
                     .build();
         }
     }
 
     @Builder
     public record Query(
-            Timeline.Id id,
+            TimelineId id,
             String description,
             List<SnapshotResult.Query> snapshotList,
             AuditResult audit
@@ -33,16 +34,16 @@ public class TimelineResult {
         public static Query from(Timeline domain) {
             return builder()
                     .id(domain.id())
-                    .description(domain.description())
-                    .snapshotList(domain.snapshotMap().values().stream().map(SnapshotResult.Query::from).toList())
-                    .audit(AuditResult.from(domain.audit()))
+                    .description(domain.getDescription())
+                    .snapshotList(domain.getSnapshotList().stream().map(SnapshotResult.Query::from).toList())
+                    .audit(AuditResult.from(domain))
                     .build();
         }
     }
 
     @Builder
     public record QueryCompressed(
-            Timeline.Id id,
+            TimelineId id,
             String description,
             Integer snapshotListNumber,
             AuditResult audit
@@ -50,9 +51,9 @@ public class TimelineResult {
         public static QueryCompressed from(Timeline domain) {
             return builder()
                     .id(domain.id())
-                    .description(domain.description())
-                    .snapshotListNumber(domain.snapshotMap().size())
-                    .audit(AuditResult.from(domain.audit()))
+                    .description(domain.getDescription())
+                    .snapshotListNumber(domain.getSnapshotList().size())
+                    .audit(AuditResult.from(domain))
                     .build();
         }
     }

@@ -1,49 +1,50 @@
 package com.lilamaris.capstone.application.port.in.result;
 
 import com.lilamaris.capstone.domain.embed.Effective;
-import com.lilamaris.capstone.domain.timeline.Snapshot;
-import com.lilamaris.capstone.domain.timeline.Timeline;
+import com.lilamaris.capstone.domain.model.capstone.timeline.Snapshot;
+import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
+import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
 import lombok.Builder;
 
 public class SnapshotResult {
     @Builder
     public record Command(
-            Snapshot.Id id,
+            SnapshotId id,
             EffectiveResult tx,
             EffectiveResult valid,
             Integer versionNo,
             String description,
-            Timeline.Id timelineId
+            TimelineId timelineId
     ) {
         public static Command from(Snapshot domain) {
             return builder()
                     .id(domain.id())
-                    .tx(EffectiveResult.from(domain.tx()))
-                    .valid(EffectiveResult.from(domain.valid()))
-                    .versionNo(domain.versionNo())
-                    .description(domain.description())
-                    .timelineId(domain.timelineId())
+                    .tx(EffectiveResult.from(domain.getTx()))
+                    .valid(EffectiveResult.from(domain.getValid()))
+                    .versionNo(domain.getVersionNo())
+                    .description(domain.getDescription())
+                    .timelineId(domain.getTimelineId())
                     .build();
         }
     }
 
     @Builder
     public record Query(
-            Snapshot.Id id,
+            SnapshotId id,
             EffectiveResult tx,
             EffectiveResult valid,
             Integer versionNo,
             String description,
-            Timeline.Id timelineId
+            TimelineId timelineId
     ) {
         public static Query from(Snapshot domain) {
             return builder()
                     .id(domain.id())
-                    .tx(EffectiveResult.from(domain.tx()))
-                    .valid(EffectiveResult.from(domain.valid()))
-                    .versionNo(domain.versionNo())
-                    .description(domain.description())
-                    .timelineId(domain.timelineId())
+                    .tx(EffectiveResult.from(domain.getTx()))
+                    .valid(EffectiveResult.from(domain.getValid()))
+                    .versionNo(domain.getVersionNo())
+                    .description(domain.getDescription())
+                    .timelineId(domain.getTimelineId())
                     .build();
         }
     }

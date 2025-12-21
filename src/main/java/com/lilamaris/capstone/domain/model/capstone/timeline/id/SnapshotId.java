@@ -2,11 +2,9 @@ package com.lilamaris.capstone.domain.model.capstone.timeline.id;
 
 import com.lilamaris.capstone.domain.common.impl.DefaultUuidDomainId;
 import jakarta.persistence.Embeddable;
-import lombok.ToString;
 
 import java.util.UUID;
 
-@ToString(callSuper = true)
 @Embeddable
 public class SnapshotId extends DefaultUuidDomainId {
     public SnapshotId() {
@@ -19,5 +17,10 @@ public class SnapshotId extends DefaultUuidDomainId {
 
     public static SnapshotId newId() {
         return new SnapshotId();
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
     }
 }
