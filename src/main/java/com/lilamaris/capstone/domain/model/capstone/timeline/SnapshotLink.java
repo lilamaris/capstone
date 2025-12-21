@@ -1,0 +1,75 @@
+package com.lilamaris.capstone.domain.model.capstone.timeline;
+
+import com.lilamaris.capstone.domain.common.mixin.Identifiable;
+import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
+import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
+import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
+import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+@Getter
+@ToString
+@Entity
+@Table(name = "timeline_snapshot-link")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class SnapshotLink implements Identifiable<SnapshotLinkId> {
+    @Getter(AccessLevel.NONE)
+    @EmbeddedId
+    private SnapshotLinkId id;
+
+    @Embedded
+    @AttributeOverride(name = "id", column = @Column(name = "timeline_id"))
+    private TimelineId timelineId;
+
+    @Embedded
+    @AttributeOverride(name = "id", column = @Column(name = "ancestor_snapshot_id"))
+    private SnapshotId ancestorSnapshotId;
+
+    @Embedded
+    @AttributeOverride(name = "id", column = @Column(name = "descendant_snapshot_id"))
+    private SnapshotId descendantSnapshotId;
+
+    public boolean isRoot() {
+        return ancestorSnapshotId == null;
+    }
+
+    @Override
+    public final SnapshotLinkId id() {
+        return id;
+    }
+
+    protected static SnapshotLink create(
+            TimelineId timelineId,
+            SnapshotId ancestorSnapshotId,
+            SnapshotId descendantSnapshotId
+    ) {
+        return new SnapshotLink(SnapshotLinkId.newId(), timelineId, ancestorSnapshotId, descendantSnapshotId);
+    }
+
+    protected static SnapshotLink createRoot(
+            TimelineId timelineId,
+            SnapshotId descendantSnapshotId
+    ) {
+        return new SnapshotLink(SnapshotLinkId.newId(), timelineId, null, descendantSnapshotId);
+    }
+
+    private SnapshotLink(
+            SnapshotLinkId id,
+            TimelineId timelineId,
+            SnapshotId ancestorSnapshotId,
+            SnapshotId descendantSnapshotId
+    ) {
+        if (id == null) throw new DomainIllegalArgumentException("Field 'id' must not be null.");
+        if (timelineId == null) throw new DomainIllegalArgumentException("Field 'timelineId' must not be null.");
+        if (descendantSnapshotId == null) throw new DomainIllegalArgumentException("Field 'descendantSnapshotId' must not be null.");
+
+        this.id = id;
+        this.timelineId = timelineId;
+        this.ancestorSnapshotId = ancestorSnapshotId;
+        this.descendantSnapshotId = descendantSnapshotId;
+    }
+}

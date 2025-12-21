@@ -9,7 +9,6 @@ public class SnapshotTest {
 
     @BeforeEach
     void setup() {
-        timelineId = Timeline.Id.random();
     }
 
     @Test
