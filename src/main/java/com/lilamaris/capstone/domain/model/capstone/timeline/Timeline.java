@@ -2,7 +2,6 @@ package com.lilamaris.capstone.domain.model.capstone.timeline;
 
 import com.lilamaris.capstone.domain.common.impl.DefaultAuditableDomain;
 import com.lilamaris.capstone.domain.common.mixin.Identifiable;
-import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.domain.exception.DomainIllegalStateException;
 import com.lilamaris.capstone.domain.model.capstone.timeline.embed.Effective;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
@@ -19,6 +18,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+
+import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 
 @Getter
 @ToString
@@ -87,14 +88,14 @@ public class Timeline extends DefaultAuditableDomain implements Identifiable<Tim
 
         if (maybeOneSnapshot.size() > 1) {
             throw new DomainIllegalStateException(
-                    String.format("Invalid snapshot state: more then one snapshot exists for the same valid at: '%s'", validAt)
+                    String.format("More then one snapshot exists for the same valid at: '%s'", validAt)
             );
         }
 
         var sourceSnapshot = maybeOneSnapshot.stream().findFirst().orElseThrow(() -> new TimelineDomainException(
                 TimelineErrorCode.NO_AVAILABLE_SNAPSHOT,
                 String.format(
-                        "Invalid argument: no snapshot match the given criteria valid '%s'", validAt
+                        "No snapshot match the given criteria valid '%s'", validAt
                 )
         ));
 
@@ -121,7 +122,7 @@ public class Timeline extends DefaultAuditableDomain implements Identifiable<Tim
 
         if (sourceSnapshots.isEmpty()) {
             throw new TimelineDomainException(TimelineErrorCode.NO_AVAILABLE_SNAPSHOT, String.format(
-                    "Invalid argument: no snapshot match the given criteria valid range '%s'", validRange
+                    "No snapshot match the given criteria valid range '%s'", validRange
             ));
         }
 
@@ -179,7 +180,7 @@ public class Timeline extends DefaultAuditableDomain implements Identifiable<Tim
     private void checkFieldInvariants() {
         if (snapshotList.size() != snapshotLinkList.size()) {
             throw new DomainIllegalStateException(
-                    "Invalid snapshot state: snapshot count does not match snapshot link count."
+                    "Snapshot count does not match snapshot link count."
             );
         }
     }
@@ -272,16 +273,10 @@ public class Timeline extends DefaultAuditableDomain implements Identifiable<Tim
     }
 
     private Timeline(TimelineId id, List<Snapshot> snapshotList, List<SnapshotLink> snapshotLinkList, String description) {
-        if (id == null) throw new DomainIllegalArgumentException("Field 'id' must not be null.");
-        if (snapshotList == null) throw new DomainIllegalArgumentException("Field 'snapshotList' must not be null.");
-        if (snapshotLinkList == null) throw new DomainIllegalArgumentException("Field 'snapshotLinkList' must not be null.");
-        if (description == null) throw new DomainIllegalArgumentException("Field 'description' must not be null.");
-
-        this.id = id;
-        this.snapshotList = snapshotList;
-        this.snapshotLinkList = snapshotLinkList;
-        this.description = description;
-
+        this.id                 = requireField(id, "id");
+        this.snapshotList       = requireField(snapshotList, "snapshotList");
+        this.snapshotLinkList   = requireField(snapshotLinkList, "snapshotLinkList");
+        this.description        = requireField(description, "description");
         checkFieldInvariants();
     }
 }

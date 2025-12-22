@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Objects;
 
+import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
+
 @Getter
 @ToString
 @Embeddable
@@ -78,14 +80,12 @@ public class Effective {
     }
 
     private Effective(Instant from, Instant to) {
+        this.from = requireField(from, "from");
+        this.to = requireField(to, "to");
         checkInvariant(from, to);
-        this.from = from;
-        this.to = to;
     }
 
     private static void checkInvariant(Instant from, Instant to) {
-        if (from == null) throw new DomainIllegalArgumentException("Field 'from' must not be null.");
-        if (to == null) throw new DomainIllegalArgumentException("Field 'to' must not be null.");
         if (to.isBefore(from)) throw new DomainIllegalArgumentException("Field 'to' must not be before 'from'.");
     }
 }

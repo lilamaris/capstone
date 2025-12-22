@@ -1,7 +1,6 @@
 package com.lilamaris.capstone.domain.model.capstone.timeline;
 
 import com.lilamaris.capstone.domain.common.mixin.Identifiable;
-import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
@@ -10,6 +9,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
+import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 
 @Getter
 @ToString
@@ -57,19 +58,10 @@ public class SnapshotLink implements Identifiable<SnapshotLinkId> {
         return new SnapshotLink(SnapshotLinkId.newId(), timelineId, null, descendantSnapshotId);
     }
 
-    private SnapshotLink(
-            SnapshotLinkId id,
-            TimelineId timelineId,
-            SnapshotId ancestorSnapshotId,
-            SnapshotId descendantSnapshotId
-    ) {
-        if (id == null) throw new DomainIllegalArgumentException("Field 'id' must not be null.");
-        if (timelineId == null) throw new DomainIllegalArgumentException("Field 'timelineId' must not be null.");
-        if (descendantSnapshotId == null) throw new DomainIllegalArgumentException("Field 'descendantSnapshotId' must not be null.");
-
-        this.id = id;
-        this.timelineId = timelineId;
-        this.ancestorSnapshotId = ancestorSnapshotId;
-        this.descendantSnapshotId = descendantSnapshotId;
+    private SnapshotLink(SnapshotLinkId id, TimelineId timelineId, SnapshotId ancestorSnapshotId, SnapshotId descendantSnapshotId) {
+        this.id                     = requireField(id, "id");
+        this.timelineId             = requireField(timelineId, "timelineId");
+        this.descendantSnapshotId   = requireField(descendantSnapshotId, "descendantSnapshotId");
+        this.ancestorSnapshotId     = ancestorSnapshotId;
     }
 }

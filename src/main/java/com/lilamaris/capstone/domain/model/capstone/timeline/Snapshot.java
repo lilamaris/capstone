@@ -2,7 +2,6 @@ package com.lilamaris.capstone.domain.model.capstone.timeline;
 
 import com.lilamaris.capstone.domain.common.impl.DefaultAuditableDomain;
 import com.lilamaris.capstone.domain.common.mixin.Identifiable;
-import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.domain.model.capstone.timeline.embed.Effective;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
@@ -10,6 +9,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
+
+import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 
 @Getter
 @Setter(AccessLevel.PROTECTED)
@@ -79,16 +80,11 @@ public class Snapshot extends DefaultAuditableDomain implements Identifiable<Sna
     }
 
     private Snapshot(SnapshotId id, Effective tx, Effective valid, TimelineId timelineId, Integer versionNo, String description) {
-        if (id == null) throw new DomainIllegalArgumentException("Field 'id' must not be null.");
-        if (tx == null) throw new DomainIllegalArgumentException("Field 'tx' must not be null.");
-        if (valid == null) throw new DomainIllegalArgumentException("Field 'valid' must not be null.");
-        if (timelineId == null) throw new DomainIllegalArgumentException("Field 'timelineId' must not be null.");
-
-        this.id = id;
-        this.tx = tx;
-        this.valid = valid;
-        this.timelineId = timelineId;
-        this.versionNo = versionNo;
-        this.description = description;
+        this.id             = requireField(id, "id");
+        this.tx             = requireField(tx, "tx");
+        this.valid          = requireField(valid, "valid");
+        this.timelineId     = requireField(timelineId, "timelineId");
+        this.versionNo      = requireField(versionNo, "versionNo");
+        this.description    = requireField(description, "description");
     }
 }
