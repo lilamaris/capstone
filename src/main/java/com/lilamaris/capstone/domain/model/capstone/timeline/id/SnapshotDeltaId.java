@@ -1,27 +1,20 @@
 package com.lilamaris.capstone.domain.model.capstone.timeline.id;
 
-import com.lilamaris.capstone.domain.common.impl.DefaultUuidDomainId;
+import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDefaultUuidDomainId;
 import jakarta.persistence.Embeddable;
-import lombok.ToString;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
 @Embeddable
-public class SnapshotDeltaId extends DefaultUuidDomainId {
-    public SnapshotDeltaId() {
-        super();
-    }
-
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class SnapshotDeltaId extends JpaDefaultUuidDomainId {
     public SnapshotDeltaId(UUID value) {
         super(value);
     }
 
     public static SnapshotDeltaId newId() {
-        return new SnapshotDeltaId();
-    }
-
-    @Override
-    public String toString() {
-        return super.toString();
+        return new SnapshotDeltaId(UUID.randomUUID());
     }
 }

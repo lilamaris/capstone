@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.domain.model.capstone.timeline;
 
-import com.lilamaris.capstone.domain.common.mixin.Identifiable;
+import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;

@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.domain.model.capstone.timeline;
 
-import com.lilamaris.capstone.domain.common.impl.DefaultAuditableDomain;
-import com.lilamaris.capstone.domain.common.mixin.Identifiable;
+import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDefaultAuditableDomain;
+import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import com.lilamaris.capstone.domain.model.capstone.timeline.embed.Effective;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
@@ -18,7 +18,7 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 @Entity
 @Table(name = "timeline_snapshot")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Snapshot extends DefaultAuditableDomain implements Identifiable<SnapshotId> {
+public class Snapshot extends JpaDefaultAuditableDomain implements Identifiable<SnapshotId> {
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     private SnapshotId id;

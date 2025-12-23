@@ -1,7 +1,11 @@
 package com.lilamaris.capstone.domain.model.capstone.timeline;
 
-import com.lilamaris.capstone.domain.common.impl.DefaultAuditableDomain;
-import com.lilamaris.capstone.domain.common.mixin.Identifiable;
+import com.lilamaris.capstone.domain.model.common.CoreDomainType;
+import com.lilamaris.capstone.domain.model.common.DomainRef;
+import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDefaultAuditableDomain;
+import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDefaultDomainRef;
+import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
+import com.lilamaris.capstone.domain.model.common.mixin.Referenceable;
 import com.lilamaris.capstone.domain.exception.DomainIllegalStateException;
 import com.lilamaris.capstone.domain.model.capstone.timeline.embed.Effective;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
@@ -26,7 +30,7 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 @Entity
 @Table(name = "timeline_root")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Timeline extends DefaultAuditableDomain implements Identifiable<TimelineId> {
+public class Timeline extends JpaDefaultAuditableDomain implements Identifiable<TimelineId>, Referenceable {
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     private TimelineId id;
@@ -65,6 +69,11 @@ public class Timeline extends DefaultAuditableDomain implements Identifiable<Tim
     @Override
     public final TimelineId id() {
         return id;
+    }
+
+    @Override
+    public DomainRef ref() {
+        return new JpaDefaultDomainRef(CoreDomainType.TIMELINE, id);
     }
 
     public List<Snapshot> getSnapshotsWithOpenTx() {
@@ -159,6 +168,7 @@ public class Timeline extends DefaultAuditableDomain implements Identifiable<Tim
                 ? Comparator.comparing(s -> s.getTx().getFrom())
                 : Comparator.comparing(s -> s.getValid().getFrom());
     }
+
     private Predicate<Snapshot> ifEffectiveOpen(EffectiveSelector selector, boolean state) {
         return selector == EffectiveSelector.TX
                 ? s -> s.getTx().isOpen() == state

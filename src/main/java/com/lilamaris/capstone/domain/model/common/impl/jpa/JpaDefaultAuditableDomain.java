@@ -1,6 +1,6 @@
-package com.lilamaris.capstone.domain.common.impl;
+package com.lilamaris.capstone.domain.model.common.impl.jpa;
 
-import com.lilamaris.capstone.domain.common.mixin.Auditable;
+import com.lilamaris.capstone.domain.model.common.mixin.Auditable;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AccessLevel;
@@ -14,7 +14,7 @@ import java.time.Instant;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class DefaultAuditableDomain implements Auditable {
+public class JpaDefaultAuditableDomain implements Auditable {
     @CreatedDate
     private Instant createdAt;
 

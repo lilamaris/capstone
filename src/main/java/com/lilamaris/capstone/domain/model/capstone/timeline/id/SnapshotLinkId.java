@@ -1,27 +1,20 @@
 package com.lilamaris.capstone.domain.model.capstone.timeline.id;
 
-import com.lilamaris.capstone.domain.common.impl.DefaultUuidDomainId;
+import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDefaultUuidDomainId;
 import jakarta.persistence.Embeddable;
-import lombok.ToString;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
 @Embeddable
-public class SnapshotLinkId extends DefaultUuidDomainId {
-    public SnapshotLinkId() {
-        super();
-    }
-
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class SnapshotLinkId extends JpaDefaultUuidDomainId {
     public SnapshotLinkId(UUID value) {
         super(value);
     }
 
     public static SnapshotLinkId newId() {
-        return new SnapshotLinkId();
-    }
-
-    @Override
-    public String toString() {
-        return super.toString();
+        return new SnapshotLinkId(UUID.randomUUID());
     }
 }

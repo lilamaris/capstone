@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.domain.model.capstone.timeline;
 
-import com.lilamaris.capstone.domain.common.impl.DefaultAuditableDomain;
-import com.lilamaris.capstone.domain.common.mixin.Identifiable;
+import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDefaultAuditableDomain;
+import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotDeltaId;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -16,7 +16,7 @@ import lombok.ToString;
 @Entity
 @Table(name = "timeline_snapshot_delta")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SnapshotDelta extends DefaultAuditableDomain implements Identifiable<SnapshotDeltaId> {
+public class SnapshotDelta extends JpaDefaultAuditableDomain implements Identifiable<SnapshotDeltaId> {
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     private SnapshotDeltaId id;

@@ -1,8 +1,5 @@
-package com.lilamaris.capstone.domain.common;
+package com.lilamaris.capstone.domain.model.common;
 
-import lombok.ToString;
-
-@ToString
 public abstract class AbstractDomainId<ID> implements DomainId<ID> {
     @Override
     public boolean equals(Object o) {
@@ -12,5 +9,10 @@ public abstract class AbstractDomainId<ID> implements DomainId<ID> {
     @Override
     public int hashCode() {
         return value().hashCode();
+    }
+
+    @Override
+    public final String toString() {
+        return value().toString();
     }
 }

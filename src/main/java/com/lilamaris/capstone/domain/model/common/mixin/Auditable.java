@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.domain.common.mixin;
+package com.lilamaris.capstone.domain.model.common.mixin;
 
 import java.time.Instant;
 
