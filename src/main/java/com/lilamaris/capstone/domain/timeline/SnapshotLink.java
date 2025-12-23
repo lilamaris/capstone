@@ -1,8 +1,8 @@
 package com.lilamaris.capstone.domain.timeline;
 
-import com.lilamaris.capstone.domain.embed.Audit;
-import com.lilamaris.capstone.domain.DomainType;
 import com.lilamaris.capstone.domain.AbstractUUIDDomainId;
+import com.lilamaris.capstone.domain.DomainType;
+import com.lilamaris.capstone.domain.embed.Audit;
 import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import lombok.Builder;
 
@@ -23,33 +23,10 @@ public record SnapshotLink(
         List<DomainDelta> domainDeltaList,
         Audit audit
 ) {
-    public enum Type implements DomainType {
-        INSTANCE;
-
-        @Override
-        public String getName() {
-            return "timeline.snapshot-link";
-        }
-    }
-
-    public static class Id extends AbstractUUIDDomainId<Type> {
-        public Id() {
-            super();
-        }
-
-        public Id(UUID uuid) {
-            super(uuid);
-        }
-
-        @Override
-        public Type getDomainType() {
-            return Type.INSTANCE;
-        }
-    }
-
     public SnapshotLink {
         if (timelineId == null) throw new DomainIllegalArgumentException("Field 'timelineId' must not be null.");
-        if (descendantSnapshotId == null) throw new DomainIllegalArgumentException("Field 'descendantSnapshotId' must not be null.");
+        if (descendantSnapshotId == null)
+            throw new DomainIllegalArgumentException("Field 'descendantSnapshotId' must not be null.");
 
         id = Optional.ofNullable(id).orElseGet(Id::new);
         isRoot = ancestorSnapshotId == null;
@@ -82,6 +59,10 @@ public record SnapshotLink(
                 .build();
     }
 
+    private static SnapshotLinkBuilder getDefaultBuilder(Timeline.Id timelineId, Snapshot.Id descendantSnapshotId) {
+        return builder().timelineId(timelineId).descendantSnapshotId(descendantSnapshotId);
+    }
+
     public SnapshotLink copyWithDomainDelta(List<DomainDelta> domainDeltaList) {
         return toBuilder().domainDeltaList(domainDeltaList).build();
     }
@@ -104,7 +85,27 @@ public record SnapshotLink(
         return copyWithDomainDelta(updated);
     }
 
-    private static SnapshotLinkBuilder getDefaultBuilder(Timeline.Id timelineId, Snapshot.Id descendantSnapshotId) {
-        return builder().timelineId(timelineId).descendantSnapshotId(descendantSnapshotId);
+    public enum Type implements DomainType {
+        INSTANCE;
+
+        @Override
+        public String getName() {
+            return "timeline.snapshot-link";
+        }
+    }
+
+    public static class Id extends AbstractUUIDDomainId<Type> {
+        public Id() {
+            super();
+        }
+
+        public Id(UUID uuid) {
+            super(uuid);
+        }
+
+        @Override
+        public Type getDomainType() {
+            return Type.INSTANCE;
+        }
     }
 }

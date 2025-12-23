@@ -4,8 +4,6 @@ import com.lilamaris.capstone.adapter.out.jpa.entity.DomainDeltaEntity;
 import com.lilamaris.capstone.domain.timeline.DomainDelta;
 import com.lilamaris.capstone.domain.timeline.SnapshotLink;
 
-import java.util.UUID;
-
 public class DomainDeltaEntityMapper {
     public static DomainDelta toDomain(DomainDeltaEntity entity) {
         var id = new DomainDelta.Id(entity.getId());

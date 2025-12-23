@@ -1,6 +1,5 @@
 package com.lilamaris.capstone.application.port.in.result;
 
-import com.lilamaris.capstone.domain.embed.Effective;
 import com.lilamaris.capstone.domain.model.capstone.timeline.Snapshot;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;

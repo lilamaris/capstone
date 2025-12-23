@@ -61,12 +61,13 @@ public record Effective(
         return new Effective(minFrom, maxTo);
     }
 
-    @Builder
-    public record Split(Effective left, Effective right) {}
-
     public Split splitAt(Instant at) {
         var left = new Effective(from, at);
         var right = new Effective(at, to);
         return Split.builder().left(left).right(right).build();
+    }
+
+    @Builder
+    public record Split(Effective left, Effective right) {
     }
 }

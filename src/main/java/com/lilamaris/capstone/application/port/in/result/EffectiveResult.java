@@ -7,7 +7,7 @@ import lombok.Builder;
 import java.time.OffsetDateTime;
 
 @Builder
-public record EffectiveResult (OffsetDateTime from, OffsetDateTime to) {
+public record EffectiveResult(OffsetDateTime from, OffsetDateTime to) {
     public static EffectiveResult from(Effective domain) {
         var fromZoneAware = UniversityClock.toZoneAware(domain.getFrom());
         var toZoneAware = UniversityClock.toZoneAware(domain.getTo());

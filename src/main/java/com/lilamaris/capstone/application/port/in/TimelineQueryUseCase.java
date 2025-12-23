@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface TimelineQueryUseCase {
     List<TimelineResult.QueryCompressed> getAll();
+
     TimelineResult.QueryCompressed getCompressedById(TimelineId timelineId);
+
     List<SnapshotResult.Query> getSnapshot(SnapshotQueryCondition condition);
 }

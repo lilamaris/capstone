@@ -7,6 +7,7 @@ import java.util.Optional;
 
 public interface CoursePort {
     Optional<Course> getById(Course.Id id);
+
     List<Course> getByIds(List<Course.Id> ids);
 
     Course save(Course domain);

@@ -1,9 +1,9 @@
 package com.lilamaris.capstone.domain.model.capstone.timeline;
 
-import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
+import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -35,13 +35,11 @@ public class SnapshotLink implements Identifiable<SnapshotLinkId> {
     @AttributeOverride(name = "value", column = @Column(name = "descendant_snapshot_id"))
     private SnapshotId descendantSnapshotId;
 
-    public boolean isRoot() {
-        return ancestorSnapshotId == null;
-    }
-
-    @Override
-    public final SnapshotLinkId id() {
-        return id;
+    private SnapshotLink(SnapshotLinkId id, TimelineId timelineId, SnapshotId ancestorSnapshotId, SnapshotId descendantSnapshotId) {
+        this.id = requireField(id, "id");
+        this.timelineId = requireField(timelineId, "timelineId");
+        this.descendantSnapshotId = requireField(descendantSnapshotId, "descendantSnapshotId");
+        this.ancestorSnapshotId = ancestorSnapshotId;
     }
 
     protected static SnapshotLink create(
@@ -59,10 +57,12 @@ public class SnapshotLink implements Identifiable<SnapshotLinkId> {
         return new SnapshotLink(SnapshotLinkId.newId(), timelineId, null, descendantSnapshotId);
     }
 
-    private SnapshotLink(SnapshotLinkId id, TimelineId timelineId, SnapshotId ancestorSnapshotId, SnapshotId descendantSnapshotId) {
-        this.id                     = requireField(id, "id");
-        this.timelineId             = requireField(timelineId, "timelineId");
-        this.descendantSnapshotId   = requireField(descendantSnapshotId, "descendantSnapshotId");
-        this.ancestorSnapshotId     = ancestorSnapshotId;
+    public boolean isRoot() {
+        return ancestorSnapshotId == null;
+    }
+
+    @Override
+    public final SnapshotLinkId id() {
+        return id;
     }
 }

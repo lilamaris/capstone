@@ -31,7 +31,7 @@ public class TimelineController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getCompressedById(
-        @PathVariable("id") UUID id
+            @PathVariable("id") UUID id
     ) {
         var timelineId = new TimelineId(id);
         var result = timelineQueryUseCase.getCompressedById(timelineId);
@@ -42,7 +42,7 @@ public class TimelineController {
     public ResponseEntity<?> getSnapshots(
             @PathVariable("id") UUID id,
             @RequestParam(name = "txAt", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime txAt,
-            @RequestParam(name = "validAt", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  LocalDateTime validAt
+            @RequestParam(name = "validAt", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime validAt
     ) {
         var timelineId = new TimelineId(id);
         var condition = SnapshotQueryCondition.create(timelineId, txAt, validAt);
@@ -54,8 +54,8 @@ public class TimelineController {
     public ResponseEntity<TimelineResult.Command> create(
             @RequestBody TimelineRequest.Create body
     ) {
-       var result = timelineCommandUseCase.create(body.description());
-       return ResponseEntity.ok(result);
+        var result = timelineCommandUseCase.create(body.description());
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("/{id}")
@@ -70,8 +70,8 @@ public class TimelineController {
 
     @PostMapping("/{id}/merge")
     public ResponseEntity<?> merge(
-        @PathVariable("id") UUID id,
-        @RequestBody TimelineRequest.Merge body
+            @PathVariable("id") UUID id,
+            @RequestBody TimelineRequest.Merge body
     ) {
         var timelineId = new TimelineId(id);
         var result = timelineCommandUseCase.merge(timelineId, body.validFrom(), body.validTo(), body.description());

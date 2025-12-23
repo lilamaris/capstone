@@ -14,6 +14,10 @@ public class AccountId extends DefaultUuidDomainId {
     @JsonValue
     protected UUID value;
 
+    public AccountId(UUID value) {
+        super(value);
+    }
+
     public static AccountId newId() {
         return new AccountId(newUuid());
     }
@@ -26,9 +30,5 @@ public class AccountId extends DefaultUuidDomainId {
     @Override
     protected void init(UUID value) {
         this.value = value;
-    }
-
-    public AccountId(UUID value) {
-        super(value);
     }
 }

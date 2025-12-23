@@ -17,6 +17,30 @@ public record CourseOffer(
         Boolean isRetire,
         Audit audit
 ) {
+    public CourseOffer {
+        if (courseId == null) throw new DomainIllegalArgumentException("Field 'courseId' must not be null.");
+        if (semester == null) throw new DomainIllegalArgumentException("Field 'semester' must not be null.");
+
+        id = Optional.ofNullable(id).orElseGet(Id::new);
+        isRetire = Optional.ofNullable(isRetire).orElse(false);
+    }
+
+    public static CourseOffer from(Id id, Course.Id courseId, Integer semester, Audit audit) {
+        return getDefaultBuilder(courseId, semester).id(id).build();
+    }
+
+    public static CourseOffer create(Course.Id courseId, Integer semester) {
+        return getDefaultBuilder(courseId, semester).build();
+    }
+
+    private static CourseOfferBuilder getDefaultBuilder(Course.Id courseId, Integer semester) {
+        return builder().courseId(courseId).semester(semester);
+    }
+
+    public CourseOffer retire() {
+        return toBuilder().isRetire(true).build();
+    }
+
     public enum Type implements DomainType {
         INSTANCE;
 
@@ -39,29 +63,5 @@ public record CourseOffer(
         public Type getDomainType() {
             return Type.INSTANCE;
         }
-    }
-
-    public CourseOffer {
-        if (courseId == null) throw new DomainIllegalArgumentException("Field 'courseId' must not be null.");
-        if (semester == null) throw new DomainIllegalArgumentException("Field 'semester' must not be null.");
-
-        id = Optional.ofNullable(id).orElseGet(Id::new);
-        isRetire = Optional.ofNullable(isRetire).orElse(false);
-    }
-
-    public static CourseOffer from(Id id, Course.Id courseId, Integer semester, Audit audit) {
-        return getDefaultBuilder(courseId, semester).id(id).build();
-    }
-
-    public static CourseOffer create(Course.Id courseId, Integer semester) {
-        return getDefaultBuilder(courseId, semester).build();
-    }
-
-    public CourseOffer retire() {
-        return toBuilder().isRetire(true).build();
-    }
-
-    private static CourseOfferBuilder getDefaultBuilder(Course.Id courseId, Integer semester) {
-        return builder().courseId(courseId).semester(semester);
     }
 }

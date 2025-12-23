@@ -6,5 +6,6 @@ import java.time.Duration;
 
 public interface RefreshTokenPort {
     RefreshToken consume(RefreshToken.Id id);
+
     void save(RefreshToken domain, Duration ttl);
 }

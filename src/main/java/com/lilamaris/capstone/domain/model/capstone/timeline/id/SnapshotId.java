@@ -14,6 +14,10 @@ public class SnapshotId extends DefaultUuidDomainId {
     @JsonValue
     protected UUID value;
 
+    public SnapshotId(UUID value) {
+        super(value);
+    }
+
     public static SnapshotId newId() {
         return new SnapshotId(newUuid());
     }
@@ -26,9 +30,5 @@ public class SnapshotId extends DefaultUuidDomainId {
     @Override
     protected void init(UUID value) {
         this.value = value;
-    }
-
-    public SnapshotId(UUID value) {
-        super(value);
     }
 }

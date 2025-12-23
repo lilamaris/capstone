@@ -27,7 +27,7 @@ public class JsonCredentialSignInProcessingFilter extends AbstractAuthentication
     public Authentication attemptAuthentication(
             HttpServletRequest request,
             HttpServletResponse response
-    ) throws AuthenticationException  {
+    ) throws AuthenticationException {
         CredentialSignInAuthenticationToken token;
         try {
             var body = mapper.readValue(request.getInputStream(), CredentialRequest.SignIn.class);

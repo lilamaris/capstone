@@ -1,11 +1,11 @@
 package com.lilamaris.capstone.adapter.in.security.authn.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lilamaris.capstone.adapter.in.security.authn.credential.filter.RefreshTokenProcessingFilter;
-import com.lilamaris.capstone.adapter.in.security.authn.credential.provider.CredentialSignInProvider;
 import com.lilamaris.capstone.adapter.in.security.authn.credential.filter.JsonCredentialRegisterProcessingFilter;
 import com.lilamaris.capstone.adapter.in.security.authn.credential.filter.JsonCredentialSignInProcessingFilter;
+import com.lilamaris.capstone.adapter.in.security.authn.credential.filter.RefreshTokenProcessingFilter;
 import com.lilamaris.capstone.adapter.in.security.authn.credential.provider.CredentialRegisterProvider;
+import com.lilamaris.capstone.adapter.in.security.authn.credential.provider.CredentialSignInProvider;
 import com.lilamaris.capstone.adapter.in.security.authn.credential.provider.RefreshTokenProvider;
 import com.lilamaris.capstone.adapter.in.security.authn.handler.CustomAuthenticationFailureHandler;
 import com.lilamaris.capstone.adapter.in.security.authn.handler.CustomAuthenticationSuccessHandler;
@@ -54,7 +54,7 @@ public class AuthenticationConfig {
                 .oauth2Login(oauth -> oauth
                         .userInfoEndpoint(
                                 u -> u
-                                         .oidcUserService(customOidcUserService)
+                                        .oidcUserService(customOidcUserService)
                                         .userService(customOAuth2UserService)
                         )
                         .successHandler(customOidcSuccessHandler)

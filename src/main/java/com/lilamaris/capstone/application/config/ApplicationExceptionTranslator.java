@@ -22,15 +22,15 @@ public class ApplicationExceptionTranslator {
         try {
             return pjp.proceed();
 
-        } catch(ResourceAlreadyExistsException e) {
+        } catch (ResourceAlreadyExistsException e) {
             log.warn("Resource already exists: {}: {}", e.getCode(), e.getMessage(), e);
             throw e;
 
-        } catch(ResourceNotFoundException e) {
+        } catch (ResourceNotFoundException e) {
             log.warn("Resource not found: {}: {}", e.getCode(), e.getMessage(), e);
             throw e;
 
-        } catch(ApplicationInvariantException e) {
+        } catch (ApplicationInvariantException e) {
             log.warn("Application invariant: {}: {}", e.getCode(), e.getMessage(), e);
             throw e;
 

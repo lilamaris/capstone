@@ -27,7 +27,7 @@ public class RefreshTokenProvider implements AuthenticationProvider {
             tokenResult = authCommandUseCase.refresh(refreshToken);
         } catch (DomainViolationException e) {
             throw e;
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new AuthenticationServiceException("Refresh failed.");
         }
 

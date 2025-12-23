@@ -20,7 +20,7 @@ public class TimelineSpecification {
     }
 
     public static Specification<Snapshot> isOpenTx() {
-        return (root, query, builder) ->  builder.and(
+        return (root, query, builder) -> builder.and(
                 builder.equal(root.get("tx").get("to"), Effective.MAX)
         );
     }

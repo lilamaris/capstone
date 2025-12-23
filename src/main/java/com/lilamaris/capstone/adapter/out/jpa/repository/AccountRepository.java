@@ -9,5 +9,6 @@ import java.util.UUID;
 
 public interface AccountRepository extends JpaRepository<AccountEntity, UUID> {
     boolean existsByProviderAndProviderId(Provider provider, String providerId);
+
     Optional<AccountEntity> findByProviderAndProviderId(Provider provider, String providerId);
 }

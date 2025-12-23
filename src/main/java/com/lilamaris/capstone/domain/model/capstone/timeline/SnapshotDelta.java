@@ -1,8 +1,8 @@
 package com.lilamaris.capstone.domain.model.capstone.timeline;
 
+import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotDeltaId;
 import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDefaultAuditableDomain;
 import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
-import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotDeltaId;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

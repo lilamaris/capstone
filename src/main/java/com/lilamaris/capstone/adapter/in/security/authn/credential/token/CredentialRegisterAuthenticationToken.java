@@ -8,9 +8,8 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 public class CredentialRegisterAuthenticationToken extends AbstractAuthenticationToken {
     private final String email;
     private final String displayName;
-    private String rawPassword;
-
     private final AuthResult.Token token;
+    private String rawPassword;
 
     public CredentialRegisterAuthenticationToken(String email, String rawPassword, String displayName) {
         super(null);

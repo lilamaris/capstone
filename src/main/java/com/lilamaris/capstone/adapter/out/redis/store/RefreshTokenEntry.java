@@ -1,5 +1,6 @@
 package com.lilamaris.capstone.adapter.out.redis.store;
 
-public record RefreshTokenEntry (
+public record RefreshTokenEntry(
         String userId
-) { }
+) {
+}

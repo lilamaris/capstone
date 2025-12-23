@@ -3,7 +3,6 @@ package com.lilamaris.capstone.application.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.lilamaris.capstone.domain.degree_course.Course;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

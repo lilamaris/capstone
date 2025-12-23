@@ -1,7 +1,5 @@
 package com.lilamaris.capstone.application;
 
-import com.lilamaris.capstone.application.config.ApplicationConfig;
-import com.lilamaris.capstone.application.config.ApplicationContext;
 import com.lilamaris.capstone.application.exception.ResourceNotFoundException;
 import com.lilamaris.capstone.application.port.in.TimelineCommandUseCase;
 import com.lilamaris.capstone.application.port.in.result.TimelineResult;

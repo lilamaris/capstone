@@ -27,7 +27,7 @@ public class ResponseWriter {
         write(response, result);
     }
 
-    private void write(HttpServletResponse response,  Object body) throws IOException {
+    private void write(HttpServletResponse response, Object body) throws IOException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(mapper.writeValueAsString(body));

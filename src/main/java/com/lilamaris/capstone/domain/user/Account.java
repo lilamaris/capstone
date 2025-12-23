@@ -20,40 +20,18 @@ public record Account(
         String passwordHash,
         Audit audit
 ) {
-    public enum Type implements DomainType {
-        INSTANCE;
-
-        @Override
-        public String getName() {
-            return "account";
-        }
-    }
-
-    public static class Id extends AbstractUUIDDomainId<Type> {
-        public Id(UUID value) {
-            super(value);
-        }
-
-        public Id() {
-            super();
-        }
-
-        @Override
-        public Type getDomainType() {
-            return Type.INSTANCE;
-        }
-    }
-
-
     public Account {
         if (provider == null) throw new DomainIllegalArgumentException("Field 'provider' must not be null.");
-        if (email == null) throw new DomainIllegalArgumentException("Field 'email' in the local provider based account must not be null.");
+        if (email == null)
+            throw new DomainIllegalArgumentException("Field 'email' in the local provider based account must not be null.");
 
         if (provider.equals(Provider.LOCAL)) {
-            if (passwordHash == null) throw new DomainIllegalArgumentException("Field 'passwordHash' in the local provider based account must not be null.");
+            if (passwordHash == null)
+                throw new DomainIllegalArgumentException("Field 'passwordHash' in the local provider based account must not be null.");
             providerId = Provider.LOCAL.name() + ":" + email;
         } else {
-            if (providerId == null) throw new DomainIllegalArgumentException("Field 'providerId' in the third party provider based account must not be null.");
+            if (providerId == null)
+                throw new DomainIllegalArgumentException("Field 'providerId' in the third party provider based account must not be null.");
         }
 
         id = Optional.ofNullable(id).orElseGet(Id::new);
@@ -83,6 +61,10 @@ public record Account(
                 .build();
     }
 
+    private static AccountBuilder getDefaultBuilder() {
+        return builder();
+    }
+
     public Account assignUser(User.Id userId) {
         return copyWithUserId(userId);
     }
@@ -90,7 +72,28 @@ public record Account(
     private Account copyWithUserId(User.Id userId) {
         return toBuilder().userId(userId).build();
     }
-    private static AccountBuilder getDefaultBuilder() {
-        return builder();
+
+    public enum Type implements DomainType {
+        INSTANCE;
+
+        @Override
+        public String getName() {
+            return "account";
+        }
+    }
+
+    public static class Id extends AbstractUUIDDomainId<Type> {
+        public Id(UUID value) {
+            super(value);
+        }
+
+        public Id() {
+            super();
+        }
+
+        @Override
+        public Type getDomainType() {
+            return Type.INSTANCE;
+        }
     }
 }

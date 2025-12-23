@@ -22,30 +22,6 @@ public record Course(
         List<CourseOfferDeltaEvent> courseOfferEventList,
         Audit audit
 ) {
-    public enum Type implements DomainType {
-        INSTANCE;
-
-        @Override
-        public String getName() {
-            return "course";
-        }
-    }
-
-    public static class Id extends AbstractUUIDDomainId<Type> {
-        public Id(UUID value) {
-            super(value);
-        }
-
-        public Id() {
-            super();
-        }
-
-        @Override
-        public Type getDomainType() {
-            return Type.INSTANCE;
-        }
-    }
-
     public Course {
         if (code == null) throw new DomainIllegalArgumentException("Field 'code' must not be null.");
         if (name == null) throw new DomainIllegalArgumentException("Field 'name' must not be null.");
@@ -68,6 +44,10 @@ public record Course(
         return getDefaultBuilder(code, name, credit).courseOfferList(courseOfferList).build();
     }
 
+    private static CourseBuilder getDefaultBuilder(String code, String name, Integer credit) {
+        return builder().code(code).name(name).credit(credit);
+    }
+
     public Course offer(Integer semester) {
         var courseOffer = CourseOffer.create(this.id(), semester);
         var event = List.of(CourseOfferDeltaEvent.from(courseOffer));
@@ -84,7 +64,27 @@ public record Course(
         return toBuilder().courseOfferList(courseOfferList).courseOfferEventList(event).build();
     }
 
-    private static CourseBuilder getDefaultBuilder(String code, String name, Integer credit) {
-        return builder().code(code).name(name).credit(credit);
+    public enum Type implements DomainType {
+        INSTANCE;
+
+        @Override
+        public String getName() {
+            return "course";
+        }
+    }
+
+    public static class Id extends AbstractUUIDDomainId<Type> {
+        public Id(UUID value) {
+            super(value);
+        }
+
+        public Id() {
+            super();
+        }
+
+        @Override
+        public Type getDomainType() {
+            return Type.INSTANCE;
+        }
     }
 }

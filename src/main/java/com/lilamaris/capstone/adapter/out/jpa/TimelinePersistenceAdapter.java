@@ -33,7 +33,8 @@ public class TimelinePersistenceAdapter implements TimelinePort {
         Specification<Snapshot> spec = Specification.unrestricted();
 
         spec = spec.and(TimelineSpecification.timelineEqual(condition.timelineId()));
-        if (condition.hasValidAt()) spec = spec.and(TimelineSpecification.betweenValid(UniversityClock.at(condition.validAt())));
+        if (condition.hasValidAt())
+            spec = spec.and(TimelineSpecification.betweenValid(UniversityClock.at(condition.validAt())));
         if (condition.hasTxAt()) spec = spec.and(TimelineSpecification.betweenTx(UniversityClock.at(condition.txAt())));
         else spec = spec.and(TimelineSpecification.isOpenTx());
 

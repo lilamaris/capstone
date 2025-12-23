@@ -12,9 +12,9 @@ public abstract class DefaultUuidDomainId extends AbstractDomainId<UUID> {
         init(value);
     }
 
-    protected abstract void init(UUID value);
-
     protected static UUID newUuid() {
         return UUID.randomUUID();
     }
+
+    protected abstract void init(UUID value);
 }

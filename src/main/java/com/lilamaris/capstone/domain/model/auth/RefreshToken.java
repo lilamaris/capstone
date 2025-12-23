@@ -9,13 +9,13 @@ public class RefreshToken implements Identifiable<RefreshTokenId> {
     private final RefreshTokenId token;
     private final String userId;
 
-    @Override
-    public RefreshTokenId id() {
-        return token;
-    }
-
     private RefreshToken(RefreshTokenId id, String userId) {
         this.token = requireField(id, "id");
         this.userId = requireField(userId, "userId");
+    }
+
+    @Override
+    public RefreshTokenId id() {
+        return token;
     }
 }

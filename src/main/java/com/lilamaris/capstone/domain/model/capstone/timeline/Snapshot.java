@@ -1,10 +1,10 @@
 package com.lilamaris.capstone.domain.model.capstone.timeline;
 
-import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDefaultAuditableDomain;
-import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import com.lilamaris.capstone.domain.model.capstone.timeline.embed.Effective;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
+import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDefaultAuditableDomain;
+import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -45,13 +45,22 @@ public class Snapshot extends JpaDefaultAuditableDomain implements Identifiable<
     private String description;
     private Integer versionNo;
 
-    @Override
-    public final SnapshotId id() {
-        return id;
+    private Snapshot(SnapshotId id, Effective tx, Effective valid, TimelineId timelineId, Integer versionNo, String description) {
+        this.id = requireField(id, "id");
+        this.tx = requireField(tx, "tx");
+        this.valid = requireField(valid, "valid");
+        this.timelineId = requireField(timelineId, "timelineId");
+        this.versionNo = requireField(versionNo, "versionNo");
+        this.description = requireField(description, "description");
     }
 
     protected static Snapshot create(Effective tx, Effective valid, TimelineId timelineId, String description) {
         return new Snapshot(SnapshotId.newId(), tx, valid, timelineId, 0, description);
+    }
+
+    @Override
+    public final SnapshotId id() {
+        return id;
     }
 
     protected Snapshot closeTxAndNext(Instant at) {
@@ -78,14 +87,5 @@ public class Snapshot extends JpaDefaultAuditableDomain implements Identifiable<
 
     private void upgrade() {
         versionNo += 1;
-    }
-
-    private Snapshot(SnapshotId id, Effective tx, Effective valid, TimelineId timelineId, Integer versionNo, String description) {
-        this.id             = requireField(id, "id");
-        this.tx             = requireField(tx, "tx");
-        this.valid          = requireField(valid, "valid");
-        this.timelineId     = requireField(timelineId, "timelineId");
-        this.versionNo      = requireField(versionNo, "versionNo");
-        this.description    = requireField(description, "description");
     }
 }

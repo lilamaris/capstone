@@ -24,7 +24,8 @@ public class NaverProfileMapper implements OidcProfileMapper {
                 .uri("https://openapi.naver.com/v1/nid/me")
                 .header("Authorization", "Bearer " + accessToken)
                 .retrieve()
-                .body(new ParameterizedTypeReference<>() {});
+                .body(new ParameterizedTypeReference<>() {
+                });
 
         additionalUserInfo = (Map<String, Object>) response.get("response");
 

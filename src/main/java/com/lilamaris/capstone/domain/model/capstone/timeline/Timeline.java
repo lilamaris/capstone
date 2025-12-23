@@ -1,20 +1,23 @@
 package com.lilamaris.capstone.domain.model.capstone.timeline;
 
-import com.lilamaris.capstone.domain.model.common.CoreDomainType;
-import com.lilamaris.capstone.domain.model.common.DomainRef;
-import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDefaultAuditableDomain;
-import com.lilamaris.capstone.domain.model.common.impl.DefaultDomainRef;
-import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
-import com.lilamaris.capstone.domain.model.common.mixin.Referenceable;
 import com.lilamaris.capstone.domain.exception.DomainIllegalStateException;
 import com.lilamaris.capstone.domain.model.capstone.timeline.embed.Effective;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
+import com.lilamaris.capstone.domain.model.common.CoreDomainType;
+import com.lilamaris.capstone.domain.model.common.DomainRef;
+import com.lilamaris.capstone.domain.model.common.impl.DefaultDomainRef;
+import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDefaultAuditableDomain;
+import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
+import com.lilamaris.capstone.domain.model.common.mixin.Referenceable;
 import com.lilamaris.capstone.domain.timeline.exception.TimelineDomainException;
 import com.lilamaris.capstone.domain.timeline.exception.TimelineErrorCode;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.Instant;
 import java.util.*;
@@ -58,13 +61,21 @@ public class Timeline extends JpaDefaultAuditableDomain implements Identifiable<
     @Transient
     private Map<SnapshotId, SnapshotLink> snapshotLinkByAncestor;
 
-    @PostLoad
-    private void onLoad() {
-        propagateToTransient();
+    private Timeline(TimelineId id, List<Snapshot> snapshotList, List<SnapshotLink> snapshotLinkList, String description) {
+        this.id = requireField(id, "id");
+        this.snapshotList = requireField(snapshotList, "snapshotList");
+        this.snapshotLinkList = requireField(snapshotLinkList, "snapshotLinkList");
+        this.description = requireField(description, "description");
+        checkFieldInvariants();
     }
 
     public static Timeline create(String description) {
         return new Timeline(TimelineId.newId(), new ArrayList<>(), new ArrayList<>(), description);
+    }
+
+    @PostLoad
+    private void onLoad() {
+        propagateToTransient();
     }
 
     @Override
@@ -205,13 +216,6 @@ public class Timeline extends JpaDefaultAuditableDomain implements Identifiable<
         snapshotLinkByAncestor = lookup.linkByAncestor;
     }
 
-    private record LookupBuildResult(
-            Map<SnapshotId, Snapshot> snapshotById,
-            Map<SnapshotLinkId, SnapshotLink> linkById,
-            Map<SnapshotId, SnapshotLink> linkByDescendant,
-            Map<SnapshotId, SnapshotLink> linkByAncestor
-    ) {}
-
     private LookupBuildResult buildSnapshotLookup() {
         var linkLookup = snapshotLinkList.stream().collect(
                 Collector.of(
@@ -230,6 +234,14 @@ public class Timeline extends JpaDefaultAuditableDomain implements Identifiable<
                 linkLookup.byDescendant(),
                 linkLookup.byAncestor()
         );
+    }
+
+    private record LookupBuildResult(
+            Map<SnapshotId, Snapshot> snapshotById,
+            Map<SnapshotLinkId, SnapshotLink> linkById,
+            Map<SnapshotId, SnapshotLink> linkByDescendant,
+            Map<SnapshotId, SnapshotLink> linkByAncestor
+    ) {
     }
 
     private static final class LinkLookupBuilder {
@@ -268,12 +280,6 @@ public class Timeline extends JpaDefaultAuditableDomain implements Identifiable<
             return this;
         }
 
-        record LinkLookup(
-                Map<SnapshotLinkId, SnapshotLink> byId,
-                Map<SnapshotId, SnapshotLink> byDescendant,
-                Map<SnapshotId, SnapshotLink> byAncestor
-        ) {}
-
         LinkLookup build() {
             return new LinkLookup(
                     Map.copyOf(byId),
@@ -281,14 +287,13 @@ public class Timeline extends JpaDefaultAuditableDomain implements Identifiable<
                     Map.copyOf(byAncestor)
             );
         }
-    }
 
-    private Timeline(TimelineId id, List<Snapshot> snapshotList, List<SnapshotLink> snapshotLinkList, String description) {
-        this.id                 = requireField(id, "id");
-        this.snapshotList       = requireField(snapshotList, "snapshotList");
-        this.snapshotLinkList   = requireField(snapshotLinkList, "snapshotLinkList");
-        this.description        = requireField(description, "description");
-        checkFieldInvariants();
+        record LinkLookup(
+                Map<SnapshotLinkId, SnapshotLink> byId,
+                Map<SnapshotId, SnapshotLink> byDescendant,
+                Map<SnapshotId, SnapshotLink> byAncestor
+        ) {
+        }
     }
 }
 

@@ -10,6 +10,10 @@ import lombok.Builder;
 public record CourseOfferDeltaEvent(
         CourseOffer offer
 ) implements DomainDeltaEventBase {
+    public static CourseOfferDeltaEvent from(CourseOffer domain) {
+        return new CourseOfferDeltaEvent(domain);
+    }
+
     @Override
     public DomainId<?, ?> domainId() {
         return offer.id();
@@ -20,9 +24,5 @@ public record CourseOfferDeltaEvent(
         return new DomainDelta.JsonPatch(
                 JsonPatchEngine.createAddPatch(offer)
         );
-    }
-
-    public static CourseOfferDeltaEvent from(CourseOffer domain) {
-        return new CourseOfferDeltaEvent(domain);
     }
 }

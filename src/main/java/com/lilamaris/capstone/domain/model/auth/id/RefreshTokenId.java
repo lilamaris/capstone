@@ -12,6 +12,10 @@ public class RefreshTokenId extends DefaultStringDomainId {
     @JsonValue
     protected String value;
 
+    public RefreshTokenId(String value) {
+        super(value);
+    }
+
     @Override
     public String value() {
         return value;
@@ -20,9 +24,5 @@ public class RefreshTokenId extends DefaultStringDomainId {
     @Override
     protected void init(String value) {
         this.value = value;
-    }
-
-    public RefreshTokenId(String value) {
-        super(value);
     }
 }

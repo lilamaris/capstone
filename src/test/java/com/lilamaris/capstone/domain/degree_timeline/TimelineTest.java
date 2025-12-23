@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TimelineTest {
     private static final Logger log = LoggerFactory.getLogger(TimelineTest.class);

@@ -5,5 +5,6 @@ import com.lilamaris.capstone.domain.timeline.DomainDelta;
 
 public interface DomainDeltaEventBase {
     DomainId<?, ?> domainId();
+
     DomainDelta.Patch toPatch();
 }

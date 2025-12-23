@@ -3,7 +3,8 @@ package com.lilamaris.capstone.domain.timeline;
 import com.lilamaris.capstone.domain.AbstractUUIDDomainId;
 import com.lilamaris.capstone.domain.DomainId;
 import com.lilamaris.capstone.domain.DomainType;
-import com.lilamaris.capstone.domain.embed.*;
+import com.lilamaris.capstone.domain.embed.Audit;
+import com.lilamaris.capstone.domain.embed.Effective;
 import com.lilamaris.capstone.domain.exception.DomainInvariantException;
 import com.lilamaris.capstone.domain.timeline.exception.TimelineDomainException;
 import com.lilamaris.capstone.domain.timeline.exception.TimelineErrorCode;
@@ -25,30 +26,6 @@ public record Timeline(
         Map<Snapshot.Id, SnapshotLink> snapshotLinkByDescendant,
         Audit audit
 ) {
-    public enum Type implements DomainType {
-        INSTANCE;
-
-        @Override
-        public String getName() {
-            return "timeline";
-        }
-    }
-    
-    public static class Id extends AbstractUUIDDomainId<Type> {
-        public Id() {
-            super();
-        }
-
-        public Id(UUID uuid) {
-            super(uuid);
-        }
-
-        @Override
-        public Type getDomainType() {
-            return Type.INSTANCE;
-        }
-    }
-
     public Timeline {
         id = Optional.ofNullable(id).orElseGet(Id::new);
         description = Optional.ofNullable(description).orElse("No description");
@@ -73,6 +50,10 @@ public record Timeline(
 
     public static Timeline create(String description) {
         return getDefaultBuilder().description(description).build();
+    }
+
+    private static TimelineBuilder getDefaultBuilder() {
+        return builder();
     }
 
     public Timeline copyWithDescription(String description) {
@@ -222,6 +203,10 @@ public record Timeline(
         return copyWithSnapshotContext(currentSnapshotMap, currentSnapshotLinkMap);
     }
 
+    private Timeline copyWithSnapshotContext(Map<Snapshot.Id, Snapshot> snapshotMap, Map<SnapshotLink.Id, SnapshotLink> snapshotLinkMap) {
+        return toBuilder().snapshotMap(snapshotMap).snapshotLinkMap(snapshotLinkMap).build();
+    }
+
 //    public Timeline rollbackSnapshot(LocalDateTime txAt, LocalDateTime targetTxAt) {
 //        if (snapshotList.isEmpty()) {
 //            throw new IllegalStateException("No snapshot exists in the timeline.");
@@ -248,14 +233,6 @@ public record Timeline(
 //
 //        return SnapshotTransition.builder().timelineId(id).before(before).after(after).build();
 //    }
-
-    private static TimelineBuilder getDefaultBuilder() {
-        return builder();
-    }
-
-    private Timeline copyWithSnapshotContext(Map<Snapshot.Id, Snapshot> snapshotMap, Map<SnapshotLink.Id, SnapshotLink> snapshotLinkMap) {
-        return toBuilder().snapshotMap(snapshotMap).snapshotLinkMap(snapshotLinkMap).build();
-    }
 
     private Timeline copyWithSnapshotLink(Map<SnapshotLink.Id, SnapshotLink> snapshotLinkMap) {
         return toBuilder().snapshotLinkMap(snapshotLinkMap).build();
@@ -324,5 +301,29 @@ public record Timeline(
             }
             current.put(l.id(), l);
         });
+    }
+
+    public enum Type implements DomainType {
+        INSTANCE;
+
+        @Override
+        public String getName() {
+            return "timeline";
+        }
+    }
+
+    public static class Id extends AbstractUUIDDomainId<Type> {
+        public Id() {
+            super();
+        }
+
+        public Id(UUID uuid) {
+            super(uuid);
+        }
+
+        @Override
+        public Type getDomainType() {
+            return Type.INSTANCE;
+        }
     }
 }

@@ -1,13 +1,16 @@
 package com.lilamaris.capstone.domain.model.auth;
 
-import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDefaultAuditableDomain;
-import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.domain.model.auth.id.AccountId;
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
+import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDefaultAuditableDomain;
+import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import com.lilamaris.capstone.domain.user.Provider;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.function.BiFunction;
 
@@ -34,6 +37,16 @@ public class Account extends JpaDefaultAuditableDomain implements Identifiable<A
     private String displayName;
     private String email;
     private String passwordHash;
+
+    private Account(AccountId id, UserId userId, Provider provider, String providerId, String displayName, String email, String passwordHash) {
+        this.id = requireField(id, "id");
+        this.userId = requireField(userId, "userId");
+        this.provider = requireField(provider, "provider");
+        this.providerId = requireField(providerId, "providerId");
+        this.displayName = requireField(displayName, "displayName");
+        this.email = requireField(email, "email");
+        this.passwordHash = passwordHash;
+    }
 
     public static String getLocalProviderId(String email) {
         return Provider.LOCAL.name() + ":" + email;
@@ -81,15 +94,5 @@ public class Account extends JpaDefaultAuditableDomain implements Identifiable<A
             );
         }
         return challenge.apply(passwordHash, rawPassword);
-    }
-
-    private Account(AccountId id, UserId userId, Provider provider, String providerId, String displayName, String email, String passwordHash) {
-        this.id             = requireField(id, "id");
-        this.userId         = requireField(userId, "userId");
-        this.provider       = requireField(provider, "provider");
-        this.providerId     = requireField(providerId, "providerId");
-        this.displayName    = requireField(displayName, "displayName");
-        this.email          = requireField(email, "email");
-        this.passwordHash   = passwordHash;
     }
 }

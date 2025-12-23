@@ -14,6 +14,10 @@ public class UserId extends DefaultUuidDomainId {
     @JsonValue
     protected UUID value;
 
+    public UserId(UUID value) {
+        super(value);
+    }
+
     public static UserId newId() {
         return new UserId(newUuid());
     }
@@ -26,9 +30,5 @@ public class UserId extends DefaultUuidDomainId {
     @Override
     protected void init(UUID value) {
         this.value = value;
-    }
-
-    public UserId(UUID value) {
-        super(value);
     }
 }

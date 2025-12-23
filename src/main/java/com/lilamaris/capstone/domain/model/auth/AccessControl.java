@@ -1,14 +1,13 @@
 package com.lilamaris.capstone.domain.model.auth;
 
+import com.lilamaris.capstone.domain.model.auth.id.AccessControlId;
+import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
 import com.lilamaris.capstone.domain.model.common.CoreDomainType;
 import com.lilamaris.capstone.domain.model.common.DomainId;
 import com.lilamaris.capstone.domain.model.common.DomainRef;
 import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDefaultAuditableDomain;
-import com.lilamaris.capstone.domain.model.common.impl.DefaultDomainRef;
 import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDomainRef;
 import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
-import com.lilamaris.capstone.domain.model.auth.id.AccessControlId;
-import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -41,9 +40,11 @@ public class AccessControl extends JpaDefaultAuditableDomain implements Identifi
 
     private String scopedRole;
 
-    @Override
-    public AccessControlId id() {
-        return id;
+    private AccessControl(AccessControlId id, UserId userId, JpaDomainRef resourceRef, String scopedRole) {
+        this.id = requireField(id, "id");
+        this.userId = requireField(userId, "userId");
+        this.resourceRef = requireField(resourceRef, "resourceRef");
+        this.scopedRole = requireField(scopedRole, "scopedRole");
     }
 
     public static AccessControl create(UserId userId, CoreDomainType resourceType, DomainId<?> resourceId, String scopedRole) {
@@ -56,10 +57,8 @@ public class AccessControl extends JpaDefaultAuditableDomain implements Identifi
         return new AccessControl(AccessControlId.newId(), userId, ref, scopedRole);
     }
 
-    private AccessControl(AccessControlId id, UserId userId, JpaDomainRef resourceRef, String scopedRole) {
-        this.id             = requireField(id, "id");
-        this.userId         = requireField(userId, "userId");
-        this.resourceRef    = requireField(resourceRef, "resourceRef");
-        this.scopedRole     = requireField(scopedRole, "scopedRole");
+    @Override
+    public AccessControlId id() {
+        return id;
     }
 }

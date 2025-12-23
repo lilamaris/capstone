@@ -1,6 +1,5 @@
 package com.lilamaris.capstone.adapter.in.security;
 
-import com.lilamaris.capstone.domain.user.Provider;
 import com.lilamaris.capstone.domain.user.Role;
 import com.lilamaris.capstone.domain.user.User;
 import lombok.*;

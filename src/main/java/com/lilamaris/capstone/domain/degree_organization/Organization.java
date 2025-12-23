@@ -18,6 +18,22 @@ public record Organization(
         List<Organization> child
 
 ) {
+    public Organization {
+        id = Optional.ofNullable(id).orElseGet(Id::new);
+        academicProgramList = Optional.ofNullable(academicProgramList).orElseGet(ArrayList::new);
+        name = Optional.ofNullable(name).orElseThrow(() -> new IllegalArgumentException("name must be set"));
+    }
+
+    public static Organization createRoot(String name) {
+        return Organization.builder().name(name).build();
+    }
+
+    public static Organization createChildOf(Organization parent, String name) {
+        return Organization.builder()
+                .name(name)
+                .build();
+    }
+
     public enum Type implements DomainType {
         INSTANCE;
 
@@ -40,21 +56,5 @@ public record Organization(
         public Type getDomainType() {
             return Type.INSTANCE;
         }
-    }
-
-    public Organization {
-        id = Optional.ofNullable(id).orElseGet(Id::new);
-        academicProgramList = Optional.ofNullable(academicProgramList).orElseGet(ArrayList::new);
-        name = Optional.ofNullable(name).orElseThrow(() -> new IllegalArgumentException("name must be set"));
-    }
-
-    public static Organization createRoot(String name) {
-        return Organization.builder().name(name).build();
-    }
-
-    public static Organization createChildOf(Organization parent, String name) {
-        return Organization.builder()
-                .name(name)
-                .build();
     }
 }

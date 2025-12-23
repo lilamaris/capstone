@@ -7,7 +7,7 @@ import com.lilamaris.capstone.domain.timeline.Timeline;
 import lombok.Builder;
 
 @Builder(toBuilder = true)
-public record SnapshotDeltaEvent (
+public record SnapshotDeltaEvent(
         Timeline.Id timelineId,
         Snapshot.Id snapshotId,
         String domainType,

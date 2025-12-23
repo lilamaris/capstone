@@ -8,8 +8,10 @@ import java.util.Optional;
 
 public interface AccessControlPort {
     boolean hasGrant(User.Id userId, DomainRef domainRef, String scopedRole);
+
     Optional<AccessControl> getById(AccessControl.Id id);
 
     AccessControl save(AccessControl domain);
+
     void delete(AccessControl.Id id);
 }

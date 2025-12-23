@@ -19,10 +19,15 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Effective {
+    public static final Instant MAX = Instant.parse("9999-12-31T23:59:59Z");
     private Instant from;
     private Instant to;
 
-    public static final Instant MAX = Instant.parse("9999-12-31T23:59:59Z");
+    private Effective(Instant from, Instant to) {
+        this.from = requireField(from, "from");
+        this.to = requireField(to, "to");
+        checkInvariant(from, to);
+    }
 
     public static Effective create(Instant from, Instant to) {
         return new Effective(from, to);
@@ -32,6 +37,10 @@ public class Effective {
         var parsedFrom = from.atZone(zoneId).toInstant();
         var parsedTo = to.atZone(zoneId).toInstant();
         return new Effective(parsedFrom, parsedTo);
+    }
+
+    private static void checkInvariant(Instant from, Instant to) {
+        if (to.isBefore(from)) throw new DomainIllegalArgumentException("Field 'to' must not be before 'from'.");
     }
 
     public boolean isOpen() {
@@ -77,15 +86,5 @@ public class Effective {
     @Override
     public int hashCode() {
         return Objects.hash(from, to);
-    }
-
-    private Effective(Instant from, Instant to) {
-        this.from = requireField(from, "from");
-        this.to = requireField(to, "to");
-        checkInvariant(from, to);
-    }
-
-    private static void checkInvariant(Instant from, Instant to) {
-        if (to.isBefore(from)) throw new DomainIllegalArgumentException("Field 'to' must not be before 'from'.");
     }
 }

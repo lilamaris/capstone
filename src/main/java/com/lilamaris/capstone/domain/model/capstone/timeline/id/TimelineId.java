@@ -14,6 +14,10 @@ public class TimelineId extends DefaultUuidDomainId {
     @JsonValue
     protected UUID value;
 
+    public TimelineId(UUID value) {
+        super(value);
+    }
+
     public static TimelineId newId() {
         return new TimelineId(newUuid());
     }
@@ -26,9 +30,5 @@ public class TimelineId extends DefaultUuidDomainId {
     @Override
     protected void init(UUID value) {
         this.value = value;
-    }
-
-    public TimelineId(UUID value) {
-        super(value);
     }
 }

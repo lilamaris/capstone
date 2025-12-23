@@ -14,6 +14,10 @@ public class AccessControlId extends DefaultUuidDomainId {
     @JsonValue
     protected UUID value;
 
+    public AccessControlId(UUID value) {
+        super(value);
+    }
+
     public static AccessControlId newId() {
         return new AccessControlId(newUuid());
     }
@@ -26,9 +30,5 @@ public class AccessControlId extends DefaultUuidDomainId {
     @Override
     protected void init(UUID value) {
         this.value = value;
-    }
-
-    public AccessControlId(UUID value) {
-        super(value);
     }
 }

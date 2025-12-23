@@ -7,6 +7,7 @@ import java.util.function.Function;
 
 public interface AuthCommandUseCase {
     AuthResult.Token credentialSignIn(String email, Function<String, Boolean> challengeFunction);
+
     AuthResult.Token oidcSignIn(Provider provider, String providerId, String email, String displayName);
 
     AuthResult.Token credentialRegister(String email, String passwordHash, String displayName);

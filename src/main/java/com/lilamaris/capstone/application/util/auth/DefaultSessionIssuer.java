@@ -10,13 +10,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class DefaultSessionIssuer implements SessionIssuer{
+public class DefaultSessionIssuer implements SessionIssuer {
     private final JwtUtil jwtUtil;
     private final RefreshTokenPort refreshTokenPort;
 
     @Override
     public AuthResult.Token issue(AuthIdentity identity) {
-        User.Id userId= identity.user().id();
+        User.Id userId = identity.user().id();
         String displayName = identity.user().displayName();
         Role role = identity.user().role();
 

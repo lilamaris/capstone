@@ -2,7 +2,7 @@ package com.lilamaris.capstone.domain.timeline;
 
 import com.lilamaris.capstone.domain.AbstractUUIDDomainId;
 import com.lilamaris.capstone.domain.DomainType;
-import com.lilamaris.capstone.domain.embed.*;
+import com.lilamaris.capstone.domain.embed.Effective;
 import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import lombok.Builder;
 
@@ -19,30 +19,6 @@ public record Snapshot(
         Integer versionNo,
         String description
 ) {
-    public enum Type implements DomainType {
-        INSTANCE;
-
-        @Override
-        public String getName() {
-            return "timeline.snapshot";
-        }
-    }
-
-    public static class Id extends AbstractUUIDDomainId<Type> {
-        public Id() {
-            super();
-        }
-
-        public Id(UUID uuid) {
-            super(uuid);
-        }
-
-        @Override
-        public Type getDomainType() {
-            return Type.INSTANCE;
-        }
-    }
-
     public Snapshot {
         if (tx == null) throw new DomainIllegalArgumentException("Field 'tx' must not be null.");
         if (valid == null) throw new DomainIllegalArgumentException("Field 'valid' must not be null.");
@@ -73,6 +49,10 @@ public record Snapshot(
         return new Snapshot(null, tx, valid, timelineId, 0, description);
     }
 
+    private static SnapshotBuilder getDefaultBuilder(Effective tx, Effective valid, Timeline.Id timelineId) {
+        return builder().tx(tx).valid(valid).timelineId(timelineId);
+    }
+
     public Snapshot closeTxAt(Instant at) {
         var closedTx = tx.closeAt(at);
         return copyWithTx(closedTx);
@@ -81,10 +61,6 @@ public record Snapshot(
     public Snapshot closeValidAt(Instant at) {
         var closedValid = tx.closeAt(at);
         return copyWithValid(closedValid);
-    }
-
-    private static SnapshotBuilder getDefaultBuilder(Effective tx, Effective valid, Timeline.Id timelineId) {
-        return builder().tx(tx).valid(valid).timelineId(timelineId);
     }
 
     private Snapshot buildWithPolicy(SnapshotBuilder builder) {
@@ -101,5 +77,29 @@ public record Snapshot(
 
     private Snapshot copyWithValid(Effective valid) {
         return buildWithPolicy(toBuilder().valid(valid));
+    }
+
+    public enum Type implements DomainType {
+        INSTANCE;
+
+        @Override
+        public String getName() {
+            return "timeline.snapshot";
+        }
+    }
+
+    public static class Id extends AbstractUUIDDomainId<Type> {
+        public Id() {
+            super();
+        }
+
+        public Id(UUID uuid) {
+            super(uuid);
+        }
+
+        @Override
+        public Type getDomainType() {
+            return Type.INSTANCE;
+        }
     }
 }

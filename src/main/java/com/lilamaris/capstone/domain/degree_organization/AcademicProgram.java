@@ -11,13 +11,26 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Builder(toBuilder = true)
-public record AcademicProgram (
+public record AcademicProgram(
         Id id,
         String name,
         ProgramType programType,
         List<CourseOffer> courseOfferList,
         Organization.Id organizationId
 ) {
+    public AcademicProgram {
+        programType = Optional.ofNullable(programType).orElseThrow(() -> new IllegalArgumentException("program type must be set"));
+        courseOfferList = Optional.ofNullable(courseOfferList).orElseGet(ArrayList::new);
+        organizationId = Optional.ofNullable(organizationId).orElseThrow(() -> new IllegalArgumentException("organization id must be set"));
+    }
+
+    public static AcademicProgram from(ProgramType programType, List<CourseOffer> courseOfferList) {
+        return builder()
+                .programType(programType)
+                .courseOfferList(courseOfferList)
+                .build();
+    }
+
     public enum Type implements DomainType {
         INSTANCE;
 
@@ -42,22 +55,10 @@ public record AcademicProgram (
         }
     }
 
-    public AcademicProgram {
-        programType = Optional.ofNullable(programType).orElseThrow(() -> new IllegalArgumentException("program type must be set"));
-        courseOfferList = Optional.ofNullable(courseOfferList).orElseGet(ArrayList::new);
-        organizationId = Optional.ofNullable(organizationId).orElseThrow(() -> new IllegalArgumentException("organization id must be set"));
-    }
-
     @Builder
     public record CourseOffer(
             Course.Id courseId,
             Integer semester
-    ) {}
-
-    public static AcademicProgram from(ProgramType programType, List<CourseOffer> courseOfferList) {
-        return builder()
-                .programType(programType)
-                .courseOfferList(courseOfferList)
-                .build();
+    ) {
     }
 }

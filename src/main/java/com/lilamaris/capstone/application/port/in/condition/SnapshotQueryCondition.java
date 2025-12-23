@@ -20,7 +20,15 @@ public record SnapshotQueryCondition(
         return new SnapshotQueryCondition(timelineId, txAt, validAt);
     }
 
-    public boolean hasTxAt() { return txAt != null; }
-    public boolean hasValidAt() { return validAt != null; }
-    public boolean showLatest() { return txAt == null; }
+    public boolean hasTxAt() {
+        return txAt != null;
+    }
+
+    public boolean hasValidAt() {
+        return validAt != null;
+    }
+
+    public boolean showLatest() {
+        return txAt == null;
+    }
 }

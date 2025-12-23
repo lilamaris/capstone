@@ -14,6 +14,10 @@ public class SnapshotDeltaId extends DefaultUuidDomainId {
     @JsonValue
     protected UUID value;
 
+    public SnapshotDeltaId(UUID value) {
+        super(value);
+    }
+
     public static SnapshotDeltaId newId() {
         return new SnapshotDeltaId(newUuid());
     }
@@ -26,9 +30,5 @@ public class SnapshotDeltaId extends DefaultUuidDomainId {
     @Override
     protected void init(UUID value) {
         this.value = value;
-    }
-
-    public SnapshotDeltaId(UUID value) {
-        super(value);
     }
 }
