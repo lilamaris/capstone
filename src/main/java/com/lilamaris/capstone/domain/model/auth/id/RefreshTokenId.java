@@ -1,34 +1,28 @@
 package com.lilamaris.capstone.domain.model.auth.id;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.lilamaris.capstone.domain.model.common.impl.DefaultUuidDomainId;
+import com.lilamaris.capstone.domain.model.common.impl.DefaultStringDomainId;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class AccountId extends DefaultUuidDomainId {
+public class RefreshTokenId extends DefaultStringDomainId {
     @JsonValue
-    protected UUID value;
-
-    public static AccountId newId() {
-        return new AccountId(newUuid());
-    }
+    protected String value;
 
     @Override
-    public UUID value() {
+    public String value() {
         return value;
     }
 
     @Override
-    protected void init(UUID value) {
+    protected void init(String value) {
         this.value = value;
     }
 
-    public AccountId(UUID value) {
+    public RefreshTokenId(String value) {
         super(value);
     }
 }

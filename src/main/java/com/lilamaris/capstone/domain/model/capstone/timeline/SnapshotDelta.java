@@ -3,9 +3,7 @@ package com.lilamaris.capstone.domain.model.capstone.timeline;
 import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDefaultAuditableDomain;
 import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotDeltaId;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +17,7 @@ import lombok.ToString;
 public class SnapshotDelta extends JpaDefaultAuditableDomain implements Identifiable<SnapshotDeltaId> {
     @Getter(AccessLevel.NONE)
     @EmbeddedId
+    @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private SnapshotDeltaId id;
 
     @Override

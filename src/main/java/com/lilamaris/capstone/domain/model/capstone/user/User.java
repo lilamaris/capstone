@@ -18,6 +18,7 @@ import lombok.ToString;
 public class User extends JpaDefaultAuditableDomain implements Identifiable<UserId> {
     @Getter(AccessLevel.NONE)
     @EmbeddedId
+    @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private UserId id;
 
     @Enumerated(EnumType.STRING)

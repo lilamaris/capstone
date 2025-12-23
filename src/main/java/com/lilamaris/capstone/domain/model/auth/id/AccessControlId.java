@@ -1,6 +1,7 @@
 package com.lilamaris.capstone.domain.model.auth.id;
 
-import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDefaultUuidDomainId;
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.lilamaris.capstone.domain.model.common.impl.DefaultUuidDomainId;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -9,12 +10,25 @@ import java.util.UUID;
 
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class AccessControlId extends JpaDefaultUuidDomainId {
-    public AccessControlId(UUID value) {
-        super(value);
-    }
+public class AccessControlId extends DefaultUuidDomainId {
+    @JsonValue
+    protected UUID value;
 
     public static AccessControlId newId() {
-        return new AccessControlId(UUID.randomUUID());
+        return new AccessControlId(newUuid());
+    }
+
+    @Override
+    public UUID value() {
+        return value;
+    }
+
+    @Override
+    protected void init(UUID value) {
+        this.value = value;
+    }
+
+    public AccessControlId(UUID value) {
+        super(value);
     }
 }

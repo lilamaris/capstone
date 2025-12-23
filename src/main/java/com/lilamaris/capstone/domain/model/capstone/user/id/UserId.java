@@ -1,6 +1,7 @@
 package com.lilamaris.capstone.domain.model.capstone.user.id;
 
-import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDefaultUuidDomainId;
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.lilamaris.capstone.domain.model.common.impl.DefaultUuidDomainId;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -9,12 +10,25 @@ import java.util.UUID;
 
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserId extends JpaDefaultUuidDomainId {
-    public UserId(UUID value) {
-        super(value);
-    }
+public class UserId extends DefaultUuidDomainId {
+    @JsonValue
+    protected UUID value;
 
     public static UserId newId() {
-        return new UserId(UUID.randomUUID());
+        return new UserId(newUuid());
+    }
+
+    @Override
+    public UUID value() {
+        return value;
+    }
+
+    @Override
+    protected void init(UUID value) {
+        this.value = value;
+    }
+
+    public UserId(UUID value) {
+        super(value);
     }
 }

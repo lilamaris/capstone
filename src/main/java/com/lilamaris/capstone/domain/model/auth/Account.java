@@ -21,10 +21,11 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 public class Account extends JpaDefaultAuditableDomain implements Identifiable<AccountId> {
     @Getter(AccessLevel.NONE)
     @EmbeddedId
+    @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private AccountId id;
 
     @Embedded
-    @AttributeOverride(name = "id", column = @Column(name = "timeline_id", insertable = false, updatable = false))
+    @AttributeOverride(name = "value", column = @Column(name = "timeline_id", insertable = false, updatable = false))
     private UserId userId;
 
     @Enumerated(EnumType.STRING)

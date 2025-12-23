@@ -20,18 +20,19 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 public class SnapshotLink implements Identifiable<SnapshotLinkId> {
     @Getter(AccessLevel.NONE)
     @EmbeddedId
+    @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private SnapshotLinkId id;
 
     @Embedded
-    @AttributeOverride(name = "id", column = @Column(name = "timeline_id", insertable = false, updatable = false))
+    @AttributeOverride(name = "value", column = @Column(name = "timeline_id", insertable = false, updatable = false))
     private TimelineId timelineId;
 
     @Embedded
-    @AttributeOverride(name = "id", column = @Column(name = "ancestor_snapshot_id"))
+    @AttributeOverride(name = "value", column = @Column(name = "ancestor_snapshot_id"))
     private SnapshotId ancestorSnapshotId;
 
     @Embedded
-    @AttributeOverride(name = "id", column = @Column(name = "descendant_snapshot_id"))
+    @AttributeOverride(name = "value", column = @Column(name = "descendant_snapshot_id"))
     private SnapshotId descendantSnapshotId;
 
     public boolean isRoot() {

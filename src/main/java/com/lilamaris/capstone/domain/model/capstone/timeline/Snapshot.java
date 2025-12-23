@@ -21,6 +21,7 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 public class Snapshot extends JpaDefaultAuditableDomain implements Identifiable<SnapshotId> {
     @Getter(AccessLevel.NONE)
     @EmbeddedId
+    @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private SnapshotId id;
 
     @Embedded
@@ -38,7 +39,7 @@ public class Snapshot extends JpaDefaultAuditableDomain implements Identifiable<
     private Effective valid;
 
     @Embedded
-    @AttributeOverride(name = "id", column = @Column(name = "timeline_id", insertable = false, updatable = false))
+    @AttributeOverride(name = "value", column = @Column(name = "timeline_id", insertable = false, updatable = false))
     private TimelineId timelineId;
 
     private String description;

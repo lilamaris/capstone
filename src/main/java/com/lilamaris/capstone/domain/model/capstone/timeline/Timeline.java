@@ -3,7 +3,7 @@ package com.lilamaris.capstone.domain.model.capstone.timeline;
 import com.lilamaris.capstone.domain.model.common.CoreDomainType;
 import com.lilamaris.capstone.domain.model.common.DomainRef;
 import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDefaultAuditableDomain;
-import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDefaultDomainRef;
+import com.lilamaris.capstone.domain.model.common.impl.DefaultDomainRef;
 import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import com.lilamaris.capstone.domain.model.common.mixin.Referenceable;
 import com.lilamaris.capstone.domain.exception.DomainIllegalStateException;
@@ -33,6 +33,7 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 public class Timeline extends JpaDefaultAuditableDomain implements Identifiable<TimelineId>, Referenceable {
     @Getter(AccessLevel.NONE)
     @EmbeddedId
+    @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private TimelineId id;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
@@ -73,7 +74,7 @@ public class Timeline extends JpaDefaultAuditableDomain implements Identifiable<
 
     @Override
     public DomainRef ref() {
-        return new JpaDefaultDomainRef(CoreDomainType.TIMELINE, id);
+        return DefaultDomainRef.from(CoreDomainType.TIMELINE, id);
     }
 
     public List<Snapshot> getSnapshotsWithOpenTx() {
