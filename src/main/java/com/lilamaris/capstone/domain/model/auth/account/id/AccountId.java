@@ -1,7 +1,7 @@
-package com.lilamaris.capstone.domain.model.auth.id;
+package com.lilamaris.capstone.domain.model.auth.account.id;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.lilamaris.capstone.domain.model.common.impl.DefaultUuidDomainId;
+import com.lilamaris.capstone.domain.model.common.id.impl.DefaultUuidDomainId;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -18,10 +18,6 @@ public class AccountId extends DefaultUuidDomainId {
         super(value);
     }
 
-    public static AccountId newId() {
-        return new AccountId(newUuid());
-    }
-
     @Override
     public UUID value() {
         return value;
@@ -31,4 +27,6 @@ public class AccountId extends DefaultUuidDomainId {
     protected void init(UUID value) {
         this.value = value;
     }
+
+    public static final AccountIdSpec SPEC = new AccountIdSpec();
 }
