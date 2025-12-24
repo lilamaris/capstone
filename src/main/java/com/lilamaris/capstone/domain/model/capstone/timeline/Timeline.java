@@ -5,10 +5,10 @@ import com.lilamaris.capstone.domain.model.capstone.timeline.embed.Effective;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
-import com.lilamaris.capstone.domain.model.common.CoreDomainType;
-import com.lilamaris.capstone.domain.model.common.DomainRef;
-import com.lilamaris.capstone.domain.model.common.impl.DefaultDomainRef;
-import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDefaultAuditableDomain;
+import com.lilamaris.capstone.domain.model.common.id.*;
+import com.lilamaris.capstone.domain.model.common.type.CoreDomainType;
+import com.lilamaris.capstone.domain.model.common.id.impl.DefaultDomainRef;
+import com.lilamaris.capstone.domain.model.common.embed.impl.JpaDefaultAuditableDomain;
 import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import com.lilamaris.capstone.domain.model.common.mixin.Referenceable;
 import com.lilamaris.capstone.domain.timeline.exception.TimelineDomainException;
@@ -50,6 +50,9 @@ public class Timeline extends JpaDefaultAuditableDomain implements Identifiable<
     private String description;
 
     @Transient
+    private IdGenerationContext idGenerationContext;
+
+    @Transient
     private Map<SnapshotId, Snapshot> snapshotMap;
 
     @Transient
@@ -61,21 +64,18 @@ public class Timeline extends JpaDefaultAuditableDomain implements Identifiable<
     @Transient
     private Map<SnapshotId, SnapshotLink> snapshotLinkByAncestor;
 
-    private Timeline(TimelineId id, List<Snapshot> snapshotList, List<SnapshotLink> snapshotLinkList, String description) {
+    @PostLoad
+    private void onLoad() {
+        propagateToTransient();
+    }
+
+    protected Timeline(IdGenerationContext idGenerationContext, TimelineId id, List<Snapshot> snapshotList, List<SnapshotLink> snapshotLinkList, String description) {
+        this.idGenerationContext = idGenerationContext;
         this.id = requireField(id, "id");
         this.snapshotList = requireField(snapshotList, "snapshotList");
         this.snapshotLinkList = requireField(snapshotLinkList, "snapshotLinkList");
         this.description = requireField(description, "description");
         checkFieldInvariants();
-    }
-
-    public static Timeline create(String description) {
-        return new Timeline(TimelineId.newId(), new ArrayList<>(), new ArrayList<>(), description);
-    }
-
-    @PostLoad
-    private void onLoad() {
-        propagateToTransient();
     }
 
     @Override
@@ -120,14 +120,15 @@ public class Timeline extends JpaDefaultAuditableDomain implements Identifiable<
                 )
         ));
 
-        var newSnapshotLeft = sourceSnapshot.closeTxAndNext(txAt);
-        var newSnapshotRight = newSnapshotLeft.closeValidAndNext(validAt);
+        sourceSnapshot.close(EffectiveSelector.TX, txAt);
+        var newTx = Effective.create(txAt, Effective.MAX);
+        var newValidSplit = sourceSnapshot.getValid().splitAt(validAt);
 
-        var newSnapshotLeftLink = SnapshotLink.create(id, sourceSnapshot.id(), newSnapshotLeft.id());
-        var newSnapshotRightLink = SnapshotLink.create(id, newSnapshotLeft.id(), newSnapshotRight.id());
+        var newSnapshotLeft = new Snapshot(idGenerationContext.next(SnapshotId.SPEC), newTx, newValidSplit.left(), id, 0, description);
+        var newSnapshotRight = new Snapshot(idGenerationContext.next(SnapshotId.SPEC), newTx, newValidSplit.right(), id, 0, description);
 
-        newSnapshotLeft.setDescription(description);
-        newSnapshotRight.setDescription(description);
+        var newSnapshotLeftLink = new SnapshotLink(idGenerationContext.next(SnapshotLinkId.SPEC), id, sourceSnapshot.id(), newSnapshotLeft.id());
+        var newSnapshotRightLink = new SnapshotLink(idGenerationContext.next(SnapshotLinkId.SPEC), id, newSnapshotLeft.id(), newSnapshotRight.id());
 
         snapshotList.addAll(List.of(newSnapshotLeft, newSnapshotRight));
         snapshotLinkList.addAll(List.of(newSnapshotLeftLink, newSnapshotRightLink));
@@ -156,8 +157,9 @@ public class Timeline extends JpaDefaultAuditableDomain implements Identifiable<
         var mergedSnapshotValid = Effective.create(startValidAt, endValidAt);
         var mergedSnapshotTx = Effective.create(txAt, Effective.MAX);
 
-        var mergedSnapshot = Snapshot.create(mergedSnapshotTx, mergedSnapshotValid, id, description);
-        var mergedSnapshotLink = SnapshotLink.create(id, earliestSnapshot.id(), mergedSnapshot.id());
+        var mergedSnapshot = new Snapshot(idGenerationContext.next(SnapshotId.SPEC), mergedSnapshotTx, mergedSnapshotValid, id, 0, description);
+        var mergedSnapshotLink = new SnapshotLink(idGenerationContext.next(SnapshotLinkId.SPEC), id, earliestSnapshot.id(), mergedSnapshot.id());
+
 
         snapshotList.add(mergedSnapshot);
         snapshotLinkList.add(mergedSnapshotLink);
@@ -167,8 +169,9 @@ public class Timeline extends JpaDefaultAuditableDomain implements Identifiable<
     private void createInitialSnapshot(Instant txAt, Instant validAt, String description) {
         var tx = Effective.create(txAt, Effective.MAX);
         var valid = Effective.create(validAt, Effective.MAX);
-        var snapshot = Snapshot.create(tx, valid, id, description);
-        var link = SnapshotLink.create(id, null, snapshot.id());
+
+        var snapshot = new Snapshot(idGenerationContext.next(SnapshotId.SPEC), tx, valid, id, 0, description);
+        var link = new SnapshotLink(idGenerationContext.next(SnapshotLinkId.SPEC), id, null, snapshot.id());
 
         snapshotList.add(snapshot);
         snapshotLinkList.add(link);
