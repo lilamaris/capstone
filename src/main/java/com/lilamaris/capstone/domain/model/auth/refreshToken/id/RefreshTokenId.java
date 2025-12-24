@@ -1,7 +1,7 @@
-package com.lilamaris.capstone.domain.model.auth.id;
+package com.lilamaris.capstone.domain.model.auth.refreshToken.id;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.lilamaris.capstone.domain.model.common.impl.DefaultStringDomainId;
+import com.lilamaris.capstone.domain.model.common.id.impl.DefaultStringDomainId;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -25,4 +25,6 @@ public class RefreshTokenId extends DefaultStringDomainId {
     protected void init(String value) {
         this.value = value;
     }
+
+    public static final RefreshTokenIdSpec SPEC = new RefreshTokenIdSpec();
 }
