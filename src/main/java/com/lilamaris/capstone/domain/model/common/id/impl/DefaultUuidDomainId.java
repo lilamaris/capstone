@@ -1,6 +1,6 @@
-package com.lilamaris.capstone.domain.model.common.impl;
+package com.lilamaris.capstone.domain.model.common.id.impl;
 
-import com.lilamaris.capstone.domain.model.common.AbstractDomainId;
+import com.lilamaris.capstone.domain.model.common.id.AbstractDomainId;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

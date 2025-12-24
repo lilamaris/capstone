@@ -1,6 +1,6 @@
-package com.lilamaris.capstone.domain.model.common.impl.jpa;
+package com.lilamaris.capstone.domain.model.common.embed.impl;
 
-import com.lilamaris.capstone.domain.model.common.DomainMeta;
+import com.lilamaris.capstone.domain.model.common.embed.DomainMeta;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.*;

@@ -2,13 +2,13 @@ package com.lilamaris.capstone.domain.model.capstone.course;
 
 import com.lilamaris.capstone.domain.model.capstone.course.id.CourseId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
-import com.lilamaris.capstone.domain.model.common.DomainRef;
-import com.lilamaris.capstone.domain.model.common.ResourceDomainType;
-import com.lilamaris.capstone.domain.model.common.impl.DefaultDomainRef;
-import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDefaultAuditableDomain;
-import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDomainMeta;
+import com.lilamaris.capstone.domain.model.common.embed.impl.JpaDefaultAuditableDomain;
+import com.lilamaris.capstone.domain.model.common.embed.impl.JpaDomainMeta;
+import com.lilamaris.capstone.domain.model.common.id.DomainRef;
+import com.lilamaris.capstone.domain.model.common.id.impl.DefaultDomainRef;
 import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import com.lilamaris.capstone.domain.model.common.mixin.Referenceable;
+import com.lilamaris.capstone.domain.model.common.type.ResourceDomainType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

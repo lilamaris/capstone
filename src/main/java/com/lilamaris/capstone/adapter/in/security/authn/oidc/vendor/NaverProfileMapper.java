@@ -2,7 +2,7 @@ package com.lilamaris.capstone.adapter.in.security.authn.oidc.vendor;
 
 import com.lilamaris.capstone.adapter.in.security.authn.oidc.NormalizedProfile;
 import com.lilamaris.capstone.adapter.in.security.authn.oidc.OidcProfileMapper;
-import com.lilamaris.capstone.domain.user.Provider;
+import com.lilamaris.capstone.domain.model.auth.account.Provider;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Component;

@@ -61,6 +61,10 @@ public class Effective {
         return split.right();
     }
 
+    public void open(Instant at) {
+        this.from = at;
+    }
+
     public void close(Instant at) {
         this.to = at;
     }

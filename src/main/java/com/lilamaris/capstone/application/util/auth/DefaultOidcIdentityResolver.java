@@ -1,20 +1,25 @@
 package com.lilamaris.capstone.application.util.auth;
 
 import com.lilamaris.capstone.application.exception.ResourceNotFoundException;
-import com.lilamaris.capstone.application.port.out.AuthPort;
+import com.lilamaris.capstone.application.port.out.AccountPort;
 import com.lilamaris.capstone.application.port.out.UserPort;
-import com.lilamaris.capstone.domain.user.Account;
-import com.lilamaris.capstone.domain.user.Provider;
-import com.lilamaris.capstone.domain.user.Role;
-import com.lilamaris.capstone.domain.user.User;
+import com.lilamaris.capstone.domain.model.auth.account.Account;
+import com.lilamaris.capstone.domain.model.auth.account.AccountFactory;
+import com.lilamaris.capstone.domain.model.auth.account.Provider;
+import com.lilamaris.capstone.domain.model.capstone.user.Role;
+import com.lilamaris.capstone.domain.model.capstone.user.User;
+import com.lilamaris.capstone.domain.model.capstone.user.UserFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class DefaultOidcIdentityResolver implements OidcIdentityResolver {
-    private final AuthPort authPort;
+    private final AccountPort accountPort;
     private final UserPort userPort;
+
+    private final UserFactory userFactory;
+    private final AccountFactory accountFactory;
 
     @Override
     public AuthIdentity resolve(Provider provider, String providerId, String email, String displayName) {
@@ -22,18 +27,19 @@ public class DefaultOidcIdentityResolver implements OidcIdentityResolver {
         Account account;
         boolean isCreated = false;
 
-        var accountOptional = authPort.getBy(provider, providerId);
+        var accountOptional = accountPort.getBy(provider, providerId);
 
         if (accountOptional.isPresent()) {
             account = accountOptional.get();
-            user = userPort.getById(account.userId()).orElseThrow(() -> new ResourceNotFoundException(
-                    String.format("User with id '%s' not found.", account.userId().getValue())
+            var userId = account.getUserId();
+            user = userPort.getById(userId).orElseThrow(() -> new ResourceNotFoundException(
+                    String.format("User with id '%s' not found.", userId)
             ));
         } else {
-            account = Account.createOidc(provider, providerId, email, displayName);
-            user = User.create(displayName, Role.USER);
-            user = user.linkAccount(account);
+            user = userFactory.create(displayName, Role.USER);
+            account = accountFactory.create(user.id(), provider, providerId, email, displayName);
             user = userPort.save(user);
+            account = accountPort.save(account);
             isCreated = true;
         }
 

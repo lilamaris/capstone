@@ -1,8 +1,8 @@
-package com.lilamaris.capstone.domain.model.common.impl;
+package com.lilamaris.capstone.domain.model.common.id.impl;
 
-import com.lilamaris.capstone.domain.model.common.DomainId;
-import com.lilamaris.capstone.domain.model.common.DomainRef;
-import com.lilamaris.capstone.domain.model.common.DomainType;
+import com.lilamaris.capstone.domain.model.common.id.DomainId;
+import com.lilamaris.capstone.domain.model.common.id.DomainRef;
+import com.lilamaris.capstone.domain.model.common.type.DomainType;
 
 import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 

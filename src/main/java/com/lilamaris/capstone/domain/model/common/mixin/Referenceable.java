@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.domain.model.common.mixin;
 
-import com.lilamaris.capstone.domain.model.common.DomainRef;
+import com.lilamaris.capstone.domain.model.common.id.DomainRef;
 
 public interface Referenceable {
     DomainRef ref();

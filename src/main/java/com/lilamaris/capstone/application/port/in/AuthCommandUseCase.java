@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.application.port.in;
 
 import com.lilamaris.capstone.application.port.in.result.AuthResult;
-import com.lilamaris.capstone.domain.user.Provider;
+import com.lilamaris.capstone.domain.model.auth.account.Provider;
 
 import java.util.function.Function;
 

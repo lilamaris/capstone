@@ -1,6 +1,6 @@
-package com.lilamaris.capstone.domain.model.common.impl;
+package com.lilamaris.capstone.domain.model.common.embed.impl;
 
-import com.lilamaris.capstone.domain.model.common.DomainMeta;
+import com.lilamaris.capstone.domain.model.common.embed.DomainMeta;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;

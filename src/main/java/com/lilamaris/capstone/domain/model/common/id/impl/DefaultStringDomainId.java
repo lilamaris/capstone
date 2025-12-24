@@ -1,11 +1,9 @@
-package com.lilamaris.capstone.domain.model.common.impl;
+package com.lilamaris.capstone.domain.model.common.id.impl;
 
-import com.lilamaris.capstone.domain.model.common.AbstractDomainId;
-import jakarta.persistence.Embeddable;
+import com.lilamaris.capstone.domain.model.common.id.AbstractDomainId;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-@Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class DefaultStringDomainId extends AbstractDomainId<String> {
     protected DefaultStringDomainId(String value) {

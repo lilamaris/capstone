@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.adapter.in.security.authn.oidc;
 
-import com.lilamaris.capstone.domain.user.Provider;
+import com.lilamaris.capstone.domain.model.auth.account.Provider;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

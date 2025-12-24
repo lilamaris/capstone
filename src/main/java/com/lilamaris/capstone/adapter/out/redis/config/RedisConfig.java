@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.adapter.out.redis.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lilamaris.capstone.adapter.out.redis.store.RefreshTokenEntry;
+import com.lilamaris.capstone.domain.model.auth.refreshToken.RefreshToken;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -13,13 +13,13 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisConfig {
 
     @Bean
-    RedisTemplate<String, RefreshTokenEntry> refreshTokenTemplate(
+    RedisTemplate<String, RefreshToken> refreshTokenTemplate(
             RedisConnectionFactory connectionFactory,
             ObjectMapper objectMapper
     ) {
-        var serializer = new Jackson2JsonRedisSerializer<>(objectMapper, RefreshTokenEntry.class);
+        var serializer = new Jackson2JsonRedisSerializer<>(objectMapper, RefreshToken.class);
 
-        var template = new RedisTemplate<String, RefreshTokenEntry>();
+        var template = new RedisTemplate<String, RefreshToken>();
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(serializer);

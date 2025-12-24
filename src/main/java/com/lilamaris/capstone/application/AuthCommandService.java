@@ -3,14 +3,14 @@ package com.lilamaris.capstone.application;
 import com.lilamaris.capstone.application.exception.ResourceAlreadyExistsException;
 import com.lilamaris.capstone.application.port.in.AuthCommandUseCase;
 import com.lilamaris.capstone.application.port.in.result.AuthResult;
-import com.lilamaris.capstone.application.port.out.AuthPort;
+import com.lilamaris.capstone.application.port.out.AccountPort;
 import com.lilamaris.capstone.application.port.out.UserPort;
 import com.lilamaris.capstone.application.util.auth.*;
-import com.lilamaris.capstone.domain.auth.RefreshToken;
-import com.lilamaris.capstone.domain.user.Account;
-import com.lilamaris.capstone.domain.user.Provider;
-import com.lilamaris.capstone.domain.user.Role;
-import com.lilamaris.capstone.domain.user.User;
+import com.lilamaris.capstone.domain.model.auth.account.AccountFactory;
+import com.lilamaris.capstone.domain.model.auth.account.Provider;
+import com.lilamaris.capstone.domain.model.auth.refreshToken.id.RefreshTokenId;
+import com.lilamaris.capstone.domain.model.capstone.user.Role;
+import com.lilamaris.capstone.domain.model.capstone.user.UserFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,13 +25,16 @@ public class AuthCommandService implements AuthCommandUseCase {
     private final TokenIdentityResolver tokenIdentityResolver;
     private final SessionIssuer sessionIssuer;
 
-    private final AuthPort authPort;
+    private final AccountPort accountPort;
     private final UserPort userPort;
+
+    private final UserFactory userFactory;
+    private final AccountFactory accountFactory;
 
     @Override
     @Transactional
     public AuthResult.Token refresh(String refreshToken) {
-        var identity = tokenIdentityResolver.resolve(new RefreshToken.Id(refreshToken));
+        var identity = tokenIdentityResolver.resolve(new RefreshTokenId(refreshToken));
         return sessionIssuer.issue(identity);
 
     }
@@ -52,14 +55,15 @@ public class AuthCommandService implements AuthCommandUseCase {
 
     @Override
     public AuthResult.Token credentialRegister(String email, String passwordHash, String displayName) {
-        if (authPort.isExists(Provider.LOCAL, email)) {
+        if (accountPort.isExists(Provider.LOCAL, email)) {
             throw new ResourceAlreadyExistsException("Account already exists.");
         }
 
-        var account = Account.createCredential(displayName, email, passwordHash);
-        var user = User.create(displayName, Role.USER);
-        user = user.linkAccount(account);
+        var user = userFactory.create(displayName, Role.USER);
+        var account = accountFactory.create(user.id(), displayName, email, passwordHash);
+
         user = userPort.save(user);
+        account = accountPort.save(account);
 
         var identity = new AuthIdentity(user, account, true);
         return sessionIssuer.issue(identity);

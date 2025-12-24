@@ -2,8 +2,8 @@ package com.lilamaris.capstone.application.util.auth;
 
 import com.lilamaris.capstone.application.exception.ApplicationInvariantException;
 import com.lilamaris.capstone.application.util.UniversityClock;
-import com.lilamaris.capstone.domain.user.Role;
-import com.lilamaris.capstone.domain.user.User;
+import com.lilamaris.capstone.domain.model.capstone.user.Role;
+import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -50,13 +50,13 @@ public class JwtUtil {
         key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
     }
 
-    public String createAccessToken(User.Id userId, String displayName, Role role) {
+    public String createAccessToken(UserId userId, String displayName, Role role) {
         var now = UniversityClock.now().toEpochMilli();
         var issuedAt = new Date(now);
         var expiredAt = new Date(now + accessTokenExpiration.toMillis());
 
         return Jwts.builder()
-                .subject(userId.getValue().toString())
+                .subject(userId.toString())
                 .claim(DISPLAY_NAME_KEY, displayName)
                 .claim(AUTHORITIES_KEY, role.name())
                 .issuedAt(issuedAt)

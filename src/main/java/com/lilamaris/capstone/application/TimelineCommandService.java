@@ -6,7 +6,7 @@ import com.lilamaris.capstone.application.port.in.result.TimelineResult;
 import com.lilamaris.capstone.application.port.out.TimelinePort;
 import com.lilamaris.capstone.application.util.UniversityClock;
 import com.lilamaris.capstone.domain.event.SnapshotDeltaEvent;
-import com.lilamaris.capstone.domain.model.capstone.timeline.Timeline;
+import com.lilamaris.capstone.domain.model.capstone.timeline.TimelineFactory;
 import com.lilamaris.capstone.domain.model.capstone.timeline.embed.Effective;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +23,11 @@ import java.time.LocalDateTime;
 public class TimelineCommandService implements TimelineCommandUseCase {
     private final TimelinePort timelinePort;
 
+    private final TimelineFactory timelineFactory;
+
     @Override
     public TimelineResult.Command create(String description) {
-        var domain = Timeline.create(description);
+        var domain = timelineFactory.create(description);
         var created = timelinePort.save(domain);
 
         return TimelineResult.Command.from(created);
