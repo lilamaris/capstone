@@ -1,0 +1,64 @@
+package com.lilamaris.capstone.domain;
+
+import com.lilamaris.capstone.application.util.generator.DefaultIdGenerator;
+import com.lilamaris.capstone.domain.model.auth.access_control.AccessControlFactory;
+import com.lilamaris.capstone.domain.model.auth.access_control.id.AccessControlId;
+import com.lilamaris.capstone.domain.model.auth.access_control.id.AccessControlIdSpec;
+import com.lilamaris.capstone.domain.model.capstone.timeline.TimelineFactory;
+import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
+import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
+import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
+import com.lilamaris.capstone.domain.model.capstone.timeline.spec.TimelineIdSpec;
+import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
+import com.lilamaris.capstone.domain.model.capstone.user.id.UserIdSpec;
+import com.lilamaris.capstone.domain.model.common.id.impl.DefaultIdGenerateContext;
+import com.lilamaris.capstone.util.FixedIdGenerationContext;
+import com.lilamaris.capstone.util.SequentialUuidGenerator;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
+public class AccessControlTest {
+    private static final Logger log = LoggerFactory.getLogger(AccessControlTest.class);
+    private AccessControlFactory factory;
+    private TimelineFactory timelineFactory;
+    private UserId userId1;
+    private UserId userId2;
+
+    @BeforeEach
+    void run() {
+        var generator = new DefaultIdGenerator();
+
+        var ctx = new DefaultIdGenerateContext(generator, Map.of(
+                AccessControlId.SPEC, new SequentialUuidGenerator()
+        ));
+
+        var timelineIdCtx = new DefaultIdGenerateContext(generator, Map.of(
+                TimelineId.SPEC, new SequentialUuidGenerator(),
+                SnapshotId.SPEC, new SequentialUuidGenerator(),
+                SnapshotLinkId.SPEC, new SequentialUuidGenerator()
+        ));
+
+        factory = new AccessControlFactory(ctx);
+        timelineFactory = new TimelineFactory(timelineIdCtx);
+
+        userId1 = generator.generate(UserId.SPEC, new SequentialUuidGenerator());
+        userId2 = generator.generate(UserId.SPEC, new SequentialUuidGenerator());
+    }
+
+    @Test
+    void should_create() {
+        var referenceable = timelineFactory.create("Test referenceable domain");
+        var ref = referenceable.ref();
+        var ac1 = factory.create(userId1, ref, "test");
+
+        log.info("AccessControl: {}", ac1);
+        assertThat(ac1.getUserId()).isEqualTo(userId1);
+        assertThat(ac1.getResourceRef()).isEqualTo(ref);
+    }
+}
