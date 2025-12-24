@@ -35,26 +35,11 @@ public class SnapshotLink implements Identifiable<SnapshotLinkId> {
     @AttributeOverride(name = "value", column = @Column(name = "descendant_snapshot_id"))
     private SnapshotId descendantSnapshotId;
 
-    private SnapshotLink(SnapshotLinkId id, TimelineId timelineId, SnapshotId ancestorSnapshotId, SnapshotId descendantSnapshotId) {
+    protected SnapshotLink(SnapshotLinkId id, TimelineId timelineId, SnapshotId ancestorSnapshotId, SnapshotId descendantSnapshotId) {
         this.id = requireField(id, "id");
         this.timelineId = requireField(timelineId, "timelineId");
         this.descendantSnapshotId = requireField(descendantSnapshotId, "descendantSnapshotId");
         this.ancestorSnapshotId = ancestorSnapshotId;
-    }
-
-    protected static SnapshotLink create(
-            TimelineId timelineId,
-            SnapshotId ancestorSnapshotId,
-            SnapshotId descendantSnapshotId
-    ) {
-        return new SnapshotLink(SnapshotLinkId.newId(), timelineId, ancestorSnapshotId, descendantSnapshotId);
-    }
-
-    protected static SnapshotLink createRoot(
-            TimelineId timelineId,
-            SnapshotId descendantSnapshotId
-    ) {
-        return new SnapshotLink(SnapshotLinkId.newId(), timelineId, null, descendantSnapshotId);
     }
 
     public boolean isRoot() {

@@ -45,7 +45,7 @@ public class Snapshot extends JpaDefaultAuditableDomain implements Identifiable<
     private String description;
     private Integer versionNo;
 
-    private Snapshot(SnapshotId id, Effective tx, Effective valid, TimelineId timelineId, Integer versionNo, String description) {
+    protected Snapshot(SnapshotId id, Effective tx, Effective valid, TimelineId timelineId, Integer versionNo, String description) {
         this.id = requireField(id, "id");
         this.tx = requireField(tx, "tx");
         this.valid = requireField(valid, "valid");
@@ -54,26 +54,18 @@ public class Snapshot extends JpaDefaultAuditableDomain implements Identifiable<
         this.description = requireField(description, "description");
     }
 
-    protected static Snapshot create(Effective tx, Effective valid, TimelineId timelineId, String description) {
-        return new Snapshot(SnapshotId.newId(), tx, valid, timelineId, 0, description);
-    }
-
     @Override
     public final SnapshotId id() {
         return id;
     }
 
-    protected Snapshot closeTxAndNext(Instant at) {
-        var next = tx.closeAndNext(at);
+    protected void open(EffectiveSelector selector, Instant at) {
+        if (selector == EffectiveSelector.TX) {
+            tx.open(at);
+        } else {
+            valid.open(at);
+        }
         upgrade();
-        return Snapshot.create(next, valid, timelineId, description);
-    }
-
-    protected Snapshot closeValidAndNext(Instant at) {
-        var next = valid.closeAndNext(at);
-        upgrade();
-        return Snapshot.create(tx, next, timelineId, description);
-
     }
 
     protected void close(EffectiveSelector selector, Instant at) {
