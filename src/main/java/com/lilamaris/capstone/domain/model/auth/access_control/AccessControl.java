@@ -1,12 +1,9 @@
-package com.lilamaris.capstone.domain.model.auth;
+package com.lilamaris.capstone.domain.model.auth.access_control;
 
-import com.lilamaris.capstone.domain.model.auth.id.AccessControlId;
+import com.lilamaris.capstone.domain.model.auth.access_control.id.AccessControlId;
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
-import com.lilamaris.capstone.domain.model.common.CoreDomainType;
-import com.lilamaris.capstone.domain.model.common.DomainId;
-import com.lilamaris.capstone.domain.model.common.DomainRef;
-import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDefaultAuditableDomain;
-import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDomainRef;
+import com.lilamaris.capstone.domain.model.common.embed.impl.JpaDefaultAuditableDomain;
+import com.lilamaris.capstone.domain.model.common.id.impl.JpaDomainRef;
 import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -40,21 +37,11 @@ public class AccessControl extends JpaDefaultAuditableDomain implements Identifi
 
     private String scopedRole;
 
-    private AccessControl(AccessControlId id, UserId userId, JpaDomainRef resourceRef, String scopedRole) {
+    protected AccessControl(AccessControlId id, UserId userId, JpaDomainRef resourceRef, String scopedRole) {
         this.id = requireField(id, "id");
         this.userId = requireField(userId, "userId");
         this.resourceRef = requireField(resourceRef, "resourceRef");
         this.scopedRole = requireField(scopedRole, "scopedRole");
-    }
-
-    public static AccessControl create(UserId userId, CoreDomainType resourceType, DomainId<?> resourceId, String scopedRole) {
-        var ref = JpaDomainRef.from(resourceType, resourceId);
-        return new AccessControl(AccessControlId.newId(), userId, ref, scopedRole);
-    }
-
-    public static AccessControl create(UserId userId, DomainRef resourceRef, String scopedRole) {
-        var ref = JpaDomainRef.from(resourceRef);
-        return new AccessControl(AccessControlId.newId(), userId, ref, scopedRole);
     }
 
     @Override

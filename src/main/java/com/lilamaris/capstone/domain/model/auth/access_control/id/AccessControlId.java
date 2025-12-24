@@ -1,7 +1,7 @@
-package com.lilamaris.capstone.domain.model.auth.id;
+package com.lilamaris.capstone.domain.model.auth.access_control.id;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.lilamaris.capstone.domain.model.common.impl.DefaultUuidDomainId;
+import com.lilamaris.capstone.domain.model.common.id.impl.DefaultUuidDomainId;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -18,10 +18,6 @@ public class AccessControlId extends DefaultUuidDomainId {
         super(value);
     }
 
-    public static AccessControlId newId() {
-        return new AccessControlId(newUuid());
-    }
-
     @Override
     public UUID value() {
         return value;
@@ -31,4 +27,6 @@ public class AccessControlId extends DefaultUuidDomainId {
     protected void init(UUID value) {
         this.value = value;
     }
+
+    public static final AccessControlIdSpec SPEC = new AccessControlIdSpec();
 }

@@ -2,10 +2,10 @@ package com.lilamaris.capstone.domain.model.capstone.user;
 
 import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
-import com.lilamaris.capstone.domain.model.common.CoreDomainType;
-import com.lilamaris.capstone.domain.model.common.DomainRef;
-import com.lilamaris.capstone.domain.model.common.impl.DefaultDomainRef;
-import com.lilamaris.capstone.domain.model.common.impl.jpa.JpaDefaultAuditableDomain;
+import com.lilamaris.capstone.domain.model.common.type.CoreDomainType;
+import com.lilamaris.capstone.domain.model.common.id.DomainRef;
+import com.lilamaris.capstone.domain.model.common.id.impl.DefaultDomainRef;
+import com.lilamaris.capstone.domain.model.common.embed.impl.JpaDefaultAuditableDomain;
 import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import com.lilamaris.capstone.domain.model.common.mixin.Referenceable;
 import jakarta.persistence.*;
@@ -29,7 +29,7 @@ public class User extends JpaDefaultAuditableDomain implements Identifiable<User
     private Role role;
     private String displayName;
 
-    private User(UserId id, String displayName, Role role) {
+    protected User(UserId id, String displayName, Role role) {
         if (id == null) throw new DomainIllegalArgumentException("Field 'id' must not be null.");
         if (displayName == null) throw new DomainIllegalArgumentException("Field 'displayName' must not be null.");
         if (role == null) throw new DomainIllegalArgumentException("Field 'role' must not be null.");
@@ -37,10 +37,6 @@ public class User extends JpaDefaultAuditableDomain implements Identifiable<User
         this.id = id;
         this.displayName = displayName;
         this.role = role;
-    }
-
-    public static User create(String displayName, Role role) {
-        return new User(UserId.newId(), displayName, role);
     }
 
     @Override
