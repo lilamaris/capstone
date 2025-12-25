@@ -4,6 +4,7 @@ import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
 import com.lilamaris.capstone.domain.model.common.embed.impl.JpaDefaultAuditableDomain;
 import com.lilamaris.capstone.domain.model.common.id.DomainRef;
+import com.lilamaris.capstone.domain.model.common.id.IdGenerationContext;
 import com.lilamaris.capstone.domain.model.common.id.impl.DefaultDomainRef;
 import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import com.lilamaris.capstone.domain.model.common.mixin.Referenceable;
@@ -29,11 +30,15 @@ public class User extends JpaDefaultAuditableDomain implements Identifiable<User
     private Role role;
     private String displayName;
 
-    protected User(UserId id, String displayName, Role role) {
+    @Transient
+    private IdGenerationContext idGenerationContext;
+
+    protected User(IdGenerationContext idGenerationContext, UserId id, String displayName, Role role) {
         if (id == null) throw new DomainIllegalArgumentException("Field 'id' must not be null.");
         if (displayName == null) throw new DomainIllegalArgumentException("Field 'displayName' must not be null.");
         if (role == null) throw new DomainIllegalArgumentException("Field 'role' must not be null.");
 
+        this.idGenerationContext = idGenerationContext;
         this.id = id;
         this.displayName = displayName;
         this.role = role;

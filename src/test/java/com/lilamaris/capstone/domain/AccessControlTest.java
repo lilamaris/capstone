@@ -1,18 +1,13 @@
 package com.lilamaris.capstone.domain;
 
-import com.lilamaris.capstone.application.util.generator.DefaultIdGenerator;
 import com.lilamaris.capstone.domain.model.auth.access_control.AccessControlFactory;
 import com.lilamaris.capstone.domain.model.auth.access_control.id.AccessControlId;
-import com.lilamaris.capstone.domain.model.auth.access_control.id.AccessControlIdSpec;
 import com.lilamaris.capstone.domain.model.capstone.timeline.TimelineFactory;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
-import com.lilamaris.capstone.domain.model.capstone.timeline.spec.TimelineIdSpec;
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
-import com.lilamaris.capstone.domain.model.capstone.user.id.UserIdSpec;
-import com.lilamaris.capstone.domain.model.common.id.impl.DefaultIdGenerateContext;
-import com.lilamaris.capstone.util.FixedIdGenerationContext;
+import com.lilamaris.capstone.application.util.generator.DefaultIdGenerationContext;
 import com.lilamaris.capstone.util.SequentialUuidGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,23 +27,27 @@ public class AccessControlTest {
 
     @BeforeEach
     void run() {
-        var generator = new DefaultIdGenerator();
+        Map<Class<?>, DefaultIdGenerationContext.Binding<?, ?>> accessControlIdMap = Map.of(
+                AccessControlId.class, DefaultIdGenerationContext.bind(AccessControlId::new, new SequentialUuidGenerator())
+        );
 
-        var ctx = new DefaultIdGenerateContext(generator, Map.of(
-                AccessControlId.SPEC, new SequentialUuidGenerator()
-        ));
+        Map<Class<?>, DefaultIdGenerationContext.Binding<?, ?>> timelineIdMap = Map.of(
+                TimelineId.class, DefaultIdGenerationContext.bind(TimelineId::new, new SequentialUuidGenerator()),
+                SnapshotId.class, DefaultIdGenerationContext.bind(SnapshotId::new, new SequentialUuidGenerator()),
+                SnapshotLinkId.class, DefaultIdGenerationContext.bind(SnapshotLinkId::new, new SequentialUuidGenerator())
+        );
 
-        var timelineIdCtx = new DefaultIdGenerateContext(generator, Map.of(
-                TimelineId.SPEC, new SequentialUuidGenerator(),
-                SnapshotId.SPEC, new SequentialUuidGenerator(),
-                SnapshotLinkId.SPEC, new SequentialUuidGenerator()
-        ));
+
+        var ctx = new DefaultIdGenerationContext(accessControlIdMap);
+
+        var timelineIdCtx = new DefaultIdGenerationContext(timelineIdMap);
 
         factory = new AccessControlFactory(ctx);
         timelineFactory = new TimelineFactory(timelineIdCtx);
 
-        userId1 = generator.generate(UserId.SPEC, new SequentialUuidGenerator());
-        userId2 = generator.generate(UserId.SPEC, new SequentialUuidGenerator());
+        var userUuidRawGen = new SequentialUuidGenerator();
+        userId1 = new UserId(userUuidRawGen.generate());
+        userId2 = new UserId(userUuidRawGen.generate());
     }
 
     @Test

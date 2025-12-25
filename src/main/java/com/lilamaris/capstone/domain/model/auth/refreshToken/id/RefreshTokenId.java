@@ -25,6 +25,4 @@ public class RefreshTokenId extends DefaultStringDomainId {
     protected void init(String value) {
         this.value = value;
     }
-
-    public static final RefreshTokenIdSpec SPEC = new RefreshTokenIdSpec();
 }

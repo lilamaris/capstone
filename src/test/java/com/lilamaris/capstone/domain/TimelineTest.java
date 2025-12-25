@@ -1,6 +1,5 @@
 package com.lilamaris.capstone.domain;
 
-import com.lilamaris.capstone.application.util.generator.DefaultIdGenerator;
 import com.lilamaris.capstone.domain.model.capstone.timeline.Snapshot;
 import com.lilamaris.capstone.domain.model.capstone.timeline.SnapshotLink;
 import com.lilamaris.capstone.domain.model.capstone.timeline.Timeline;
@@ -9,7 +8,7 @@ import com.lilamaris.capstone.domain.model.capstone.timeline.embed.Effective;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
-import com.lilamaris.capstone.domain.model.common.id.impl.DefaultIdGenerateContext;
+import com.lilamaris.capstone.application.util.generator.DefaultIdGenerationContext;
 import com.lilamaris.capstone.util.SequentialUuidGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,11 +28,10 @@ public class TimelineTest {
 
     @BeforeEach
     void run() {
-        var generator = new DefaultIdGenerator();
-        var ctx = new DefaultIdGenerateContext(generator, Map.of(
-                TimelineId.SPEC, new SequentialUuidGenerator(),
-                SnapshotId.SPEC, new SequentialUuidGenerator(),
-                SnapshotLinkId.SPEC, new SequentialUuidGenerator()
+        var ctx = new DefaultIdGenerationContext(Map.of(
+                TimelineId.class, DefaultIdGenerationContext.bind(TimelineId::new, new SequentialUuidGenerator()),
+                SnapshotId.class, DefaultIdGenerationContext.bind(SnapshotId::new, new SequentialUuidGenerator()),
+                SnapshotLinkId.class, DefaultIdGenerationContext.bind(SnapshotLinkId::new, new SequentialUuidGenerator())
         ));
         factory = new TimelineFactory(ctx);
         initialTxAt = Instant.parse("2025-01-01T00:00:00Z");

@@ -4,10 +4,8 @@ import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.domain.model.auth.account.id.AccountId;
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
 import com.lilamaris.capstone.domain.model.common.id.IdGenerationContext;
-import com.lilamaris.capstone.domain.model.common.id.IdGenerator;
-import com.lilamaris.capstone.domain.model.common.id.IdSpec;
 import com.lilamaris.capstone.domain.model.common.id.RawGenerator;
-import com.lilamaris.capstone.domain.model.common.id.impl.DefaultIdGenerateContext;
+import com.lilamaris.capstone.application.util.generator.DefaultIdGenerationContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -22,18 +20,17 @@ public class AccountFactory {
     private final IdGenerationContext idGenerationContext;
 
     public AccountFactory(
-            IdGenerator idGenerator,
             RawGenerator<UUID> uuidRawGenerator
     ) {
-        Map<IdSpec<?, ?>, RawGenerator<?>> map = Map.of(
-                AccountId.SPEC, uuidRawGenerator
+        Map<Class<?>, DefaultIdGenerationContext.Binding<?, ?>> map = Map.of(
+                AccountId.class, DefaultIdGenerationContext.bind(AccountId::new, uuidRawGenerator)
         );
 
-        this.idGenerationContext = new DefaultIdGenerateContext(idGenerator, map);
+        this.idGenerationContext = new DefaultIdGenerationContext(map);
     }
 
     public Account create(UserId userId, String displayName, String email, String passwordHash) {
-        var id = idGenerationContext.next(AccountId.SPEC);
+        var id = idGenerationContext.next(AccountId.class);
         return new Account(
                 id,
                 userId,
@@ -51,7 +48,7 @@ public class AccountFactory {
                     "Can not create a local account by explicitly specifying the provider."
             );
         }
-        var id = idGenerationContext.next(AccountId.SPEC);
+        var id = idGenerationContext.next(AccountId.class);
         return new Account(
                 id,
                 userId,

@@ -128,11 +128,11 @@ public class Timeline extends JpaDefaultAuditableDomain implements Identifiable<
         var newTx = Effective.create(txAt, Effective.MAX);
         var newValidSplit = sourceSnapshot.getValid().splitAt(validAt);
 
-        var newSnapshotLeft = new Snapshot(idGenerationContext.next(SnapshotId.SPEC), newTx, newValidSplit.left(), id, 0, description);
-        var newSnapshotRight = new Snapshot(idGenerationContext.next(SnapshotId.SPEC), newTx, newValidSplit.right(), id, 0, description);
+        var newSnapshotLeft = new Snapshot(idGenerationContext.next(SnapshotId.class), newTx, newValidSplit.left(), id, 0, description);
+        var newSnapshotRight = new Snapshot(idGenerationContext.next(SnapshotId.class), newTx, newValidSplit.right(), id, 0, description);
 
-        var newSnapshotLeftLink = new SnapshotLink(idGenerationContext.next(SnapshotLinkId.SPEC), id, sourceSnapshot.id(), newSnapshotLeft.id());
-        var newSnapshotRightLink = new SnapshotLink(idGenerationContext.next(SnapshotLinkId.SPEC), id, newSnapshotLeft.id(), newSnapshotRight.id());
+        var newSnapshotLeftLink = new SnapshotLink(idGenerationContext.next(SnapshotLinkId.class), id, sourceSnapshot.id(), newSnapshotLeft.id());
+        var newSnapshotRightLink = new SnapshotLink(idGenerationContext.next(SnapshotLinkId.class), id, newSnapshotLeft.id(), newSnapshotRight.id());
 
         snapshotList.addAll(List.of(newSnapshotLeft, newSnapshotRight));
         snapshotLinkList.addAll(List.of(newSnapshotLeftLink, newSnapshotRightLink));
@@ -161,8 +161,8 @@ public class Timeline extends JpaDefaultAuditableDomain implements Identifiable<
         var mergedSnapshotValid = Effective.create(startValidAt, endValidAt);
         var mergedSnapshotTx = Effective.create(txAt, Effective.MAX);
 
-        var mergedSnapshot = new Snapshot(idGenerationContext.next(SnapshotId.SPEC), mergedSnapshotTx, mergedSnapshotValid, id, 0, description);
-        var mergedSnapshotLink = new SnapshotLink(idGenerationContext.next(SnapshotLinkId.SPEC), id, earliestSnapshot.id(), mergedSnapshot.id());
+        var mergedSnapshot = new Snapshot(idGenerationContext.next(SnapshotId.class), mergedSnapshotTx, mergedSnapshotValid, id, 0, description);
+        var mergedSnapshotLink = new SnapshotLink(idGenerationContext.next(SnapshotLinkId.class), id, earliestSnapshot.id(), mergedSnapshot.id());
 
 
         snapshotList.add(mergedSnapshot);
@@ -174,8 +174,8 @@ public class Timeline extends JpaDefaultAuditableDomain implements Identifiable<
         var tx = Effective.create(txAt, Effective.MAX);
         var valid = Effective.create(validAt, Effective.MAX);
 
-        var snapshot = new Snapshot(idGenerationContext.next(SnapshotId.SPEC), tx, valid, id, 0, description);
-        var link = new SnapshotLink(idGenerationContext.next(SnapshotLinkId.SPEC), id, null, snapshot.id());
+        var snapshot = new Snapshot(idGenerationContext.next(SnapshotId.class), tx, valid, id, 0, description);
+        var link = new SnapshotLink(idGenerationContext.next(SnapshotLinkId.class), id, null, snapshot.id());
 
         snapshotList.add(snapshot);
         snapshotLinkList.add(link);

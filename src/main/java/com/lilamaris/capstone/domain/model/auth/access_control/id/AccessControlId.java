@@ -27,6 +27,4 @@ public class AccessControlId extends DefaultUuidDomainId {
     protected void init(UUID value) {
         this.value = value;
     }
-
-    public static final AccessControlIdSpec SPEC = new AccessControlIdSpec();
 }

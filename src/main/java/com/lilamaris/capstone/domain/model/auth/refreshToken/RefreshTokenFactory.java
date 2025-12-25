@@ -3,15 +3,13 @@ package com.lilamaris.capstone.domain.model.auth.refreshToken;
 import com.lilamaris.capstone.domain.model.auth.refreshToken.id.RefreshTokenId;
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
 import com.lilamaris.capstone.domain.model.common.id.IdGenerationContext;
-import com.lilamaris.capstone.domain.model.common.id.IdGenerator;
-import com.lilamaris.capstone.domain.model.common.id.IdSpec;
 import com.lilamaris.capstone.domain.model.common.id.RawGenerator;
-import com.lilamaris.capstone.domain.model.common.id.impl.DefaultIdGenerateContext;
+import com.lilamaris.capstone.application.util.generator.DefaultIdGenerationContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -19,18 +17,17 @@ public class RefreshTokenFactory {
     private final IdGenerationContext idGenerationContext;
 
     public RefreshTokenFactory(
-            IdGenerator idGenerator,
-            RawGenerator<UUID> uuidRawGenerator
+            @Qualifier("opaqueToken") RawGenerator<String> stringRawGenerator
     ) {
-        Map<IdSpec<?, ?>, RawGenerator<?>> map = Map.of(
-                RefreshTokenId.SPEC, uuidRawGenerator
+        Map<Class<?>, DefaultIdGenerationContext.Binding<?, ?>> map = Map.of(
+                RefreshTokenId.class, DefaultIdGenerationContext.bind(RefreshTokenId::new, stringRawGenerator)
         );
 
-        this.idGenerationContext = new DefaultIdGenerateContext(idGenerator, map);
+        this.idGenerationContext = new DefaultIdGenerationContext(map);
     }
 
     public RefreshToken create(UserId userId) {
-        var id = idGenerationContext.next(RefreshTokenId.SPEC);
+        var id = idGenerationContext.next(RefreshTokenId.class);
         return new RefreshToken(id, userId);
     }
 }

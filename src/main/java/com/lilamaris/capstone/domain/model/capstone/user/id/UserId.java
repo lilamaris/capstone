@@ -27,6 +27,4 @@ public class UserId extends DefaultUuidDomainId {
     protected void init(UUID value) {
         this.value = value;
     }
-
-    public static final UserIdSpec SPEC = new UserIdSpec();
 }

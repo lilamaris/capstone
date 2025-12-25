@@ -2,10 +2,8 @@ package com.lilamaris.capstone.domain.model.capstone.user;
 
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
 import com.lilamaris.capstone.domain.model.common.id.IdGenerationContext;
-import com.lilamaris.capstone.domain.model.common.id.IdGenerator;
-import com.lilamaris.capstone.domain.model.common.id.IdSpec;
 import com.lilamaris.capstone.domain.model.common.id.RawGenerator;
-import com.lilamaris.capstone.domain.model.common.id.impl.DefaultIdGenerateContext;
+import com.lilamaris.capstone.application.util.generator.DefaultIdGenerationContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,18 +16,17 @@ public class UserFactory {
     private final IdGenerationContext idGenerationContext;
 
     public UserFactory(
-            IdGenerator idGenerator,
             RawGenerator<UUID> uuidRawGenerator
     ) {
-        Map<IdSpec<?, ?>, RawGenerator<?>> map = Map.of(
-                UserId.SPEC, uuidRawGenerator
+        Map<Class<?>, DefaultIdGenerationContext.Binding<?, ?>> map = Map.of(
+                UserId.class, DefaultIdGenerationContext.bind(UserId::new, uuidRawGenerator)
         );
 
-        this.idGenerationContext = new DefaultIdGenerateContext(idGenerator, map);
+        this.idGenerationContext = new DefaultIdGenerationContext(map);
     }
 
     public User create(String displayName, Role role) {
-        var id = idGenerationContext.next(UserId.SPEC);
-        return new User(id, displayName, role);
+        var id = idGenerationContext.next(UserId.class);
+        return new User(idGenerationContext, id, displayName, role);
     }
 }
