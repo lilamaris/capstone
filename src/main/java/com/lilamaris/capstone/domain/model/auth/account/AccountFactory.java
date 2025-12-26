@@ -1,12 +1,11 @@
 package com.lilamaris.capstone.domain.model.auth.account;
 
+import com.lilamaris.capstone.application.util.generator.DefaultIdGenerationContext;
 import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.domain.model.auth.account.id.AccountId;
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
 import com.lilamaris.capstone.domain.model.common.id.IdGenerationContext;
 import com.lilamaris.capstone.domain.model.common.id.RawGenerator;
-import com.lilamaris.capstone.application.util.generator.DefaultIdGenerationContext;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -15,7 +14,6 @@ import java.util.UUID;
 import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 
 @Component
-@RequiredArgsConstructor
 public class AccountFactory {
     private final IdGenerationContext idGenerationContext;
 

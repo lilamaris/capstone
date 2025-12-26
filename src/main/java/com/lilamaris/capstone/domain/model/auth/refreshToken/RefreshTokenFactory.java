@@ -1,18 +1,16 @@
 package com.lilamaris.capstone.domain.model.auth.refreshToken;
 
+import com.lilamaris.capstone.application.util.generator.DefaultIdGenerationContext;
 import com.lilamaris.capstone.domain.model.auth.refreshToken.id.RefreshTokenId;
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
 import com.lilamaris.capstone.domain.model.common.id.IdGenerationContext;
 import com.lilamaris.capstone.domain.model.common.id.RawGenerator;
-import com.lilamaris.capstone.application.util.generator.DefaultIdGenerationContext;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 @Component
-@RequiredArgsConstructor
 public class RefreshTokenFactory {
     private final IdGenerationContext idGenerationContext;
 

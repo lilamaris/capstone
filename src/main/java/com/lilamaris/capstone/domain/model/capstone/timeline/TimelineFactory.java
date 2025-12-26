@@ -1,12 +1,11 @@
 package com.lilamaris.capstone.domain.model.capstone.timeline;
 
+import com.lilamaris.capstone.application.util.generator.DefaultIdGenerationContext;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
 import com.lilamaris.capstone.domain.model.common.id.IdGenerationContext;
 import com.lilamaris.capstone.domain.model.common.id.RawGenerator;
-import com.lilamaris.capstone.application.util.generator.DefaultIdGenerationContext;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -14,7 +13,6 @@ import java.util.Map;
 import java.util.UUID;
 
 @Component
-@RequiredArgsConstructor
 public class TimelineFactory {
     private final IdGenerationContext idGenerationContext;
 

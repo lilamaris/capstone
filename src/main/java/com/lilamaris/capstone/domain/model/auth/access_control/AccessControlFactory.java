@@ -1,20 +1,21 @@
 package com.lilamaris.capstone.domain.model.auth.access_control;
 
+import com.lilamaris.capstone.application.util.generator.DefaultIdGenerationContext;
 import com.lilamaris.capstone.domain.model.auth.access_control.id.AccessControlId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
-import com.lilamaris.capstone.domain.model.common.id.*;
-import com.lilamaris.capstone.application.util.generator.DefaultIdGenerationContext;
+import com.lilamaris.capstone.domain.model.common.id.DomainId;
+import com.lilamaris.capstone.domain.model.common.id.DomainRef;
+import com.lilamaris.capstone.domain.model.common.id.IdGenerationContext;
+import com.lilamaris.capstone.domain.model.common.id.RawGenerator;
 import com.lilamaris.capstone.domain.model.common.id.impl.JpaDomainRef;
 import com.lilamaris.capstone.domain.model.common.type.CoreDomainType;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.UUID;
 
 @Component
-@RequiredArgsConstructor
 public class AccessControlFactory {
     private final IdGenerationContext idGenerationContext;
 
