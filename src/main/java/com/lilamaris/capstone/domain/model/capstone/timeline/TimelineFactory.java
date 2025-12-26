@@ -30,6 +30,6 @@ public class TimelineFactory {
 
     public Timeline create(String description) {
         var id = idGenerationContext.next(TimelineId.class);
-        return new Timeline(idGenerationContext, id, new ArrayList<>(), new ArrayList<>(), description);
+        return Timeline.create(idGenerationContext, id, new ArrayList<>(), new ArrayList<>(), description);
     }
 }

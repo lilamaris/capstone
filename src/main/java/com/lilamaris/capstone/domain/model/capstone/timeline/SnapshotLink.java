@@ -1,14 +1,20 @@
 package com.lilamaris.capstone.domain.model.capstone.timeline;
 
+import com.lilamaris.capstone.domain.model.capstone.timeline.event.SnapshotLinked;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
+import com.lilamaris.capstone.domain.model.common.event.DomainEvent;
 import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 
@@ -35,11 +41,42 @@ public class SnapshotLink implements Identifiable<SnapshotLinkId> {
     @AttributeOverride(name = "value", column = @Column(name = "descendant_snapshot_id"))
     private SnapshotId descendantSnapshotId;
 
-    protected SnapshotLink(SnapshotLinkId id, TimelineId timelineId, SnapshotId ancestorSnapshotId, SnapshotId descendantSnapshotId) {
+    @Transient
+    private List<DomainEvent> eventList;
+
+    protected SnapshotLink(
+            SnapshotLinkId id,
+            TimelineId timelineId,
+            SnapshotId ancestorSnapshotId,
+            SnapshotId descendantSnapshotId
+    ) {
         this.id = requireField(id, "id");
         this.timelineId = requireField(timelineId, "timelineId");
         this.descendantSnapshotId = requireField(descendantSnapshotId, "descendantSnapshotId");
         this.ancestorSnapshotId = ancestorSnapshotId;
+        this.eventList = new ArrayList<>();
+    }
+
+    protected static SnapshotLink create(
+            SnapshotLinkId id,
+            TimelineId timelineId,
+            SnapshotId ancestorSnapshotId,
+            SnapshotId descendantSnapshotId
+    ) {
+        var snapshotLink = new SnapshotLink(id, timelineId, ancestorSnapshotId, descendantSnapshotId);
+        snapshotLink.registerCreated();
+        return snapshotLink;
+    }
+
+    private void registerCreated() {
+        var event = new SnapshotLinked(id, ancestorSnapshotId, descendantSnapshotId, Instant.now());
+        eventList.add(event);
+    }
+
+    protected List<DomainEvent> pullEvent() {
+        var copy = List.copyOf(eventList);
+        eventList.clear();
+        return copy;
     }
 
     public boolean isRoot() {

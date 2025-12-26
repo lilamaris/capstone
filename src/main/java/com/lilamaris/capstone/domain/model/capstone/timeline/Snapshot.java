@@ -1,14 +1,19 @@
 package com.lilamaris.capstone.domain.model.capstone.timeline;
 
 import com.lilamaris.capstone.domain.model.capstone.timeline.embed.Effective;
+import com.lilamaris.capstone.domain.model.capstone.timeline.event.SnapshotCreated;
+import com.lilamaris.capstone.domain.model.capstone.timeline.event.SnapshotEffectiveChanged;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
 import com.lilamaris.capstone.domain.model.common.embed.impl.JpaDefaultAuditableDomain;
+import com.lilamaris.capstone.domain.model.common.event.DomainEvent;
 import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 
@@ -45,13 +50,30 @@ public class Snapshot extends JpaDefaultAuditableDomain implements Identifiable<
     private String description;
     private Integer versionNo;
 
-    protected Snapshot(SnapshotId id, Effective tx, Effective valid, TimelineId timelineId, Integer versionNo, String description) {
+    @Transient
+    private List<DomainEvent> eventList;
+
+    protected Snapshot(
+            SnapshotId id,
+            Effective tx,
+            Effective valid,
+            TimelineId timelineId,
+            Integer versionNo,
+            String description
+    ) {
         this.id = requireField(id, "id");
         this.tx = requireField(tx, "tx");
         this.valid = requireField(valid, "valid");
         this.timelineId = requireField(timelineId, "timelineId");
         this.versionNo = requireField(versionNo, "versionNo");
         this.description = requireField(description, "description");
+        this.eventList = new ArrayList<>();
+    }
+
+    protected static Snapshot create(SnapshotId id, Effective tx, Effective valid, TimelineId timelineId, Integer versionNo, String description) {
+        var snapshot = new Snapshot(id, tx, valid, timelineId, versionNo, description);
+        snapshot.registerCreated();
+        return snapshot;
     }
 
     @Override
@@ -66,6 +88,7 @@ public class Snapshot extends JpaDefaultAuditableDomain implements Identifiable<
             valid.open(at);
         }
         upgrade();
+        registerEffectiveChanged(selector, at);
     }
 
     protected void close(EffectiveSelector selector, Instant at) {
@@ -75,6 +98,23 @@ public class Snapshot extends JpaDefaultAuditableDomain implements Identifiable<
             valid.close(at);
         }
         upgrade();
+        registerEffectiveChanged(selector, at);
+    }
+
+    protected List<DomainEvent> pullEvent() {
+        var copy = List.copyOf(eventList);
+        eventList.clear();
+        return copy;
+    }
+
+    private void registerCreated() {
+        var event = new SnapshotCreated(id, Instant.now());
+        eventList.add(event);
+    }
+
+    private void registerEffectiveChanged(EffectiveSelector selector, Instant at) {
+        var event = new SnapshotEffectiveChanged(id, selector, at, Instant.now());
+        eventList.add(event);
     }
 
     private void upgrade() {
