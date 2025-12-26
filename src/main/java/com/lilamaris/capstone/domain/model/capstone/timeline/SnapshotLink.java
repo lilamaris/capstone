@@ -4,6 +4,7 @@ import com.lilamaris.capstone.domain.model.capstone.timeline.event.SnapshotLinke
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
+import com.lilamaris.capstone.domain.model.common.embed.impl.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.domain.model.common.event.DomainEvent;
 import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import jakarta.persistence.*;
@@ -11,6 +12,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -20,9 +22,10 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 
 @Getter
 @ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "timeline_snapshot_link")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class SnapshotLink implements Identifiable<SnapshotLinkId> {
     @Getter(AccessLevel.NONE)
     @EmbeddedId
@@ -40,6 +43,9 @@ public class SnapshotLink implements Identifiable<SnapshotLinkId> {
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "descendant_snapshot_id"))
     private SnapshotId descendantSnapshotId;
+
+    @Embedded
+    private JpaAuditMetadata audit;
 
     @Transient
     private List<DomainEvent> eventList;

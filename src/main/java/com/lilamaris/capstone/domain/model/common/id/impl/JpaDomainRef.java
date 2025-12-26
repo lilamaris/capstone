@@ -2,6 +2,7 @@ package com.lilamaris.capstone.domain.model.common.id.impl;
 
 import com.lilamaris.capstone.domain.model.common.id.DomainId;
 import com.lilamaris.capstone.domain.model.common.id.DomainRef;
+import com.lilamaris.capstone.domain.model.common.mixin.ToPojo;
 import com.lilamaris.capstone.domain.model.common.type.CoreDomainType;
 import com.lilamaris.capstone.domain.model.common.type.DomainType;
 import jakarta.persistence.Column;
@@ -20,7 +21,7 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 @ToString
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class JpaDomainRef {
+public class JpaDomainRef implements DomainRef, ToPojo<DomainRef> {
     @Enumerated(EnumType.STRING)
     @Column(name = "ref_type", nullable = false)
     private CoreDomainType type;
@@ -47,7 +48,8 @@ public class JpaDomainRef {
         );
     }
 
-    public DefaultDomainRef toDomainRef() {
+    @Override
+    public DefaultDomainRef toPOJO() {
         return new DefaultDomainRef(type, id);
     }
 
@@ -61,5 +63,15 @@ public class JpaDomainRef {
     @Override
     public int hashCode() {
         return Objects.hash(type, id);
+    }
+
+    @Override
+    public DomainType type() {
+        throw new UnsupportedOperationException("JpaDomainRef is not materialized domain type");
+    }
+
+    @Override
+    public String id() {
+        throw new UnsupportedOperationException("JpaDomainRef is not materialized id");
     }
 }

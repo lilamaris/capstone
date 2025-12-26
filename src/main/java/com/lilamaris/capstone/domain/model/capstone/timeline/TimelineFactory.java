@@ -28,8 +28,8 @@ public class TimelineFactory {
         this.idGenerationContext = new DefaultIdGenerationContext(map);
     }
 
-    public Timeline create(String description) {
+    public Timeline create(String title, String details) {
         var id = idGenerationContext.next(TimelineId.class);
-        return Timeline.create(idGenerationContext, id, new ArrayList<>(), new ArrayList<>(), description);
+        return Timeline.create(idGenerationContext, id, new ArrayList<>(), new ArrayList<>(), title, details);
     }
 }

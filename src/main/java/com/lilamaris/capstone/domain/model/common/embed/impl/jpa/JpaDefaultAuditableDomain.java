@@ -1,6 +1,6 @@
-package com.lilamaris.capstone.domain.model.common.embed.impl;
+package com.lilamaris.capstone.domain.model.common.embed.impl.jpa;
 
-import com.lilamaris.capstone.domain.model.common.mixin.Auditable;
+import com.lilamaris.capstone.domain.model.common.embed.AuditMetadata;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AccessLevel;
@@ -14,7 +14,7 @@ import java.time.Instant;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class JpaDefaultAuditableDomain implements Auditable {
+public class JpaDefaultAuditableDomain implements AuditMetadata {
     @CreatedDate
     private Instant createdAt;
 

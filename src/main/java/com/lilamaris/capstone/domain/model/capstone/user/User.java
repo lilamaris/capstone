@@ -2,7 +2,7 @@ package com.lilamaris.capstone.domain.model.capstone.user;
 
 import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
-import com.lilamaris.capstone.domain.model.common.embed.impl.JpaDefaultAuditableDomain;
+import com.lilamaris.capstone.domain.model.common.embed.impl.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.domain.model.common.id.DomainRef;
 import com.lilamaris.capstone.domain.model.common.id.IdGenerationContext;
 import com.lilamaris.capstone.domain.model.common.id.impl.DefaultDomainRef;
@@ -20,11 +20,14 @@ import lombok.ToString;
 @Entity
 @Table(name = "usr")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User extends JpaDefaultAuditableDomain implements Identifiable<UserId>, Referenceable {
+public class User implements Identifiable<UserId>, Referenceable {
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private UserId id;
+
+    @Embedded
+    private JpaAuditMetadata audit;
 
     @Enumerated(EnumType.STRING)
     private Role role;

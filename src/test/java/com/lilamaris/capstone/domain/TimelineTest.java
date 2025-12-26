@@ -30,7 +30,7 @@ public class TimelineTest {
 
     @Test
     void should_create_initial_snapshot() {
-        var initial = factory.create("Initial");
+        var initial = factory.create("Test Timeline", "Initial");
 
         initial.migrate(initialTxAt, initialValidAt, "Test Description");
 
@@ -65,7 +65,7 @@ public class TimelineTest {
 
     @Test
     void should_migrate() {
-        var initial = factory.create("Initial");
+        var initial = factory.create("Test Timeline", "Initial");
 
         initial.migrate(initialTxAt, initialValidAt, "Test Description");
 

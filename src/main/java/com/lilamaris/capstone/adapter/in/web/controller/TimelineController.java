@@ -54,7 +54,7 @@ public class TimelineController {
     public ResponseEntity<TimelineResult.Command> create(
             @RequestBody TimelineRequest.Create body
     ) {
-        var result = timelineCommandUseCase.create(body.description());
+        var result = timelineCommandUseCase.create(body.title(), body.details());
         return ResponseEntity.ok(result);
     }
 
@@ -64,7 +64,7 @@ public class TimelineController {
             @RequestBody TimelineRequest.Migrate body
     ) {
         var timelineId = new TimelineId(id);
-        var result = timelineCommandUseCase.migrate(timelineId, body.validAt(), body.description());
+        var result = timelineCommandUseCase.migrate(timelineId, body.validAt(), body.details());
         return ResponseEntity.ok(result);
     }
 
@@ -74,18 +74,9 @@ public class TimelineController {
             @RequestBody TimelineRequest.Merge body
     ) {
         var timelineId = new TimelineId(id);
-        var result = timelineCommandUseCase.merge(timelineId, body.validFrom(), body.validTo(), body.description());
+        var result = timelineCommandUseCase.merge(timelineId, body.validFrom(), body.validTo(), body.details());
         return ResponseEntity.ok(result);
     }
-
-//    @PostMapping("/{id}/rollbackSnapshot")
-//    public ResponseEntity<?> rollback(
-//            @PathVariable("id") UUID id,
-//            @RequestBody TimelineRequest.Rollback body
-//    ) {
-//        var result = timelineCommandUseCase.rollback(Timeline.Id.from(id), body.targetTxAt(), body.description());
-//        return ResponseEntity.ok(result);
-//    }
 
     @PutMapping("/{id}")
     public ResponseEntity<TimelineResult.Command> update(
@@ -93,7 +84,7 @@ public class TimelineController {
             @RequestBody TimelineRequest.Update body
     ) {
         var timelineId = new TimelineId(id);
-        var result = timelineCommandUseCase.update(timelineId, body.description());
+        var result = timelineCommandUseCase.update(timelineId, body.title(), body.details());
         return ResponseEntity.ok(result);
     }
 }

@@ -5,11 +5,16 @@ import com.lilamaris.capstone.domain.model.capstone.timeline.event.SnapshotCreat
 import com.lilamaris.capstone.domain.model.capstone.timeline.event.SnapshotEffectiveChanged;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
-import com.lilamaris.capstone.domain.model.common.embed.impl.JpaDefaultAuditableDomain;
+import com.lilamaris.capstone.domain.model.common.embed.impl.jpa.JpaAuditMetadata;
+import com.lilamaris.capstone.domain.model.common.embed.impl.jpa.JpaDescriptionMetadata;
 import com.lilamaris.capstone.domain.model.common.event.DomainEvent;
 import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -18,12 +23,12 @@ import java.util.List;
 import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 
 @Getter
-@Setter(AccessLevel.PROTECTED)
 @ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "timeline_snapshot")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Snapshot extends JpaDefaultAuditableDomain implements Identifiable<SnapshotId> {
+@EntityListeners(AuditingEntityListener.class)
+public class Snapshot implements Identifiable<SnapshotId> {
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
@@ -47,7 +52,12 @@ public class Snapshot extends JpaDefaultAuditableDomain implements Identifiable<
     @AttributeOverride(name = "value", column = @Column(name = "timeline_id", insertable = false, updatable = false))
     private TimelineId timelineId;
 
-    private String description;
+    @Embedded
+    private JpaAuditMetadata audit;
+
+    @Embedded
+    private JpaDescriptionMetadata descriptionMetadata;
+
     private Integer versionNo;
 
     @Transient
@@ -59,19 +69,27 @@ public class Snapshot extends JpaDefaultAuditableDomain implements Identifiable<
             Effective valid,
             TimelineId timelineId,
             Integer versionNo,
-            String description
+            JpaDescriptionMetadata descriptionMetadata
     ) {
         this.id = requireField(id, "id");
         this.tx = requireField(tx, "tx");
         this.valid = requireField(valid, "valid");
         this.timelineId = requireField(timelineId, "timelineId");
         this.versionNo = requireField(versionNo, "versionNo");
-        this.description = requireField(description, "description");
+        this.descriptionMetadata = requireField(descriptionMetadata, "descriptionMetadata");
         this.eventList = new ArrayList<>();
     }
 
-    protected static Snapshot create(SnapshotId id, Effective tx, Effective valid, TimelineId timelineId, Integer versionNo, String description) {
-        var snapshot = new Snapshot(id, tx, valid, timelineId, versionNo, description);
+    protected static Snapshot create(
+            SnapshotId id,
+            Effective tx,
+            Effective valid,
+            TimelineId timelineId,
+            Integer versionNo,
+            String title
+    ) {
+        var descriptionMetadata = JpaDescriptionMetadata.create(title);
+        var snapshot = new Snapshot(id, tx, valid, timelineId, versionNo, descriptionMetadata);
         snapshot.registerCreated();
         return snapshot;
     }

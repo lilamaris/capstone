@@ -26,15 +26,15 @@ public class TimelineCommandService implements TimelineCommandUseCase {
     private final TimelineFactory timelineFactory;
 
     @Override
-    public TimelineResult.Command create(String description) {
-        var domain = timelineFactory.create(description);
+    public TimelineResult.Command create(String title, String details) {
+        var domain = timelineFactory.create(title, details);
         var created = timelinePort.save(domain);
 
         return TimelineResult.Command.from(created);
     }
 
     @Override
-    public TimelineResult.Command update(TimelineId id, String description) {
+    public TimelineResult.Command update(TimelineId id, String title, String details) {
         var timeline = timelinePort.getById(id).orElseThrow(() -> new ResourceNotFoundException(
                 String.format("Timeline with id '%s' not found.", id)
         ));
@@ -43,19 +43,19 @@ public class TimelineCommandService implements TimelineCommandUseCase {
     }
 
     @Override
-    public TimelineResult.Command migrate(TimelineId id, LocalDateTime validAt, String description) {
+    public TimelineResult.Command migrate(TimelineId id, LocalDateTime validAt, String details) {
         var timeline = timelinePort.getById(id).orElseThrow(() -> new ResourceNotFoundException(
                 String.format("Timeline with id '%s' not found.", id)
         ));
 
-        timeline.migrate(UniversityClock.now(), UniversityClock.at(validAt), description);
+        timeline.migrate(UniversityClock.now(), UniversityClock.at(validAt), details);
         var saved = timelinePort.save(timeline);
 
         return TimelineResult.Command.from(saved);
     }
 
     @Override
-    public TimelineResult.Command merge(TimelineId id, LocalDateTime validFrom, LocalDateTime validTo, String description) {
+    public TimelineResult.Command merge(TimelineId id, LocalDateTime validFrom, LocalDateTime validTo, String details) {
         var timeline = timelinePort.getById(id).orElseThrow(() -> new ResourceNotFoundException(
                 String.format("Timeline with id '%s' not found.", id)
         ));
@@ -64,34 +64,9 @@ public class TimelineCommandService implements TimelineCommandUseCase {
                 UniversityClock.at(validFrom),
                 UniversityClock.at(validTo)
         );
-        timeline.mergeValidRange(UniversityClock.now(), validRange, description);
+        timeline.mergeValidRange(UniversityClock.now(), validRange, details);
         var saved = timelinePort.save(timeline);
 
         return TimelineResult.Command.from(saved);
-    }
-
-//    @Override
-//    public TimelineResult.Command rollback(Timeline.Id id, LocalDateTime targetTxAt, String description) {
-//        var txAt = Effective.now();
-//        var timeline = timelinePort.getById(id).orElseThrow(EntityNotFoundException::new);
-//        var updated = timeline.rollbackSnapshot(txAt, targetTxAt);
-//        var apply = timeline.applyTransition(preview);
-//        var saved = timelinePort.save(apply);
-//
-//        return TimelineResult.Command.from(saved);
-//    }
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleSnapshotDeltaEvent(SnapshotDeltaEvent event) {
-        // TODO: We expect all fields of SnapshotDeltaEvent to be non-null. The structure must be changed.
-//        var id = event.timelineId();
-//
-//        var timeline = timelinePort.getById(id).orElseThrow(() -> new ResourceNotFoundException(
-//                String.format("Timeline with id '%s' not found.", id.getValue())
-//        ));
-//
-//        var updated = timeline.updateDomainDelta(event.snapshotId(), event.domainType(), event.domainId(), event.toPatch());
-//        timelinePort.save(updated);
     }
 }

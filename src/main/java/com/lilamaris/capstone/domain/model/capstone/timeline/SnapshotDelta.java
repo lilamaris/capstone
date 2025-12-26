@@ -3,7 +3,7 @@ package com.lilamaris.capstone.domain.model.capstone.timeline;
 import com.lilamaris.capstone.domain.model.capstone.timeline.event.SnapshotDeltaCreated;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotDeltaId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
-import com.lilamaris.capstone.domain.model.common.embed.impl.JpaDefaultAuditableDomain;
+import com.lilamaris.capstone.domain.model.common.embed.impl.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.domain.model.common.event.DomainEvent;
 import com.lilamaris.capstone.domain.model.common.id.impl.JpaDomainRef;
 import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
@@ -12,6 +12,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -21,10 +22,11 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 
 @Getter
 @ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "timeline_snapshot_delta")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SnapshotDelta extends JpaDefaultAuditableDomain implements Identifiable<SnapshotDeltaId> {
+@EntityListeners(AuditingEntityListener.class)
+public class SnapshotDelta implements Identifiable<SnapshotDeltaId> {
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
@@ -40,6 +42,9 @@ public class SnapshotDelta extends JpaDefaultAuditableDomain implements Identifi
             @AttributeOverride(name = "id", column = @Column(name = "resource_id"))
     })
     private JpaDomainRef resourceRef;
+
+    @Embedded
+    private JpaAuditMetadata audit;
 
     @Transient
     private List<DomainEvent> eventList;
@@ -61,7 +66,7 @@ public class SnapshotDelta extends JpaDefaultAuditableDomain implements Identifi
     }
 
     private void registerCreated() {
-        var event = new SnapshotDeltaCreated(id, resourceRef.toDomainRef(), Instant.now());
+        var event = new SnapshotDeltaCreated(id, resourceRef.toPOJO(), Instant.now());
         eventList.add(event);
     }
 

@@ -6,7 +6,7 @@ import com.lilamaris.capstone.domain.model.capstone.timeline.event.TimelineCreat
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
-import com.lilamaris.capstone.domain.model.common.embed.impl.JpaDefaultAuditableDomain;
+import com.lilamaris.capstone.domain.model.common.embed.impl.jpa.JpaDescriptionMetadata;
 import com.lilamaris.capstone.domain.model.common.event.CollectedDomainEvent;
 import com.lilamaris.capstone.domain.model.common.event.DomainEvent;
 import com.lilamaris.capstone.domain.model.common.id.IdGenerationContext;
@@ -20,6 +20,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.data.domain.AfterDomainEventPublication;
 import org.springframework.data.domain.DomainEvents;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 import java.util.*;
@@ -32,46 +33,58 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 
 @Getter
 @ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "timeline_root")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Timeline extends JpaDefaultAuditableDomain implements Identifiable<TimelineId> {
-    @Transient
-    private final List<DomainEvent> eventList = new ArrayList<>();
+@EntityListeners(AuditingEntityListener.class)
+public class Timeline implements Identifiable<TimelineId> {
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private TimelineId id;
+
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "timeline_id", nullable = false)
     private List<Snapshot> snapshotList;
+
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "timeline_id", nullable = false)
     private List<SnapshotLink> snapshotLinkList;
-    private String description;
+
+    @Embedded
+    private JpaDescriptionMetadata descriptionMetadata;
+
     @Transient
     private IdGenerationContext idGenerationContext;
+
     @Transient
     private Map<SnapshotId, Snapshot> snapshotMap;
+
     @Transient
     private Map<SnapshotLinkId, SnapshotLink> snapshotLinkMap;
+
     @Transient
     private Map<SnapshotId, SnapshotLink> snapshotLinkByDescendant;
+
     @Transient
     private Map<SnapshotId, SnapshotLink> snapshotLinkByAncestor;
+
+    @Transient
+    private List<DomainEvent> eventList;
 
     protected Timeline(
             IdGenerationContext idGenerationContext,
             TimelineId id,
             List<Snapshot> snapshotList,
             List<SnapshotLink> snapshotLinkList,
-            String description
+            JpaDescriptionMetadata descriptionMetadata
     ) {
         this.idGenerationContext = idGenerationContext;
         this.id = requireField(id, "id");
         this.snapshotList = requireField(snapshotList, "snapshotList");
         this.snapshotLinkList = requireField(snapshotLinkList, "snapshotLinkList");
-        this.description = requireField(description, "description");
+        this.descriptionMetadata = requireField(descriptionMetadata, "descriptionMetadata");
+        this.eventList = new ArrayList<>();
         checkFieldInvariants();
     }
 
@@ -80,17 +93,18 @@ public class Timeline extends JpaDefaultAuditableDomain implements Identifiable<
             TimelineId id,
             List<Snapshot> snapshotList,
             List<SnapshotLink> snapshotLinklist,
-            String description
+            String title,
+            String details
     ) {
+        var descriptionMetadata = JpaDescriptionMetadata.create(title, details);
         var timeline = new Timeline(
                 idGenerationContext,
                 id,
                 snapshotList,
                 snapshotLinklist,
-                description
+                descriptionMetadata
         );
         timeline.onCreated();
-
         return timeline;
     }
 
@@ -127,9 +141,9 @@ public class Timeline extends JpaDefaultAuditableDomain implements Identifiable<
         return snapshotList.stream().filter(s -> !s.getTx().isOpen()).toList();
     }
 
-    public void migrate(Instant txAt, Instant validAt, String description) {
+    public void migrate(Instant txAt, Instant validAt, String details) {
         if (snapshotList.isEmpty()) {
-            createInitialSnapshot(txAt, validAt, description);
+            createInitialSnapshot(txAt, validAt, details);
             return;
         }
 
@@ -155,8 +169,8 @@ public class Timeline extends JpaDefaultAuditableDomain implements Identifiable<
         var newTx = Effective.create(txAt, Effective.MAX);
         var newValidSplit = sourceSnapshot.getValid().splitAt(validAt);
 
-        var newSnapshotLeft = Snapshot.create(idGenerationContext.next(SnapshotId.class), newTx, newValidSplit.left(), id, 0, description);
-        var newSnapshotRight = Snapshot.create(idGenerationContext.next(SnapshotId.class), newTx, newValidSplit.right(), id, 0, description);
+        var newSnapshotLeft = Snapshot.create(idGenerationContext.next(SnapshotId.class), newTx, newValidSplit.left(), id, 0, details);
+        var newSnapshotRight = Snapshot.create(idGenerationContext.next(SnapshotId.class), newTx, newValidSplit.right(), id, 0, details);
 
         var newSnapshotLeftLink = SnapshotLink.create(idGenerationContext.next(SnapshotLinkId.class), id, sourceSnapshot.id(), newSnapshotLeft.id());
         var newSnapshotRightLink = SnapshotLink.create(idGenerationContext.next(SnapshotLinkId.class), id, newSnapshotLeft.id(), newSnapshotRight.id());

@@ -2,8 +2,8 @@ package com.lilamaris.capstone.domain.model.capstone.course;
 
 import com.lilamaris.capstone.domain.model.capstone.course.id.CourseId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
-import com.lilamaris.capstone.domain.model.common.embed.impl.JpaDefaultAuditableDomain;
-import com.lilamaris.capstone.domain.model.common.embed.impl.JpaDomainMeta;
+import com.lilamaris.capstone.domain.model.common.embed.impl.jpa.JpaAuditMetadata;
+import com.lilamaris.capstone.domain.model.common.embed.impl.jpa.JpaDescriptionMetadata;
 import com.lilamaris.capstone.domain.model.common.id.DomainRef;
 import com.lilamaris.capstone.domain.model.common.id.impl.DefaultDomainRef;
 import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
@@ -14,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +23,11 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 
 @Getter
 @ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "course_root")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Course extends JpaDefaultAuditableDomain implements Identifiable<CourseId>, Referenceable {
+@EntityListeners(AuditingEntityListener.class)
+public class Course implements Identifiable<CourseId>, Referenceable {
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
@@ -36,27 +38,25 @@ public class Course extends JpaDefaultAuditableDomain implements Identifiable<Co
     private List<CourseOffer> courseOfferList;
 
     @Embedded
-    private JpaDomainMeta metadata;
+    private JpaAuditMetadata audit;
 
-    private Course(CourseId id, List<CourseOffer> courseOfferList, JpaDomainMeta metadata) {
+    @Embedded
+    private JpaDescriptionMetadata descriptionMetadata;
+
+    private Course(CourseId id, List<CourseOffer> courseOfferList, JpaDescriptionMetadata descriptionMetadata) {
         this.id = requireField(id, "id");
         this.courseOfferList = requireField(courseOfferList, "courseOfferList");
-        this.metadata = requireField(metadata, "metadata");
+        this.descriptionMetadata = requireField(descriptionMetadata, "metadata");
     }
 
-    public static Course create(String title, String description) {
-        var metadata = JpaDomainMeta.create(title, description);
-        return new Course(CourseId.newId(), new ArrayList<>(), metadata);
+    public static Course create(String title, String details) {
+        var descriptionMetadata = JpaDescriptionMetadata.create(title, details);
+        return new Course(CourseId.newId(), new ArrayList<>(), descriptionMetadata);
     }
 
     public void offer(SnapshotId snapshotId, Integer credit) {
         var offer = CourseOffer.create(id, snapshotId, credit);
         courseOfferList.add(offer);
-    }
-
-    public void updateMetadata(String title, String description) {
-        var newMeta = JpaDomainMeta.create(title, description);
-        metadata.assign(newMeta);
     }
 
     @Override

@@ -3,7 +3,7 @@ package com.lilamaris.capstone.domain.model.capstone.course;
 import com.lilamaris.capstone.domain.model.capstone.course.id.CourseId;
 import com.lilamaris.capstone.domain.model.capstone.course.id.CourseOfferId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
-import com.lilamaris.capstone.domain.model.common.embed.impl.JpaDefaultAuditableDomain;
+import com.lilamaris.capstone.domain.model.common.embed.impl.jpa.JpaDefaultAuditableDomain;
 import com.lilamaris.capstone.domain.model.common.id.DomainRef;
 import com.lilamaris.capstone.domain.model.common.id.impl.DefaultDomainRef;
 import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;

@@ -3,23 +3,25 @@ package com.lilamaris.capstone.domain.model.auth.account;
 import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.domain.model.auth.account.id.AccountId;
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
-import com.lilamaris.capstone.domain.model.common.embed.impl.JpaDefaultAuditableDomain;
+import com.lilamaris.capstone.domain.model.common.embed.impl.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 
 @Getter
 @ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "account_root")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Account extends JpaDefaultAuditableDomain implements Identifiable<AccountId> {
+@EntityListeners(AuditingEntityListener.class)
+public class Account implements Identifiable<AccountId> {
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
@@ -28,6 +30,9 @@ public class Account extends JpaDefaultAuditableDomain implements Identifiable<A
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "user_id", updatable = false))
     private UserId userId;
+
+    @Embedded
+    private JpaAuditMetadata audit;
 
     @Enumerated(EnumType.STRING)
     private Provider provider;
