@@ -27,28 +27,23 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 @Table(name = "timeline_snapshot_link")
 @EntityListeners(AuditingEntityListener.class)
 public class SnapshotLink implements Identifiable<SnapshotLinkId> {
+    @Embedded
+    private final JpaAuditMetadata audit = new JpaAuditMetadata();
+    @Transient
+    private final List<DomainEvent> eventList = new ArrayList<>();
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private SnapshotLinkId id;
-
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "timeline_id", insertable = false, updatable = false))
     private TimelineId timelineId;
-
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "ancestor_snapshot_id"))
     private SnapshotId ancestorSnapshotId;
-
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "descendant_snapshot_id"))
     private SnapshotId descendantSnapshotId;
-
-    @Embedded
-    private JpaAuditMetadata audit;
-
-    @Transient
-    private List<DomainEvent> eventList;
 
     protected SnapshotLink(
             SnapshotLinkId id,
@@ -60,7 +55,6 @@ public class SnapshotLink implements Identifiable<SnapshotLinkId> {
         this.timelineId = requireField(timelineId, "timelineId");
         this.descendantSnapshotId = requireField(descendantSnapshotId, "descendantSnapshotId");
         this.ancestorSnapshotId = ancestorSnapshotId;
-        this.eventList = new ArrayList<>();
     }
 
     protected static SnapshotLink create(

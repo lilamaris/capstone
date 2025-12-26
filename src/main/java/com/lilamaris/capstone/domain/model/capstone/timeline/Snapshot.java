@@ -29,39 +29,32 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 @Table(name = "timeline_snapshot")
 @EntityListeners(AuditingEntityListener.class)
 public class Snapshot implements Identifiable<SnapshotId> {
+    @Embedded
+    private final JpaAuditMetadata audit = new JpaAuditMetadata();
+    @Transient
+    private final List<DomainEvent> eventList = new ArrayList<>();
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private SnapshotId id;
-
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "from", column = @Column(name = "tx_from")),
             @AttributeOverride(name = "to", column = @Column(name = "tx_to")),
     })
     private Effective tx;
-
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "from", column = @Column(name = "valid_from")),
             @AttributeOverride(name = "to", column = @Column(name = "valid_to")),
     })
     private Effective valid;
-
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "timeline_id", insertable = false, updatable = false))
     private TimelineId timelineId;
-
-    @Embedded
-    private JpaAuditMetadata audit;
-
     @Embedded
     private JpaDescriptionMetadata descriptionMetadata;
-
     private Integer versionNo;
-
-    @Transient
-    private List<DomainEvent> eventList;
 
     protected Snapshot(
             SnapshotId id,
@@ -77,7 +70,6 @@ public class Snapshot implements Identifiable<SnapshotId> {
         this.timelineId = requireField(timelineId, "timelineId");
         this.versionNo = requireField(versionNo, "versionNo");
         this.descriptionMetadata = requireField(descriptionMetadata, "descriptionMetadata");
-        this.eventList = new ArrayList<>();
     }
 
     protected static Snapshot create(

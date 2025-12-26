@@ -5,6 +5,8 @@ import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
 import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import lombok.Getter;
 
+import java.util.function.Supplier;
+
 import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 
 @Getter
@@ -15,6 +17,10 @@ public class RefreshToken implements Identifiable<RefreshTokenId> {
     protected RefreshToken(RefreshTokenId id, UserId userId) {
         this.token = requireField(id, "id");
         this.userId = requireField(userId, "userId");
+    }
+
+    public static RefreshToken create(UserId userId, Supplier<RefreshTokenId> idSupplier) {
+        return new RefreshToken(idSupplier.get(), userId);
     }
 
     @Override

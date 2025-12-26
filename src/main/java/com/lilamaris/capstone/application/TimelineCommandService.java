@@ -5,16 +5,14 @@ import com.lilamaris.capstone.application.port.in.TimelineCommandUseCase;
 import com.lilamaris.capstone.application.port.in.result.TimelineResult;
 import com.lilamaris.capstone.application.port.out.TimelinePort;
 import com.lilamaris.capstone.application.util.UniversityClock;
-import com.lilamaris.capstone.domain.event.SnapshotDeltaEvent;
-import com.lilamaris.capstone.domain.model.capstone.timeline.TimelineFactory;
+import com.lilamaris.capstone.domain.model.capstone.timeline.Timeline;
 import com.lilamaris.capstone.domain.model.capstone.timeline.embed.Effective;
+import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
+import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
+import com.lilamaris.capstone.domain.model.common.id.IdGenerationContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.time.LocalDateTime;
 
@@ -22,12 +20,13 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class TimelineCommandService implements TimelineCommandUseCase {
     private final TimelinePort timelinePort;
-
-    private final TimelineFactory timelineFactory;
+    private final IdGenerationContext ids;
 
     @Override
     public TimelineResult.Command create(String title, String details) {
-        var domain = timelineFactory.create(title, details);
+        var domain = Timeline.create(
+                title, details, () -> ids.next(TimelineId.class)
+        );
         var created = timelinePort.save(domain);
 
         return TimelineResult.Command.from(created);
@@ -48,7 +47,13 @@ public class TimelineCommandService implements TimelineCommandUseCase {
                 String.format("Timeline with id '%s' not found.", id)
         ));
 
-        timeline.migrate(UniversityClock.now(), UniversityClock.at(validAt), details);
+        timeline.migrate(
+                UniversityClock.now(),
+                UniversityClock.at(validAt),
+                details,
+                () -> ids.next(SnapshotId.class),
+                () -> ids.next(SnapshotLinkId.class)
+        );
         var saved = timelinePort.save(timeline);
 
         return TimelineResult.Command.from(saved);
@@ -64,7 +69,13 @@ public class TimelineCommandService implements TimelineCommandUseCase {
                 UniversityClock.at(validFrom),
                 UniversityClock.at(validTo)
         );
-        timeline.mergeValidRange(UniversityClock.now(), validRange, details);
+        timeline.mergeValidRange(
+                UniversityClock.now(),
+                validRange,
+                details,
+                () -> ids.next(SnapshotId.class),
+                () -> ids.next(SnapshotLinkId.class)
+        );
         var saved = timelinePort.save(timeline);
 
         return TimelineResult.Command.from(saved);

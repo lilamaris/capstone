@@ -12,7 +12,7 @@ public class SnapshotResult {
             EffectiveResult tx,
             EffectiveResult valid,
             Integer versionNo,
-            String description,
+            DescriptionResult description,
             TimelineId timelineId
     ) {
         public static Command from(Snapshot domain) {
@@ -21,7 +21,7 @@ public class SnapshotResult {
                     .tx(EffectiveResult.from(domain.getTx()))
                     .valid(EffectiveResult.from(domain.getValid()))
                     .versionNo(domain.getVersionNo())
-                    .description(domain.getDescription())
+                    .description(DescriptionResult.from(domain.getDescriptionMetadata()))
                     .timelineId(domain.getTimelineId())
                     .build();
         }
@@ -33,7 +33,7 @@ public class SnapshotResult {
             EffectiveResult tx,
             EffectiveResult valid,
             Integer versionNo,
-            String description,
+            DescriptionResult description,
             TimelineId timelineId
     ) {
         public static Query from(Snapshot domain) {
@@ -42,7 +42,7 @@ public class SnapshotResult {
                     .tx(EffectiveResult.from(domain.getTx()))
                     .valid(EffectiveResult.from(domain.getValid()))
                     .versionNo(domain.getVersionNo())
-                    .description(domain.getDescription())
+                    .description(DescriptionResult.from(domain.getDescriptionMetadata()))
                     .timelineId(domain.getTimelineId())
                     .build();
         }

@@ -6,11 +6,14 @@ import com.lilamaris.capstone.application.port.in.result.AuthResult;
 import com.lilamaris.capstone.application.port.out.AccountPort;
 import com.lilamaris.capstone.application.port.out.UserPort;
 import com.lilamaris.capstone.application.util.auth.*;
-import com.lilamaris.capstone.domain.model.auth.account.AccountFactory;
+import com.lilamaris.capstone.domain.model.auth.account.Account;
 import com.lilamaris.capstone.domain.model.auth.account.Provider;
+import com.lilamaris.capstone.domain.model.auth.account.id.AccountId;
 import com.lilamaris.capstone.domain.model.auth.refreshToken.id.RefreshTokenId;
 import com.lilamaris.capstone.domain.model.capstone.user.Role;
-import com.lilamaris.capstone.domain.model.capstone.user.UserFactory;
+import com.lilamaris.capstone.domain.model.capstone.user.User;
+import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
+import com.lilamaris.capstone.domain.model.common.id.IdGenerationContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,11 +28,9 @@ public class AuthCommandService implements AuthCommandUseCase {
     private final TokenIdentityResolver tokenIdentityResolver;
     private final SessionIssuer sessionIssuer;
 
+    private final IdGenerationContext ids;
     private final AccountPort accountPort;
     private final UserPort userPort;
-
-    private final UserFactory userFactory;
-    private final AccountFactory accountFactory;
 
     @Override
     @Transactional
@@ -59,8 +60,8 @@ public class AuthCommandService implements AuthCommandUseCase {
             throw new ResourceAlreadyExistsException("Account already exists.");
         }
 
-        var user = userFactory.create(displayName, Role.USER);
-        var account = accountFactory.create(user.id(), displayName, email, passwordHash);
+        var user = User.create(displayName, Role.USER, () -> ids.next(UserId.class));
+        var account = Account.create(user.id(), displayName, email, passwordHash, () -> ids.next(AccountId.class));
 
         user = userPort.save(user);
         account = accountPort.save(account);

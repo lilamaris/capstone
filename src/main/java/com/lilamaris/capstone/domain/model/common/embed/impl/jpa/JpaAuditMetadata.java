@@ -4,7 +4,6 @@ import com.lilamaris.capstone.domain.model.common.embed.AuditMetadata;
 import com.lilamaris.capstone.domain.model.common.embed.impl.DefaultAuditMetadata;
 import com.lilamaris.capstone.domain.model.common.mixin.ToPojo;
 import jakarta.persistence.Embeddable;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -16,7 +15,7 @@ import java.time.Instant;
 @Getter
 @ToString
 @Embeddable
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class JpaAuditMetadata implements AuditMetadata, ToPojo<AuditMetadata> {
     @CreatedDate
     private Instant createdAt;

@@ -2,9 +2,11 @@ package com.lilamaris.capstone.application.util.auth;
 
 import com.lilamaris.capstone.application.port.in.result.AuthResult;
 import com.lilamaris.capstone.application.port.out.RefreshTokenPort;
-import com.lilamaris.capstone.domain.model.auth.refreshToken.RefreshTokenFactory;
+import com.lilamaris.capstone.domain.model.auth.refreshToken.RefreshToken;
+import com.lilamaris.capstone.domain.model.auth.refreshToken.id.RefreshTokenId;
 import com.lilamaris.capstone.domain.model.capstone.user.Role;
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
+import com.lilamaris.capstone.domain.model.common.id.IdGenerationContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +16,7 @@ public class DefaultSessionIssuer implements SessionIssuer {
     private final JwtUtil jwtUtil;
     private final RefreshTokenPort refreshTokenPort;
 
-    private final RefreshTokenFactory refreshTokenFactory;
+    private final IdGenerationContext ids;
 
     @Override
     public AuthResult.Token issue(AuthIdentity identity) {
@@ -25,7 +27,7 @@ public class DefaultSessionIssuer implements SessionIssuer {
         String accessTokenValue = jwtUtil.createAccessToken(userId, displayName, role);
         String refreshTokenValue = jwtUtil.createRefreshToken();
 
-        var refreshToken = refreshTokenFactory.create(userId);
+        var refreshToken = RefreshToken.create(userId, () -> ids.next(RefreshTokenId.class));
 
         refreshTokenPort.save(refreshToken, jwtUtil.getRefreshTokenExpiration());
 

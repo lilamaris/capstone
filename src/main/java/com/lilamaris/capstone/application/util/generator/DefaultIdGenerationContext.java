@@ -1,16 +1,23 @@
 package com.lilamaris.capstone.application.util.generator;
 
-import com.lilamaris.capstone.domain.model.common.id.*;
+import com.lilamaris.capstone.domain.model.common.id.DomainId;
+import com.lilamaris.capstone.domain.model.common.id.IdGenerationContext;
+import com.lilamaris.capstone.domain.model.common.id.IdSpec;
+import com.lilamaris.capstone.domain.model.common.id.RawGenerator;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class DefaultIdGenerationContext implements IdGenerationContext {
-    public record Binding<T extends DomainId<R>, R>(IdSpec<T, R> spec, RawGenerator<R> rawGen) {}
-
     private final Map<Class<?>, Binding<?, ?>> bindings;
 
-    public DefaultIdGenerationContext(Map<Class<?>, Binding<?, ?>> bindings) {
-        this.bindings = Map.copyOf(bindings);
+    public DefaultIdGenerationContext() {
+        this.bindings = new HashMap<>();
+    }
+
+    public <T extends DomainId<R>, R> void register(Class<T> idClass, IdSpec<T, R> idSpec, RawGenerator<R> rawGenerator) {
+        var bind = new Binding<>(idSpec, rawGenerator);
+        bindings.put(idClass, bind);
     }
 
     @SuppressWarnings("unchecked")
@@ -24,7 +31,6 @@ public class DefaultIdGenerationContext implements IdGenerationContext {
         return binding.spec.fromRaw(binding.rawGen.generate());
     }
 
-    public static <T extends DomainId<R>, R> Binding<T, R> bind(IdSpec<T, R> spec, RawGenerator<R> rawGen) {
-        return new Binding<>(spec, rawGen);
+    public record Binding<T extends DomainId<R>, R>(IdSpec<T, R> spec, RawGenerator<R> rawGen) {
     }
 }

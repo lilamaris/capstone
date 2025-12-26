@@ -27,28 +27,23 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 @Table(name = "timeline_snapshot_delta")
 @EntityListeners(AuditingEntityListener.class)
 public class SnapshotDelta implements Identifiable<SnapshotDeltaId> {
+    @Embedded
+    private final JpaAuditMetadata audit = new JpaAuditMetadata();
+    @Transient
+    private final List<DomainEvent> eventList = new ArrayList<>();
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private SnapshotDeltaId id;
-
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "snapshot_link_id", nullable = false, updatable = false))
     private SnapshotLinkId snapshotLinkId;
-
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "type", column = @Column(name = "resource_type")),
             @AttributeOverride(name = "id", column = @Column(name = "resource_id"))
     })
     private JpaDomainRef resourceRef;
-
-    @Embedded
-    private JpaAuditMetadata audit;
-
-    @Transient
-    private List<DomainEvent> eventList;
-
     private String jsonPatch;
 
     protected SnapshotDelta(SnapshotDeltaId id, SnapshotLinkId snapshotLinkId, JpaDomainRef resourceRef, String jsonPatch) {
@@ -56,7 +51,6 @@ public class SnapshotDelta implements Identifiable<SnapshotDeltaId> {
         this.snapshotLinkId = requireField(snapshotLinkId, "snapshotLinkId");
         this.resourceRef = requireField(resourceRef, "resourceRef");
         this.jsonPatch = requireField(jsonPatch, "jsonPatch");
-        this.eventList = new ArrayList<>();
     }
 
     protected static SnapshotDelta create(SnapshotDeltaId id, SnapshotLinkId snapshotLinkId, JpaDomainRef resourceRef, String jsonPatch) {

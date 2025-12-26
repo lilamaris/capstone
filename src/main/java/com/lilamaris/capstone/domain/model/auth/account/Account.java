@@ -13,6 +13,8 @@ import lombok.ToString;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.function.Supplier;
+
 import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 
 @Getter
@@ -22,18 +24,15 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 @Table(name = "account_root")
 @EntityListeners(AuditingEntityListener.class)
 public class Account implements Identifiable<AccountId> {
+    @Embedded
+    private final JpaAuditMetadata audit = new JpaAuditMetadata();
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private AccountId id;
-
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "user_id", updatable = false))
     private UserId userId;
-
-    @Embedded
-    private JpaAuditMetadata audit;
-
     @Enumerated(EnumType.STRING)
     private Provider provider;
     private String providerId;
@@ -41,7 +40,15 @@ public class Account implements Identifiable<AccountId> {
     private String email;
     private String passwordHash;
 
-    protected Account(AccountId id, UserId userId, Provider provider, String providerId, String displayName, String email, String passwordHash) {
+    protected Account(
+            AccountId id,
+            UserId userId,
+            Provider provider,
+            String providerId,
+            String displayName,
+            String email,
+            String passwordHash
+    ) {
         this.id = requireField(id, "id");
         this.userId = requireField(userId, "userId");
         this.provider = requireField(provider, "provider");
@@ -49,6 +56,49 @@ public class Account implements Identifiable<AccountId> {
         this.displayName = requireField(displayName, "displayName");
         this.email = requireField(email, "email");
         this.passwordHash = passwordHash;
+    }
+
+    public static Account create(
+            UserId userId,
+            String displayName,
+            String email,
+            String passwordHash,
+            Supplier<AccountId> idSupplier
+    ) {
+        return new Account(
+                idSupplier.get(),
+                userId,
+                Provider.LOCAL,
+                email,
+                displayName,
+                email,
+                requireField(passwordHash, "passwordHash")
+        );
+    }
+
+    public static Account create(
+            UserId userId,
+            Provider provider,
+            String providerId,
+            String displayName,
+            String email,
+            Supplier<AccountId> idSupplier
+    ) {
+        if (provider.equals(Provider.LOCAL)) {
+            throw new DomainIllegalArgumentException(
+                    "Can not create a local account by explicitly specifying the provider."
+            );
+        }
+
+        return new Account(
+                idSupplier.get(),
+                userId,
+                provider,
+                providerId,
+                displayName,
+                email,
+                null
+        );
     }
 
     @Override

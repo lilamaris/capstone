@@ -4,11 +4,12 @@ import com.lilamaris.capstone.application.exception.ResourceNotFoundException;
 import com.lilamaris.capstone.application.port.out.AccountPort;
 import com.lilamaris.capstone.application.port.out.UserPort;
 import com.lilamaris.capstone.domain.model.auth.account.Account;
-import com.lilamaris.capstone.domain.model.auth.account.AccountFactory;
 import com.lilamaris.capstone.domain.model.auth.account.Provider;
+import com.lilamaris.capstone.domain.model.auth.account.id.AccountId;
 import com.lilamaris.capstone.domain.model.capstone.user.Role;
 import com.lilamaris.capstone.domain.model.capstone.user.User;
-import com.lilamaris.capstone.domain.model.capstone.user.UserFactory;
+import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
+import com.lilamaris.capstone.domain.model.common.id.IdGenerationContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,8 +19,7 @@ public class DefaultOidcIdentityResolver implements OidcIdentityResolver {
     private final AccountPort accountPort;
     private final UserPort userPort;
 
-    private final UserFactory userFactory;
-    private final AccountFactory accountFactory;
+    private final IdGenerationContext ids;
 
     @Override
     public AuthIdentity resolve(Provider provider, String providerId, String email, String displayName) {
@@ -36,8 +36,8 @@ public class DefaultOidcIdentityResolver implements OidcIdentityResolver {
                     String.format("User with id '%s' not found.", userId)
             ));
         } else {
-            user = userFactory.create(displayName, Role.USER);
-            account = accountFactory.create(user.id(), provider, providerId, email, displayName);
+            user = User.create(displayName, Role.USER, () -> ids.next(UserId.class));
+            account = Account.create(user.id(), provider, providerId, email, displayName, () -> ids.next(AccountId.class));
             user = userPort.save(user);
             account = accountPort.save(account);
             isCreated = true;

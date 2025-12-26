@@ -15,6 +15,7 @@ import lombok.ToString;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 
@@ -25,25 +26,21 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 @Table(name = "_access_control")
 @EntityListeners(AuditingEntityListener.class)
 public class AccessControl implements Identifiable<AccessControlId> {
+    @Embedded
+    private final JpaAuditMetadata audit = new JpaAuditMetadata();
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private AccessControlId id;
-
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "user_id", insertable = false, updatable = false))
     private UserId userId;
-
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "type", column = @Column(name = "resource_type")),
             @AttributeOverride(name = "id", column = @Column(name = "resource_id"))
     })
     private JpaDomainRef resourceRef;
-
-    @Embedded
-    private JpaAuditMetadata audit;
-
     private String scopedRole;
 
     @Transient
@@ -61,14 +58,14 @@ public class AccessControl implements Identifiable<AccessControlId> {
         this.scopedRole = requireField(scopedRole, "scopedRole");
     }
 
-    protected static AccessControl create(
-            AccessControlId id,
+    public static AccessControl create(
             UserId userId,
             DomainRef resourceRef,
-            String scopedRole
+            String scopedRole,
+            Supplier<AccessControlId> idSupplier
     ) {
         var ref = JpaDomainRef.from(resourceRef);
-        var accessControl = new AccessControl(id, userId, ref, scopedRole);
+        var accessControl = new AccessControl(idSupplier.get(), userId, ref, scopedRole);
         accessControl.registerCreated();
         return accessControl;
     }

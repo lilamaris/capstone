@@ -6,10 +6,10 @@ import com.lilamaris.capstone.domain.model.capstone.timeline.event.TimelineCreat
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
+import com.lilamaris.capstone.domain.model.common.embed.impl.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.domain.model.common.embed.impl.jpa.JpaDescriptionMetadata;
 import com.lilamaris.capstone.domain.model.common.event.CollectedDomainEvent;
 import com.lilamaris.capstone.domain.model.common.event.DomainEvent;
-import com.lilamaris.capstone.domain.model.common.id.IdGenerationContext;
 import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import com.lilamaris.capstone.domain.timeline.exception.TimelineDomainException;
 import com.lilamaris.capstone.domain.timeline.exception.TimelineErrorCode;
@@ -26,6 +26,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -38,70 +39,55 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 @Table(name = "timeline_root")
 @EntityListeners(AuditingEntityListener.class)
 public class Timeline implements Identifiable<TimelineId> {
+    @Embedded
+    private final JpaAuditMetadata audit = new JpaAuditMetadata();
+    @Transient
+    private final List<DomainEvent> eventList = new ArrayList<>();
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private TimelineId id;
-
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "timeline_id", nullable = false)
     private List<Snapshot> snapshotList;
-
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "timeline_id", nullable = false)
     private List<SnapshotLink> snapshotLinkList;
-
     @Embedded
     private JpaDescriptionMetadata descriptionMetadata;
-
-    @Transient
-    private IdGenerationContext idGenerationContext;
-
     @Transient
     private Map<SnapshotId, Snapshot> snapshotMap;
-
     @Transient
     private Map<SnapshotLinkId, SnapshotLink> snapshotLinkMap;
-
     @Transient
     private Map<SnapshotId, SnapshotLink> snapshotLinkByDescendant;
-
     @Transient
     private Map<SnapshotId, SnapshotLink> snapshotLinkByAncestor;
 
-    @Transient
-    private List<DomainEvent> eventList;
-
     protected Timeline(
-            IdGenerationContext idGenerationContext,
             TimelineId id,
             List<Snapshot> snapshotList,
             List<SnapshotLink> snapshotLinkList,
             JpaDescriptionMetadata descriptionMetadata
     ) {
-        this.idGenerationContext = idGenerationContext;
         this.id = requireField(id, "id");
         this.snapshotList = requireField(snapshotList, "snapshotList");
         this.snapshotLinkList = requireField(snapshotLinkList, "snapshotLinkList");
         this.descriptionMetadata = requireField(descriptionMetadata, "descriptionMetadata");
-        this.eventList = new ArrayList<>();
         checkFieldInvariants();
     }
 
-    protected static Timeline create(
-            IdGenerationContext idGenerationContext,
-            TimelineId id,
-            List<Snapshot> snapshotList,
-            List<SnapshotLink> snapshotLinklist,
+    public static Timeline create(
             String title,
-            String details
+            String details,
+            Supplier<TimelineId> idSupplier
     ) {
+        var id = idSupplier.get();
         var descriptionMetadata = JpaDescriptionMetadata.create(title, details);
         var timeline = new Timeline(
-                idGenerationContext,
                 id,
-                snapshotList,
-                snapshotLinklist,
+                new ArrayList<>(),
+                new ArrayList<>(),
                 descriptionMetadata
         );
         timeline.onCreated();
@@ -141,9 +127,15 @@ public class Timeline implements Identifiable<TimelineId> {
         return snapshotList.stream().filter(s -> !s.getTx().isOpen()).toList();
     }
 
-    public void migrate(Instant txAt, Instant validAt, String details) {
+    public void migrate(
+            Instant txAt,
+            Instant validAt,
+            String details,
+            Supplier<SnapshotId> snapshotIdSupplier,
+            Supplier<SnapshotLinkId> snapshotLinkIdSupplier
+    ) {
         if (snapshotList.isEmpty()) {
-            createInitialSnapshot(txAt, validAt, details);
+            createInitialSnapshot(txAt, validAt, details, snapshotIdSupplier, snapshotLinkIdSupplier);
             return;
         }
 
@@ -169,11 +161,11 @@ public class Timeline implements Identifiable<TimelineId> {
         var newTx = Effective.create(txAt, Effective.MAX);
         var newValidSplit = sourceSnapshot.getValid().splitAt(validAt);
 
-        var newSnapshotLeft = Snapshot.create(idGenerationContext.next(SnapshotId.class), newTx, newValidSplit.left(), id, 0, details);
-        var newSnapshotRight = Snapshot.create(idGenerationContext.next(SnapshotId.class), newTx, newValidSplit.right(), id, 0, details);
+        var newSnapshotLeft = Snapshot.create(snapshotIdSupplier.get(), newTx, newValidSplit.left(), id, 0, details);
+        var newSnapshotRight = Snapshot.create(snapshotIdSupplier.get(), newTx, newValidSplit.right(), id, 0, details);
 
-        var newSnapshotLeftLink = SnapshotLink.create(idGenerationContext.next(SnapshotLinkId.class), id, sourceSnapshot.id(), newSnapshotLeft.id());
-        var newSnapshotRightLink = SnapshotLink.create(idGenerationContext.next(SnapshotLinkId.class), id, newSnapshotLeft.id(), newSnapshotRight.id());
+        var newSnapshotLeftLink = SnapshotLink.create(snapshotLinkIdSupplier.get(), id, sourceSnapshot.id(), newSnapshotLeft.id());
+        var newSnapshotRightLink = SnapshotLink.create(snapshotLinkIdSupplier.get(), id, newSnapshotLeft.id(), newSnapshotRight.id());
 
         snapshotList.addAll(List.of(newSnapshotLeft, newSnapshotRight));
         snapshotLinkList.addAll(List.of(newSnapshotLeftLink, newSnapshotRightLink));
@@ -186,7 +178,13 @@ public class Timeline implements Identifiable<TimelineId> {
         propagateToTransient();
     }
 
-    public void mergeValidRange(Instant txAt, Effective validRange, String description) {
+    public void mergeValidRange(
+            Instant txAt,
+            Effective validRange,
+            String description,
+            Supplier<SnapshotId> snapshotIdSupplier,
+            Supplier<SnapshotLinkId> snapshotLinkIdSupplier
+    ) {
         var sourceSnapshots = snapshotList.stream()
                 .filter(ifEffectiveOpen(EffectiveSelector.TX, true))
                 .filter(ifEffective(EffectiveSelector.VALID, validRange))
@@ -208,8 +206,8 @@ public class Timeline implements Identifiable<TimelineId> {
         var mergedSnapshotValid = Effective.create(startValidAt, endValidAt);
         var mergedSnapshotTx = Effective.create(txAt, Effective.MAX);
 
-        var mergedSnapshot = Snapshot.create(idGenerationContext.next(SnapshotId.class), mergedSnapshotTx, mergedSnapshotValid, id, 0, description);
-        var mergedSnapshotLink = SnapshotLink.create(idGenerationContext.next(SnapshotLinkId.class), id, earliestSnapshot.id(), mergedSnapshot.id());
+        var mergedSnapshot = Snapshot.create(snapshotIdSupplier.get(), mergedSnapshotTx, mergedSnapshotValid, id, 0, description);
+        var mergedSnapshotLink = SnapshotLink.create(snapshotLinkIdSupplier.get(), id, earliestSnapshot.id(), mergedSnapshot.id());
 
         snapshotList.add(mergedSnapshot);
         snapshotLinkList.add(mergedSnapshotLink);
@@ -220,12 +218,18 @@ public class Timeline implements Identifiable<TimelineId> {
         propagateToTransient();
     }
 
-    private void createInitialSnapshot(Instant txAt, Instant validAt, String description) {
+    private void createInitialSnapshot(
+            Instant txAt,
+            Instant validAt,
+            String description,
+            Supplier<SnapshotId> snapshotIdSupplier,
+            Supplier<SnapshotLinkId> snapshotLinkIdSupplier
+    ) {
         var tx = Effective.create(txAt, Effective.MAX);
         var valid = Effective.create(validAt, Effective.MAX);
 
-        var snapshot = Snapshot.create(idGenerationContext.next(SnapshotId.class), tx, valid, id, 0, description);
-        var link = SnapshotLink.create(idGenerationContext.next(SnapshotLinkId.class), id, null, snapshot.id());
+        var snapshot = Snapshot.create(snapshotIdSupplier.get(), tx, valid, id, 0, description);
+        var link = SnapshotLink.create(snapshotLinkIdSupplier.get(), id, null, snapshot.id());
 
         snapshotList.add(snapshot);
         snapshotLinkList.add(link);
