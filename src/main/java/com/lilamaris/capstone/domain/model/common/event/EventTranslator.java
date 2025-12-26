@@ -1,0 +1,9 @@
+package com.lilamaris.capstone.domain.model.common.event;
+
+import java.util.List;
+
+public interface EventTranslator<E extends DomainEvent> {
+    List<DomainEvent> translate(E event);
+
+    Class<E> supports();
+}
