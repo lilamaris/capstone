@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.adapter.in.security;
 
-import com.lilamaris.capstone.domain.user.Role;
-import com.lilamaris.capstone.domain.user.User;
+import com.lilamaris.capstone.domain.model.capstone.user.Role;
+import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,7 +15,7 @@ import java.util.Collections;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SecurityUserDetails implements UserDetails {
-    private User.Id userId;
+    private UserId userId;
     private String displayName;
     private Role role;
 
@@ -31,6 +31,6 @@ public class SecurityUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return userId.getValue().toString();
+        return userId.toString();
     }
 }

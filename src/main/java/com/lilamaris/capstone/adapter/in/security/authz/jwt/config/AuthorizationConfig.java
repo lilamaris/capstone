@@ -1,5 +1,6 @@
 package com.lilamaris.capstone.adapter.in.security.authz.jwt.config;
 
+import com.lilamaris.capstone.adapter.in.security.authz.jwt.ActorContextFilter;
 import com.lilamaris.capstone.adapter.in.security.authz.jwt.JwtAuthenticationFilter;
 import com.lilamaris.capstone.adapter.in.security.authz.jwt.handler.JwtAccessDeniedHandler;
 import com.lilamaris.capstone.adapter.in.security.authz.jwt.handler.JwtAuthenticationEntryPoint;
@@ -27,13 +28,15 @@ public class AuthorizationConfig {
             CorsConfigurationSource corsConfigurationSource,
             JwtAccessDeniedHandler jwtAccessDeniedHandler,
             JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
-            JwtAuthenticationFilter jwtAuthenticationFilter
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            ActorContextFilter actorContextFilter
     ) throws Exception {
         http
                 .securityMatcher("/api/**")
                 .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
 
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(actorContextFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                         .accessDeniedHandler(jwtAccessDeniedHandler)
