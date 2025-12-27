@@ -2,8 +2,8 @@ package com.lilamaris.capstone.adapter.in.security.authz.jwt;
 
 import com.lilamaris.capstone.adapter.in.security.SecurityUserDetails;
 import com.lilamaris.capstone.application.config.ActorContext;
-import com.lilamaris.capstone.domain.model.common.event.actor.CanonicalActor;
-import com.lilamaris.capstone.domain.model.common.event.actor.UserActor;
+import com.lilamaris.capstone.domain.model.common.domain.event.actor.CanonicalActor;
+import com.lilamaris.capstone.domain.model.common.domain.event.actor.UserActor;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

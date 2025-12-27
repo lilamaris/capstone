@@ -4,9 +4,9 @@ import com.lilamaris.capstone.domain.model.capstone.timeline.event.SnapshotDelta
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotDeltaId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.common.persistence.jpa.JpaAuditMetadata;
-import com.lilamaris.capstone.domain.model.common.event.DomainEvent;
+import com.lilamaris.capstone.domain.model.common.domain.event.DomainEvent;
 import com.lilamaris.capstone.domain.model.common.persistence.jpa.JpaDomainRef;
-import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
+import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

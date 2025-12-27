@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.application.util.event;
 
-import com.lilamaris.capstone.domain.model.common.event.DomainEvent;
-import com.lilamaris.capstone.domain.model.common.event.boundary.EventTranslator;
+import com.lilamaris.capstone.domain.model.common.domain.event.DomainEvent;
+import com.lilamaris.capstone.domain.model.common.domain.event.boundary.EventTranslator;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

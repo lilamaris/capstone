@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.application.port.in.result;
 
 import com.lilamaris.capstone.application.util.UniversityClock;
-import com.lilamaris.capstone.domain.model.common.embed.AuditMetadata;
+import com.lilamaris.capstone.domain.model.common.domain.metadata.AuditMetadata;
 import lombok.Builder;
 
 import java.time.OffsetDateTime;

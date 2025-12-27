@@ -9,7 +9,7 @@ import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotDeltaId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
-import com.lilamaris.capstone.domain.model.common.id.IdGenerationContext;
+import com.lilamaris.capstone.domain.model.common.domain.id.IdGenerationContext;
 import com.lilamaris.capstone.util.SequentialUuidGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

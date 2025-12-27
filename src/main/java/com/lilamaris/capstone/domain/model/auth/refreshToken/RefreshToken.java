@@ -2,7 +2,7 @@ package com.lilamaris.capstone.domain.model.auth.refreshToken;
 
 import com.lilamaris.capstone.domain.model.auth.refreshToken.id.RefreshTokenId;
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
-import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
+import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
 import lombok.Getter;
 
 import java.util.function.Supplier;

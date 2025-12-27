@@ -2,10 +2,10 @@ package com.lilamaris.capstone.application.util.event.translator;
 
 import com.lilamaris.capstone.application.config.ActorContext;
 import com.lilamaris.capstone.domain.model.capstone.timeline.event.TimelineCreated;
-import com.lilamaris.capstone.domain.model.common.event.DomainEvent;
-import com.lilamaris.capstone.domain.model.common.event.boundary.EventTranslator;
-import com.lilamaris.capstone.domain.model.common.event.canonical.ResourceCreated;
-import com.lilamaris.capstone.domain.model.common.event.canonical.ResourceGranted;
+import com.lilamaris.capstone.domain.model.common.domain.event.DomainEvent;
+import com.lilamaris.capstone.domain.model.common.domain.event.boundary.EventTranslator;
+import com.lilamaris.capstone.domain.model.common.domain.event.canonical.ResourceCreated;
+import com.lilamaris.capstone.domain.model.common.domain.event.canonical.ResourceGranted;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

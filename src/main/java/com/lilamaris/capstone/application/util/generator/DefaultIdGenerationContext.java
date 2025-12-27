@@ -1,9 +1,9 @@
 package com.lilamaris.capstone.application.util.generator;
 
-import com.lilamaris.capstone.domain.model.common.id.DomainId;
-import com.lilamaris.capstone.domain.model.common.id.IdGenerationContext;
-import com.lilamaris.capstone.domain.model.common.id.IdSpec;
-import com.lilamaris.capstone.domain.model.common.id.RawGenerator;
+import com.lilamaris.capstone.domain.model.common.domain.id.DomainId;
+import com.lilamaris.capstone.domain.model.common.domain.id.IdGenerationContext;
+import com.lilamaris.capstone.domain.model.common.domain.id.IdSpec;
+import com.lilamaris.capstone.domain.model.common.domain.id.RawGenerator;
 
 import java.util.HashMap;
 import java.util.Map;

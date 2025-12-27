@@ -10,7 +10,7 @@ import com.lilamaris.capstone.domain.model.capstone.timeline.embed.Effective;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
-import com.lilamaris.capstone.domain.model.common.id.IdGenerationContext;
+import com.lilamaris.capstone.domain.model.common.domain.id.IdGenerationContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

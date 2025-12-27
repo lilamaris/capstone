@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.domain.model.common.defaults;
 
-import com.lilamaris.capstone.domain.model.common.embed.DescriptionMetadata;
+import com.lilamaris.capstone.domain.model.common.domain.metadata.DescriptionMetadata;
 
 public record DefaultDescriptionMetadata(
         String title,
