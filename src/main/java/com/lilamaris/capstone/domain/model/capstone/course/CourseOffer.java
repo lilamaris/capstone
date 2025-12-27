@@ -3,12 +3,8 @@ package com.lilamaris.capstone.domain.model.capstone.course;
 import com.lilamaris.capstone.domain.model.capstone.course.id.CourseId;
 import com.lilamaris.capstone.domain.model.capstone.course.id.CourseOfferId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
-import com.lilamaris.capstone.domain.model.common.domain.id.DomainRef;
-import com.lilamaris.capstone.domain.model.common.defaults.DefaultDomainRef;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
-import com.lilamaris.capstone.domain.model.common.domain.contract.Referenceable;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaAuditMetadata;
-import com.lilamaris.capstone.domain.model.common.domain.type.ResourceDomainType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -22,7 +18,7 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 @Entity
 @Table(name = "_course_offer")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CourseOffer implements Identifiable<CourseOfferId>, Referenceable {
+public class CourseOffer implements Identifiable<CourseOfferId> {
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
@@ -55,10 +51,5 @@ public class CourseOffer implements Identifiable<CourseOfferId>, Referenceable {
     @Override
     public CourseOfferId id() {
         return id;
-    }
-
-    @Override
-    public DomainRef ref() {
-        return DefaultDomainRef.from(ResourceDomainType.COURSE_OFFER, id);
     }
 }

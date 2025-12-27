@@ -5,6 +5,7 @@ import com.lilamaris.capstone.domain.model.common.domain.id.DomainRef;
 import com.lilamaris.capstone.domain.model.common.defaults.DefaultDomainRef;
 import com.lilamaris.capstone.domain.model.common.defaults.DefaultUuidDomainId;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Referenceable;
+import com.lilamaris.capstone.domain.model.common.domain.id.ExternalizableId;
 import com.lilamaris.capstone.domain.model.common.domain.type.CoreDomainType;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
@@ -14,7 +15,7 @@ import java.util.UUID;
 
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TimelineId extends DefaultUuidDomainId implements Referenceable {
+public class TimelineId extends DefaultUuidDomainId implements Referenceable, ExternalizableId {
     @JsonValue
     protected UUID value;
 
@@ -34,6 +35,11 @@ public class TimelineId extends DefaultUuidDomainId implements Referenceable {
 
     @Override
     public DomainRef ref() {
-        return DefaultDomainRef.from(CoreDomainType.TIMELINE, this);
+        return new DefaultDomainRef(CoreDomainType.TIMELINE, this);
+    }
+
+    @Override
+    public String asString() {
+        return value.toString();
     }
 }

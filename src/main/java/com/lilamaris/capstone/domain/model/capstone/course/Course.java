@@ -4,11 +4,7 @@ import com.lilamaris.capstone.domain.model.capstone.course.id.CourseId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaDescriptionMetadata;
-import com.lilamaris.capstone.domain.model.common.domain.id.DomainRef;
-import com.lilamaris.capstone.domain.model.common.defaults.DefaultDomainRef;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
-import com.lilamaris.capstone.domain.model.common.domain.contract.Referenceable;
-import com.lilamaris.capstone.domain.model.common.domain.type.ResourceDomainType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -27,7 +23,7 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 @Entity
 @Table(name = "course_root")
 @EntityListeners(AuditingEntityListener.class)
-public class Course implements Identifiable<CourseId>, Referenceable {
+public class Course implements Identifiable<CourseId> {
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
@@ -62,10 +58,5 @@ public class Course implements Identifiable<CourseId>, Referenceable {
     @Override
     public CourseId id() {
         return id;
-    }
-
-    @Override
-    public DomainRef ref() {
-        return DefaultDomainRef.from(ResourceDomainType.COURSE, id);
     }
 }

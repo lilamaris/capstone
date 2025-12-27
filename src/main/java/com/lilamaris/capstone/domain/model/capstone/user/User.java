@@ -3,11 +3,7 @@ package com.lilamaris.capstone.domain.model.capstone.user;
 import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaAuditMetadata;
-import com.lilamaris.capstone.domain.model.common.domain.id.DomainRef;
-import com.lilamaris.capstone.domain.model.common.defaults.DefaultDomainRef;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
-import com.lilamaris.capstone.domain.model.common.domain.contract.Referenceable;
-import com.lilamaris.capstone.domain.model.common.domain.type.CoreDomainType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,7 +17,7 @@ import java.util.function.Supplier;
 @Entity
 @Table(name = "usr")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User implements Identifiable<UserId>, Referenceable {
+public class User implements Identifiable<UserId> {
     @Embedded
     private final JpaAuditMetadata audit = new JpaAuditMetadata();
     @Getter(AccessLevel.NONE)
@@ -55,10 +51,5 @@ public class User implements Identifiable<UserId>, Referenceable {
     @Override
     public UserId id() {
         return id;
-    }
-
-    @Override
-    public DomainRef ref() {
-        return DefaultDomainRef.from(CoreDomainType.USER, id);
     }
 }
