@@ -1,15 +1,13 @@
 package com.lilamaris.capstone.domain.model.common.domain.event.canonical;
 
+import com.lilamaris.capstone.domain.embed.DomainRef;
 import com.lilamaris.capstone.domain.model.common.domain.event.actor.CanonicalActor;
-import com.lilamaris.capstone.domain.model.common.domain.id.DomainRef;
 
 import java.time.Instant;
 
-public record ResourceGranted(
+public record ResourceDeleted(
         DomainRef ref,
         CanonicalActor actor,
-        CanonicalActor grantee,
-        String scopedRole,
         Instant occurredAt
 ) implements CanonicalEvent {
 }
