@@ -1,8 +1,8 @@
-package com.lilamaris.capstone.domain.model.common.persistence.jpa;
+package com.lilamaris.capstone.domain.model.common.infra.persistence.jpa;
 
 import com.lilamaris.capstone.domain.model.common.domain.metadata.AuditMetadata;
 import com.lilamaris.capstone.domain.model.common.defaults.DefaultAuditMetadata;
-import com.lilamaris.capstone.domain.model.common.mixin.ToPojo;
+import com.lilamaris.capstone.domain.model.common.infra.ToPojo;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

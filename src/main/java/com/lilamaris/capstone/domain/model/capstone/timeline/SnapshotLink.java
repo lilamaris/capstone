@@ -4,7 +4,7 @@ import com.lilamaris.capstone.domain.model.capstone.timeline.event.SnapshotLinke
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
-import com.lilamaris.capstone.domain.model.common.persistence.jpa.JpaAuditMetadata;
+import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.domain.model.common.domain.event.DomainEvent;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
 import jakarta.persistence.*;

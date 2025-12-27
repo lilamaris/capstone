@@ -1,9 +1,9 @@
-package com.lilamaris.capstone.domain.model.common.persistence.jpa;
+package com.lilamaris.capstone.domain.model.common.infra.persistence.jpa;
 
 import com.lilamaris.capstone.domain.model.common.defaults.DefaultDomainRef;
 import com.lilamaris.capstone.domain.model.common.domain.id.DomainId;
 import com.lilamaris.capstone.domain.model.common.domain.id.DomainRef;
-import com.lilamaris.capstone.domain.model.common.mixin.ToPojo;
+import com.lilamaris.capstone.domain.model.common.infra.ToPojo;
 import com.lilamaris.capstone.domain.model.common.domain.type.CoreDomainType;
 import com.lilamaris.capstone.domain.model.common.domain.type.DomainType;
 import jakarta.persistence.Column;

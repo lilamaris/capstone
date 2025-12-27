@@ -2,8 +2,8 @@ package com.lilamaris.capstone.domain.model.capstone.course;
 
 import com.lilamaris.capstone.domain.model.capstone.course.id.CourseId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
-import com.lilamaris.capstone.domain.model.common.persistence.jpa.JpaAuditMetadata;
-import com.lilamaris.capstone.domain.model.common.persistence.jpa.JpaDescriptionMetadata;
+import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaAuditMetadata;
+import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaDescriptionMetadata;
 import com.lilamaris.capstone.domain.model.common.domain.id.DomainRef;
 import com.lilamaris.capstone.domain.model.common.defaults.DefaultDomainRef;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;

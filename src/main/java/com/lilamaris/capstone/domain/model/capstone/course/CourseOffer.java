@@ -7,7 +7,7 @@ import com.lilamaris.capstone.domain.model.common.domain.id.DomainRef;
 import com.lilamaris.capstone.domain.model.common.defaults.DefaultDomainRef;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Referenceable;
-import com.lilamaris.capstone.domain.model.common.persistence.jpa.JpaAuditMetadata;
+import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.domain.model.common.domain.type.ResourceDomainType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
