@@ -4,7 +4,7 @@ import com.lilamaris.capstone.application.port.in.AccessControlUseCase;
 import com.lilamaris.capstone.application.port.out.AccessControlPort;
 import com.lilamaris.capstone.domain.model.auth.access_control.AccessControl;
 import com.lilamaris.capstone.domain.model.auth.access_control.id.AccessControlId;
-import com.lilamaris.capstone.domain.model.common.event.ResourceCreated;
+import com.lilamaris.capstone.domain.model.common.event.canonical.ResourceCreated;
 import com.lilamaris.capstone.domain.model.common.event.actor.UserActor;
 import com.lilamaris.capstone.domain.model.common.id.IdGenerationContext;
 import lombok.RequiredArgsConstructor;

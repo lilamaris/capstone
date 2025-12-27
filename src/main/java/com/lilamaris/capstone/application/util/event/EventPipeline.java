@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.application.util.event;
 
-import com.lilamaris.capstone.domain.model.common.event.CollectedDomainEvent;
+import com.lilamaris.capstone.domain.model.common.event.aggregate.CollectedDomainEvent;
 import com.lilamaris.capstone.domain.model.common.event.DomainEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;

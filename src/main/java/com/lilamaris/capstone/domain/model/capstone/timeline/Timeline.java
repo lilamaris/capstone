@@ -8,7 +8,7 @@ import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
 import com.lilamaris.capstone.domain.model.common.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.domain.model.common.persistence.jpa.JpaDescriptionMetadata;
-import com.lilamaris.capstone.domain.model.common.event.CollectedDomainEvent;
+import com.lilamaris.capstone.domain.model.common.event.aggregate.CollectedDomainEvent;
 import com.lilamaris.capstone.domain.model.common.event.DomainEvent;
 import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import com.lilamaris.capstone.domain.timeline.exception.TimelineDomainException;

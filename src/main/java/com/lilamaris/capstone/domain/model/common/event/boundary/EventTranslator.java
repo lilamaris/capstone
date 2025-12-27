@@ -1,4 +1,6 @@
-package com.lilamaris.capstone.domain.model.common.event;
+package com.lilamaris.capstone.domain.model.common.event.boundary;
+
+import com.lilamaris.capstone.domain.model.common.event.DomainEvent;
 
 import java.util.List;
 
