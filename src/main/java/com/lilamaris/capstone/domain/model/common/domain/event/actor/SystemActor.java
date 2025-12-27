@@ -1,5 +1,8 @@
 package com.lilamaris.capstone.domain.model.common.domain.event.actor;
 
+import com.lilamaris.capstone.domain.model.common.defaults.DefaultExternalizableId;
+import com.lilamaris.capstone.domain.model.common.domain.id.ExternalizableId;
+
 public enum SystemActor implements CanonicalActor {
     INSTANCE;
 
@@ -9,7 +12,7 @@ public enum SystemActor implements CanonicalActor {
     }
 
     @Override
-    public String identifier() {
-        return "system";
+    public ExternalizableId id() {
+        return new DefaultExternalizableId("system");
     }
 }

@@ -1,5 +1,8 @@
 package com.lilamaris.capstone.domain.model.common.domain.event.actor;
 
+import com.lilamaris.capstone.domain.model.common.defaults.DefaultExternalizableId;
+import com.lilamaris.capstone.domain.model.common.domain.id.ExternalizableId;
+
 public record ServiceActor(String serviceName) implements CanonicalActor {
     @Override
     public ActorType type() {
@@ -7,7 +10,7 @@ public record ServiceActor(String serviceName) implements CanonicalActor {
     }
 
     @Override
-    public String identifier() {
-        return serviceName;
+    public ExternalizableId id() {
+        return new DefaultExternalizableId(serviceName);
     }
 }

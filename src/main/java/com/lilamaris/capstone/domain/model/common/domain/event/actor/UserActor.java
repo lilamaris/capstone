@@ -1,13 +1,15 @@
 package com.lilamaris.capstone.domain.model.common.domain.event.actor;
 
-public record UserActor(String userId) implements CanonicalActor {
+import com.lilamaris.capstone.domain.model.common.domain.id.ExternalizableId;
+
+public record UserActor(ExternalizableId userId) implements CanonicalActor {
     @Override
     public ActorType type() {
         return ActorType.USER;
     }
 
     @Override
-    public String identifier() {
+    public ExternalizableId id() {
         return userId;
     }
 }
