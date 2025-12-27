@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.domain.model.auth.access_control.id;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.lilamaris.capstone.domain.model.common.id.impl.DefaultUuidDomainId;
+import com.lilamaris.capstone.domain.model.common.defaults.DefaultUuidDomainId;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.domain.model.common.embed.impl;
+package com.lilamaris.capstone.domain.model.common.defaults;
 
 import com.lilamaris.capstone.domain.model.common.embed.AuditMetadata;
 

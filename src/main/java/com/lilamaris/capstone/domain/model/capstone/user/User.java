@@ -2,9 +2,9 @@ package com.lilamaris.capstone.domain.model.capstone.user;
 
 import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
-import com.lilamaris.capstone.domain.model.common.embed.impl.jpa.JpaAuditMetadata;
+import com.lilamaris.capstone.domain.model.common.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.domain.model.common.id.DomainRef;
-import com.lilamaris.capstone.domain.model.common.id.impl.DefaultDomainRef;
+import com.lilamaris.capstone.domain.model.common.defaults.DefaultDomainRef;
 import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import com.lilamaris.capstone.domain.model.common.mixin.Referenceable;
 import com.lilamaris.capstone.domain.model.common.type.CoreDomainType;

@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.domain.model.auth.refreshToken.id;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.lilamaris.capstone.domain.model.common.id.impl.DefaultStringDomainId;
+import com.lilamaris.capstone.domain.model.common.defaults.DefaultStringDomainId;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

@@ -1,5 +1,6 @@
-package com.lilamaris.capstone.domain.model.common.id.impl;
+package com.lilamaris.capstone.domain.model.common.persistence.jpa;
 
+import com.lilamaris.capstone.domain.model.common.defaults.DefaultDomainRef;
 import com.lilamaris.capstone.domain.model.common.id.DomainId;
 import com.lilamaris.capstone.domain.model.common.id.DomainRef;
 import com.lilamaris.capstone.domain.model.common.mixin.ToPojo;

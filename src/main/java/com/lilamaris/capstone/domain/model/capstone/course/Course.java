@@ -2,10 +2,10 @@ package com.lilamaris.capstone.domain.model.capstone.course;
 
 import com.lilamaris.capstone.domain.model.capstone.course.id.CourseId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
-import com.lilamaris.capstone.domain.model.common.embed.impl.jpa.JpaAuditMetadata;
-import com.lilamaris.capstone.domain.model.common.embed.impl.jpa.JpaDescriptionMetadata;
+import com.lilamaris.capstone.domain.model.common.persistence.jpa.JpaAuditMetadata;
+import com.lilamaris.capstone.domain.model.common.persistence.jpa.JpaDescriptionMetadata;
 import com.lilamaris.capstone.domain.model.common.id.DomainRef;
-import com.lilamaris.capstone.domain.model.common.id.impl.DefaultDomainRef;
+import com.lilamaris.capstone.domain.model.common.defaults.DefaultDomainRef;
 import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import com.lilamaris.capstone.domain.model.common.mixin.Referenceable;
 import com.lilamaris.capstone.domain.model.common.type.ResourceDomainType;
@@ -38,7 +38,7 @@ public class Course implements Identifiable<CourseId>, Referenceable {
     private List<CourseOffer> courseOfferList;
 
     @Embedded
-    private JpaAuditMetadata audit;
+    private final JpaAuditMetadata audit = new JpaAuditMetadata();
 
     @Embedded
     private JpaDescriptionMetadata descriptionMetadata;

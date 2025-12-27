@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.domain.model.common.id.impl;
+package com.lilamaris.capstone.domain.model.common.defaults;
 
 import com.lilamaris.capstone.domain.model.common.id.AbstractDomainId;
 import lombok.AccessLevel;

@@ -3,7 +3,7 @@ package com.lilamaris.capstone.domain.model.auth.account;
 import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.domain.model.auth.account.id.AccountId;
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
-import com.lilamaris.capstone.domain.model.common.embed.impl.jpa.JpaAuditMetadata;
+import com.lilamaris.capstone.domain.model.common.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

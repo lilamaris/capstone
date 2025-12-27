@@ -3,11 +3,11 @@ package com.lilamaris.capstone.domain.model.capstone.course;
 import com.lilamaris.capstone.domain.model.capstone.course.id.CourseId;
 import com.lilamaris.capstone.domain.model.capstone.course.id.CourseOfferId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
-import com.lilamaris.capstone.domain.model.common.embed.impl.jpa.JpaDefaultAuditableDomain;
 import com.lilamaris.capstone.domain.model.common.id.DomainRef;
-import com.lilamaris.capstone.domain.model.common.id.impl.DefaultDomainRef;
+import com.lilamaris.capstone.domain.model.common.defaults.DefaultDomainRef;
 import com.lilamaris.capstone.domain.model.common.mixin.Identifiable;
 import com.lilamaris.capstone.domain.model.common.mixin.Referenceable;
+import com.lilamaris.capstone.domain.model.common.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.domain.model.common.type.ResourceDomainType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -22,7 +22,7 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 @Entity
 @Table(name = "_course_offer")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CourseOffer extends JpaDefaultAuditableDomain implements Identifiable<CourseOfferId>, Referenceable {
+public class CourseOffer implements Identifiable<CourseOfferId>, Referenceable {
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
@@ -35,6 +35,9 @@ public class CourseOffer extends JpaDefaultAuditableDomain implements Identifiab
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "snapshot_id", insertable = false, nullable = false, updatable = false))
     private SnapshotId snapshotId;
+
+    @Embedded
+    private final JpaAuditMetadata audit = new JpaAuditMetadata();
 
     private Integer credit;
 

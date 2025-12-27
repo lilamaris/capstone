@@ -2,8 +2,8 @@ package com.lilamaris.capstone.domain.model.capstone.timeline.id;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.lilamaris.capstone.domain.model.common.id.DomainRef;
-import com.lilamaris.capstone.domain.model.common.id.impl.DefaultDomainRef;
-import com.lilamaris.capstone.domain.model.common.id.impl.DefaultUuidDomainId;
+import com.lilamaris.capstone.domain.model.common.defaults.DefaultDomainRef;
+import com.lilamaris.capstone.domain.model.common.defaults.DefaultUuidDomainId;
 import com.lilamaris.capstone.domain.model.common.mixin.Referenceable;
 import com.lilamaris.capstone.domain.model.common.type.CoreDomainType;
 import jakarta.persistence.Embeddable;
