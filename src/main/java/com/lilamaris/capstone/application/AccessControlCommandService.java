@@ -4,12 +4,13 @@ import com.lilamaris.capstone.application.port.in.AccessControlUseCase;
 import com.lilamaris.capstone.application.port.out.AccessControlPort;
 import com.lilamaris.capstone.domain.model.auth.access_control.AccessControl;
 import com.lilamaris.capstone.domain.model.auth.access_control.id.AccessControlId;
-import com.lilamaris.capstone.domain.model.common.domain.event.actor.UserActor;
-import com.lilamaris.capstone.domain.model.common.domain.event.canonical.ResourceCreated;
+import com.lilamaris.capstone.domain.model.common.domain.event.canonical.ResourceGranted;
 import com.lilamaris.capstone.domain.model.common.domain.id.IdGenerationContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,10 +18,15 @@ public class AccessControlCommandService implements AccessControlUseCase {
     private final AccessControlPort accessControlPort;
     private final IdGenerationContext ids;
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @EventListener
-    public void onResourceCreated(ResourceCreated e) {
-        var userActor = (UserActor) e.actor();
-        var domain = AccessControl.create(null, e.ref(), "owner", () -> ids.next(AccessControlId.class));
-
+    public void onResourceGranted(ResourceGranted e) {
+        var domain = AccessControl.create(
+                e.grantee(),
+                e.ref(),
+                e.scopedRole(),
+                () -> ids.next(AccessControlId.class)
+        );
+        accessControlPort.save(domain);
     }
 }

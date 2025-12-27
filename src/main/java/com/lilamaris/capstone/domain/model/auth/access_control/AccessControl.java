@@ -1,10 +1,11 @@
 package com.lilamaris.capstone.domain.model.auth.access_control;
 
 import com.lilamaris.capstone.domain.model.auth.access_control.id.AccessControlId;
-import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
+import com.lilamaris.capstone.domain.model.common.domain.event.actor.CanonicalActor;
 import com.lilamaris.capstone.domain.model.common.domain.event.aggregate.AggregateEvent;
 import com.lilamaris.capstone.domain.model.common.domain.id.DomainRef;
+import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaActor;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaDomainRef;
 import jakarta.persistence.*;
@@ -33,14 +34,17 @@ public class AccessControl implements Identifiable<AccessControlId> {
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private AccessControlId id;
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "user_id", insertable = false, updatable = false))
-    private UserId userId;
+    @AttributeOverrides({
+            @AttributeOverride(name = "type", column = @Column(name = "actor_type")),
+            @AttributeOverride(name = "id", column = @Column(name = "actor_id"))
+    })
+    private JpaActor actor;
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "type", column = @Column(name = "resource_type")),
             @AttributeOverride(name = "id", column = @Column(name = "resource_id"))
     })
-    private JpaDomainRef resourceRef;
+    private JpaDomainRef resource;
     private String scopedRole;
 
     @Transient
@@ -48,24 +52,25 @@ public class AccessControl implements Identifiable<AccessControlId> {
 
     protected AccessControl(
             AccessControlId id,
-            UserId userId,
-            JpaDomainRef resourceRef,
+            JpaActor actor,
+            JpaDomainRef resource,
             String scopedRole
     ) {
         this.id = requireField(id, "id");
-        this.userId = requireField(userId, "userId");
-        this.resourceRef = requireField(resourceRef, "resourceRef");
+        this.actor = requireField(actor, "actor");
+        this.resource = requireField(resource, "resourceRef");
         this.scopedRole = requireField(scopedRole, "scopedRole");
     }
 
     public static AccessControl create(
-            UserId userId,
+            CanonicalActor actor,
             DomainRef resourceRef,
             String scopedRole,
             Supplier<AccessControlId> idSupplier
     ) {
+        var act = JpaActor.from(actor);
         var ref = JpaDomainRef.from(resourceRef);
-        var accessControl = new AccessControl(idSupplier.get(), userId, ref, scopedRole);
+        var accessControl = new AccessControl(idSupplier.get(), act, ref, scopedRole);
         accessControl.registerCreated();
         return accessControl;
     }

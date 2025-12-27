@@ -6,4 +6,9 @@ public interface DomainRef {
     DomainType type();
 
     ExternalizableId id();
+
+    default boolean sameIdentity(DomainRef other) {
+        return type() == other.type()
+                && id().asString().equals(other.id().asString());
+    }
 }

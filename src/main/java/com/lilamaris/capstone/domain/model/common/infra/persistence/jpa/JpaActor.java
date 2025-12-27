@@ -11,8 +11,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.util.Objects;
-
 import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 
 @ToString
@@ -46,23 +44,14 @@ public class JpaActor implements CanonicalActor, ToPojo<CanonicalActor> {
 
     @Override
     public ExternalizableId id() {
+        if (externalizableId == null) {
+            externalizableId = new DefaultExternalizableId(id);
+        }
         return externalizableId;
     }
 
     @Override
     public CanonicalActor toPOJO() {
-        return new DefaultActor(type, externalizableId);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof CanonicalActor other)) return false;
-        return type.equals(other.type()) && id.equals(other.id().asString());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(type, id);
+        return new DefaultActor(type, id());
     }
 }

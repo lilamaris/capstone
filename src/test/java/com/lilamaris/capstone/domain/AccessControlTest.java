@@ -6,6 +6,8 @@ import com.lilamaris.capstone.domain.model.auth.access_control.id.AccessControlI
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Referenceable;
+import com.lilamaris.capstone.domain.model.common.domain.event.actor.CanonicalActor;
+import com.lilamaris.capstone.domain.model.common.domain.event.actor.UserActor;
 import com.lilamaris.capstone.domain.model.common.domain.id.IdGenerationContext;
 import com.lilamaris.capstone.util.SequentialUuidGenerator;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,8 +21,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class AccessControlTest {
     private static final Logger log = LoggerFactory.getLogger(AccessControlTest.class);
-    private UserId userId1;
-    private UserId userId2;
+    private CanonicalActor actor;
     private Referenceable referenceable;
 
     private IdGenerationContext ids;
@@ -42,18 +43,17 @@ public class AccessControlTest {
         timelineIdSupplier = () -> ids.next(TimelineId.class);
         userIdSupplier = () -> ids.next(UserId.class);
 
-        userId1 = userIdSupplier.get();
-        userId2 = userIdSupplier.get();
+        actor = UserActor.of(userIdSupplier.get());
         referenceable = timelineIdSupplier.get();
     }
 
     @Test
     void should_create() {
         var ref = referenceable.ref();
-        var accessControl = AccessControl.create(userId1, ref, "test", accessControlIdSupplier);
+        var accessControl = AccessControl.create(actor, ref, "test", accessControlIdSupplier);
 
         log.info("AccessControl: {}", accessControl);
-        assertThat(accessControl.getUserId()).isEqualTo(userId1);
-        assertThat(accessControl.getResourceRef()).isEqualTo(ref);
+        assertThat(accessControl.getActor().sameIdentity(actor)).isTrue();
+        assertThat(accessControl.getResource().sameIdentity(ref));
     }
 }

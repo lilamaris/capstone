@@ -1,11 +1,11 @@
 package com.lilamaris.capstone.adapter.out.jpa;
 
-import com.lilamaris.capstone.adapter.out.jpa.mapper.AccessControlEntityMapper;
 import com.lilamaris.capstone.adapter.out.jpa.repository.AccessControlRepository;
 import com.lilamaris.capstone.application.port.out.AccessControlPort;
-import com.lilamaris.capstone.domain.access_control.AccessControl;
-import com.lilamaris.capstone.domain.embed.DomainRef;
-import com.lilamaris.capstone.domain.user.User;
+import com.lilamaris.capstone.domain.model.auth.access_control.AccessControl;
+import com.lilamaris.capstone.domain.model.auth.access_control.id.AccessControlId;
+import com.lilamaris.capstone.domain.model.common.domain.event.actor.CanonicalActor;
+import com.lilamaris.capstone.domain.model.common.domain.id.DomainRef;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -17,29 +17,27 @@ public class AccessControlPersistenceAdapter implements AccessControlPort {
     private final AccessControlRepository repository;
 
     @Override
-    public boolean hasGrant(User.Id userId, DomainRef domainRef, String scopedRole) {
-        return repository.existsByUserIdAndResourceIdAndResourceTypeAndScopedRole(
-                userId.getValue(),
-                domainRef.id(),
+    public boolean hasGrant(CanonicalActor actor, DomainRef domainRef, String scopedRole) {
+        return repository.existsByActor_TypeAndActor_IdAndResource_TypeAndResource_IdAndScopedRole(
+                actor.type(),
+                actor.id().asString(),
                 domainRef.type(),
-                scopedRole
-        );
+                domainRef.id().asString(),
+                scopedRole);
     }
 
     @Override
-    public Optional<AccessControl> getById(AccessControl.Id id) {
-        return repository.findById(id.getValue()).map(AccessControlEntityMapper::toDomain);
-    }
-
-    @Override
-    public void delete(AccessControl.Id id) {
-        repository.deleteById(id.getValue());
+    public Optional<AccessControl> getById(AccessControlId id) {
+        return repository.findById(id);
     }
 
     @Override
     public AccessControl save(AccessControl domain) {
-        var entity = AccessControlEntityMapper.toEntity(domain);
-        var saved = repository.save(entity);
-        return AccessControlEntityMapper.toDomain(saved);
+        return repository.save(domain);
+    }
+
+    @Override
+    public void delete(AccessControlId id) {
+        repository.deleteById(id);
     }
 }

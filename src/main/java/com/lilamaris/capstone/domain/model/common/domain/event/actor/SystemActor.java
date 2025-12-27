@@ -6,6 +6,8 @@ import com.lilamaris.capstone.domain.model.common.domain.id.ExternalizableId;
 public enum SystemActor implements CanonicalActor {
     INSTANCE;
 
+    private final ExternalizableId id = new DefaultExternalizableId("system");
+
     @Override
     public ActorType type() {
         return ActorType.SYSTEM;
@@ -13,6 +15,6 @@ public enum SystemActor implements CanonicalActor {
 
     @Override
     public ExternalizableId id() {
-        return new DefaultExternalizableId("system");
+        return id;
     }
 }

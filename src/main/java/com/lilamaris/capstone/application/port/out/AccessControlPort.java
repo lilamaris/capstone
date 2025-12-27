@@ -1,17 +1,18 @@
 package com.lilamaris.capstone.application.port.out;
 
-import com.lilamaris.capstone.domain.access_control.AccessControl;
-import com.lilamaris.capstone.domain.embed.DomainRef;
-import com.lilamaris.capstone.domain.user.User;
+import com.lilamaris.capstone.domain.model.auth.access_control.AccessControl;
+import com.lilamaris.capstone.domain.model.auth.access_control.id.AccessControlId;
+import com.lilamaris.capstone.domain.model.common.domain.event.actor.CanonicalActor;
+import com.lilamaris.capstone.domain.model.common.domain.id.DomainRef;
 
 import java.util.Optional;
 
 public interface AccessControlPort {
-    boolean hasGrant(User.Id userId, DomainRef domainRef, String scopedRole);
+    boolean hasGrant(CanonicalActor actor, DomainRef domainRef, String scopedRole);
 
-    Optional<AccessControl> getById(AccessControl.Id id);
+    Optional<AccessControl> getById(AccessControlId id);
 
     AccessControl save(AccessControl domain);
 
-    void delete(AccessControl.Id id);
+    void delete(AccessControlId id);
 }

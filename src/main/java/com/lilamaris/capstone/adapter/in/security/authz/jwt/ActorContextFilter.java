@@ -27,7 +27,7 @@ public class ActorContextFilter extends OncePerRequestFilter {
             var auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth != null) {
                 var principal = (SecurityUserDetails) auth.getPrincipal();
-                CanonicalActor actor = new UserActor(principal.getUserId().toString());
+                CanonicalActor actor = UserActor.of(principal.getUserId().toString());
                 ActorContext.set(actor);
             }
 
