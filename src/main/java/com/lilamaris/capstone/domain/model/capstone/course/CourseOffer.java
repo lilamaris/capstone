@@ -19,22 +19,18 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 @Table(name = "_course_offer")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CourseOffer implements Identifiable<CourseOfferId> {
+    @Embedded
+    private final JpaAuditMetadata audit = new JpaAuditMetadata();
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private CourseOfferId id;
-
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "course_id", insertable = false, nullable = false, updatable = false))
     private CourseId courseId;
-
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "snapshot_id", insertable = false, nullable = false, updatable = false))
     private SnapshotId snapshotId;
-
-    @Embedded
-    private final JpaAuditMetadata audit = new JpaAuditMetadata();
-
     private Integer credit;
 
     private CourseOffer(CourseOfferId id, CourseId courseId, SnapshotId snapshotId, Integer credit) {

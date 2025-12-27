@@ -2,8 +2,8 @@ package com.lilamaris.capstone.domain.model.capstone.user;
 
 import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
-import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
+import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaAuditMetadata;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

@@ -2,9 +2,9 @@ package com.lilamaris.capstone.domain.model.capstone.course;
 
 import com.lilamaris.capstone.domain.model.capstone.course.id.CourseId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
+import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaDescriptionMetadata;
-import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -24,18 +24,15 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 @Table(name = "course_root")
 @EntityListeners(AuditingEntityListener.class)
 public class Course implements Identifiable<CourseId> {
+    @Embedded
+    private final JpaAuditMetadata audit = new JpaAuditMetadata();
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private CourseId id;
-
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "course_id", nullable = false)
     private List<CourseOffer> courseOfferList;
-
-    @Embedded
-    private final JpaAuditMetadata audit = new JpaAuditMetadata();
-
     @Embedded
     private JpaDescriptionMetadata descriptionMetadata;
 

@@ -6,11 +6,11 @@ import com.lilamaris.capstone.domain.model.capstone.timeline.event.TimelineCreat
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
+import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
+import com.lilamaris.capstone.domain.model.common.domain.event.DomainEvent;
+import com.lilamaris.capstone.domain.model.common.domain.event.aggregate.CollectedDomainEvent;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaDescriptionMetadata;
-import com.lilamaris.capstone.domain.model.common.domain.event.aggregate.CollectedDomainEvent;
-import com.lilamaris.capstone.domain.model.common.domain.event.DomainEvent;
-import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
 import com.lilamaris.capstone.domain.timeline.exception.TimelineDomainException;
 import com.lilamaris.capstone.domain.timeline.exception.TimelineErrorCode;
 import jakarta.persistence.*;

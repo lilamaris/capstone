@@ -1,10 +1,10 @@
 package com.lilamaris.capstone.domain.model.capstone.timeline.id;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.lilamaris.capstone.domain.model.common.domain.id.DomainRef;
 import com.lilamaris.capstone.domain.model.common.defaults.DefaultDomainRef;
 import com.lilamaris.capstone.domain.model.common.defaults.DefaultUuidDomainId;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Referenceable;
+import com.lilamaris.capstone.domain.model.common.domain.id.DomainRef;
 import com.lilamaris.capstone.domain.model.common.domain.id.ExternalizableId;
 import com.lilamaris.capstone.domain.model.common.domain.type.CoreDomainType;
 import jakarta.persistence.Embeddable;

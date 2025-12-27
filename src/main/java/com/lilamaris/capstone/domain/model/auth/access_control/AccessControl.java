@@ -2,11 +2,11 @@ package com.lilamaris.capstone.domain.model.auth.access_control;
 
 import com.lilamaris.capstone.domain.model.auth.access_control.id.AccessControlId;
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
-import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaAuditMetadata;
+import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
 import com.lilamaris.capstone.domain.model.common.domain.event.aggregate.AggregateEvent;
 import com.lilamaris.capstone.domain.model.common.domain.id.DomainRef;
+import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaDomainRef;
-import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

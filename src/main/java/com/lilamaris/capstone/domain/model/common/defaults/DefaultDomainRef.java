@@ -14,6 +14,7 @@ public record DefaultDomainRef(DomainType type, ExternalizableId id) implements 
         return type.equals(other.type())
                 && id().asString().equals(other.id().asString());
     }
+
     @Override
     public int hashCode() {
         return Objects.hash(type, id().asString());
