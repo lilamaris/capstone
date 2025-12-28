@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.application.config.access_control.privilege.course;
 
-import com.lilamaris.capstone.application.util.policy.AccessManageable;
-import com.lilamaris.capstone.application.util.policy.DomainAction;
+import com.lilamaris.capstone.application.policy.access_control.AccessManageable;
+import com.lilamaris.capstone.application.policy.access_control.DomainAction;
 
 public enum CourseAction implements DomainAction, AccessManageable {
     READ,

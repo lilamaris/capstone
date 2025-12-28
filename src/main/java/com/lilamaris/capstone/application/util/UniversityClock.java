@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.application.util;
 
-import com.lilamaris.capstone.application.config.ApplicationContext;
+import com.lilamaris.capstone.application.context.ApplicationContext;
 import com.lilamaris.capstone.domain.embed.Effective;
 import org.springframework.stereotype.Component;
 

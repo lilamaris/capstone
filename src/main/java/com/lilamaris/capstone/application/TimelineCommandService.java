@@ -1,13 +1,14 @@
 package com.lilamaris.capstone.application;
 
-import com.lilamaris.capstone.application.config.ActorContext;
 import com.lilamaris.capstone.application.config.access_control.privilege.timeline.TimelineAction;
+import com.lilamaris.capstone.application.context.ActorContext;
 import com.lilamaris.capstone.application.exception.ResourceNotFoundException;
+import com.lilamaris.capstone.application.policy.access_control.DomainAuthorizer;
+import com.lilamaris.capstone.application.policy.identity.IdGenerationContext;
 import com.lilamaris.capstone.application.port.in.TimelineCommandUseCase;
 import com.lilamaris.capstone.application.port.in.result.TimelineResult;
 import com.lilamaris.capstone.application.port.out.TimelinePort;
 import com.lilamaris.capstone.application.util.UniversityClock;
-import com.lilamaris.capstone.application.util.policy.DomainAuthorizer;
 import com.lilamaris.capstone.domain.model.capstone.timeline.Timeline;
 import com.lilamaris.capstone.domain.model.capstone.timeline.embed.Effective;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
@@ -15,7 +16,6 @@ import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
 import com.lilamaris.capstone.domain.model.common.defaults.DefaultDescriptionMetadata;
 import com.lilamaris.capstone.domain.model.common.domain.event.actor.CanonicalActor;
-import com.lilamaris.capstone.domain.model.common.domain.id.IdGenerationContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

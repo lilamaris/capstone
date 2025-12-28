@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.domain.embed;
 
-import com.lilamaris.capstone.application.config.ApplicationContext;
+import com.lilamaris.capstone.application.context.ApplicationContext;
 import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import lombok.Builder;
 

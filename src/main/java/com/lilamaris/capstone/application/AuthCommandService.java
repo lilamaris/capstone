@@ -1,11 +1,12 @@
 package com.lilamaris.capstone.application;
 
 import com.lilamaris.capstone.application.exception.ResourceAlreadyExistsException;
+import com.lilamaris.capstone.application.policy.identity.IdGenerationContext;
 import com.lilamaris.capstone.application.port.in.AuthCommandUseCase;
 import com.lilamaris.capstone.application.port.in.result.AuthResult;
 import com.lilamaris.capstone.application.port.out.AccountPort;
 import com.lilamaris.capstone.application.port.out.UserPort;
-import com.lilamaris.capstone.application.util.auth.*;
+import com.lilamaris.capstone.application.resolver.auth.*;
 import com.lilamaris.capstone.domain.model.auth.account.Account;
 import com.lilamaris.capstone.domain.model.auth.account.Provider;
 import com.lilamaris.capstone.domain.model.auth.account.id.AccountId;
@@ -13,7 +14,6 @@ import com.lilamaris.capstone.domain.model.auth.refreshToken.id.RefreshTokenId;
 import com.lilamaris.capstone.domain.model.capstone.user.Role;
 import com.lilamaris.capstone.domain.model.capstone.user.User;
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
-import com.lilamaris.capstone.domain.model.common.domain.id.IdGenerationContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

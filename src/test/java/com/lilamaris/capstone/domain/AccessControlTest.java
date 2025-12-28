@@ -1,6 +1,7 @@
 package com.lilamaris.capstone.domain;
 
-import com.lilamaris.capstone.application.util.generator.DefaultIdGenerationContext;
+import com.lilamaris.capstone.application.policy.identity.IdGenerationContext;
+import com.lilamaris.capstone.application.policy.identity.defaults.DefaultIdGenerationContext;
 import com.lilamaris.capstone.domain.model.auth.access_control.AccessControl;
 import com.lilamaris.capstone.domain.model.auth.access_control.id.AccessControlId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
@@ -8,7 +9,6 @@ import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Referenceable;
 import com.lilamaris.capstone.domain.model.common.domain.event.actor.CanonicalActor;
 import com.lilamaris.capstone.domain.model.common.domain.event.actor.UserActor;
-import com.lilamaris.capstone.domain.model.common.domain.id.IdGenerationContext;
 import com.lilamaris.capstone.util.SequentialUuidGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
