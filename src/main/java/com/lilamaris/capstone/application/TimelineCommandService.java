@@ -13,12 +13,12 @@ import com.lilamaris.capstone.domain.model.capstone.timeline.embed.Effective;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
-import com.lilamaris.capstone.domain.model.capstone.timeline.policy.TimelineAction;
-import com.lilamaris.capstone.domain.model.capstone.timeline.policy.TimelineRole;
+import com.lilamaris.capstone.application.util.policy.timeline.TimelineAction;
+import com.lilamaris.capstone.application.util.policy.timeline.TimelineRole;
 import com.lilamaris.capstone.domain.model.common.defaults.DefaultDescriptionMetadata;
 import com.lilamaris.capstone.domain.model.common.domain.event.actor.CanonicalActor;
 import com.lilamaris.capstone.domain.model.common.domain.id.IdGenerationContext;
-import com.lilamaris.capstone.domain.model.common.domain.policy.DomainPolicyContext;
+import com.lilamaris.capstone.application.util.policy.DomainPolicyContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

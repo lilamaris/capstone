@@ -2,7 +2,7 @@ package com.lilamaris.capstone.application.util.event.translator;
 
 import com.lilamaris.capstone.application.config.ActorContext;
 import com.lilamaris.capstone.domain.model.capstone.timeline.event.TimelineCreated;
-import com.lilamaris.capstone.domain.model.capstone.timeline.policy.TimelineRole;
+import com.lilamaris.capstone.application.util.policy.timeline.TimelineRole;
 import com.lilamaris.capstone.domain.model.common.domain.event.DomainEvent;
 import com.lilamaris.capstone.domain.model.common.domain.event.boundary.EventTranslator;
 import com.lilamaris.capstone.domain.model.common.domain.event.canonical.ResourceCreated;

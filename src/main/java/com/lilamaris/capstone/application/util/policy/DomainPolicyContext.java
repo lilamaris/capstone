@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.domain.model.common.domain.policy;
+package com.lilamaris.capstone.application.util.policy;
 
 public interface DomainPolicyContext {
     boolean can(DomainRole role, DomainAction action);
