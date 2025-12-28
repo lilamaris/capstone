@@ -6,7 +6,7 @@ import com.lilamaris.capstone.application.port.in.TimelineCommandUseCase;
 import com.lilamaris.capstone.application.port.in.result.TimelineResult;
 import com.lilamaris.capstone.application.port.out.TimelinePort;
 import com.lilamaris.capstone.application.util.UniversityClock;
-import com.lilamaris.capstone.application.util.policy.DomainPermissionGuard;
+import com.lilamaris.capstone.application.util.policy.DomainAuthorizer;
 import com.lilamaris.capstone.application.util.policy.timeline.TimelineAction;
 import com.lilamaris.capstone.domain.model.capstone.timeline.Timeline;
 import com.lilamaris.capstone.domain.model.capstone.timeline.embed.Effective;
@@ -27,7 +27,7 @@ public class TimelineCommandService implements TimelineCommandUseCase {
     private final TimelinePort timelinePort;
 
     private final IdGenerationContext ids;
-    private final DomainPermissionGuard timelinePermissionGuard;
+    private final DomainAuthorizer timelineAuthorizer;
 
     @Override
     public TimelineResult.Command create(String title, String details) {
@@ -42,7 +42,7 @@ public class TimelineCommandService implements TimelineCommandUseCase {
     @Override
     public TimelineResult.Command update(TimelineId id, String title, String details) {
         CanonicalActor actor = ActorContext.get();
-        timelinePermissionGuard.check(actor, id.ref(), TimelineAction.UPDATE_METADATA);
+        timelineAuthorizer.authorize(actor, id.ref(), TimelineAction.UPDATE_METADATA);
 
         var timeline = timelinePort.getById(id).orElseThrow(() -> new ResourceNotFoundException(
                 String.format("Timeline with id '%s' not found.", id)
@@ -56,7 +56,7 @@ public class TimelineCommandService implements TimelineCommandUseCase {
     @Override
     public TimelineResult.Command migrate(TimelineId id, LocalDateTime validAt, String details) {
         CanonicalActor actor = ActorContext.get();
-
+        timelineAuthorizer.authorize(actor, id.ref(), TimelineAction.MIGRATE);
 
         var timeline = timelinePort.getById(id).orElseThrow(() -> new ResourceNotFoundException(
                 String.format("Timeline with id '%s' not found.", id)
@@ -76,6 +76,9 @@ public class TimelineCommandService implements TimelineCommandUseCase {
 
     @Override
     public TimelineResult.Command merge(TimelineId id, LocalDateTime validFrom, LocalDateTime validTo, String details) {
+        CanonicalActor actor = ActorContext.get();
+        timelineAuthorizer.authorize(actor, id.ref(), TimelineAction.MERGE);
+
         var timeline = timelinePort.getById(id).orElseThrow(() -> new ResourceNotFoundException(
                 String.format("Timeline with id '%s' not found.", id)
         ));

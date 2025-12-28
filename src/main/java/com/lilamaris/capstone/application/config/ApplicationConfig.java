@@ -6,12 +6,12 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.lilamaris.capstone.application.port.out.AccessControlPort;
 import com.lilamaris.capstone.application.util.generator.DefaultIdGenerationContext;
 import com.lilamaris.capstone.application.util.generator.OpaqueTokenRawGenerator;
-import com.lilamaris.capstone.application.util.policy.DefaultPermissionGuard;
+import com.lilamaris.capstone.application.util.policy.DefaultAuthorizer;
 import com.lilamaris.capstone.application.util.policy.DefaultRoleTranslator;
-import com.lilamaris.capstone.application.util.policy.DomainPermissionGuard;
+import com.lilamaris.capstone.application.util.policy.DomainAuthorizer;
 import com.lilamaris.capstone.application.util.policy.RoleTranslator;
 import com.lilamaris.capstone.application.util.policy.timeline.TimelineAction;
-import com.lilamaris.capstone.application.util.policy.timeline.TimelinePermissionRegistry;
+import com.lilamaris.capstone.application.util.policy.timeline.TimelinePolicy;
 import com.lilamaris.capstone.application.util.policy.timeline.TimelineRole;
 import com.lilamaris.capstone.domain.model.auth.access_control.id.AccessControlId;
 import com.lilamaris.capstone.domain.model.auth.account.id.AccountId;
@@ -71,11 +71,11 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public TimelinePermissionRegistry timelinePolicyResolver() {
-        var resolver = new TimelinePermissionRegistry();
-        resolver.register(TimelineRole.VIEWER, Set.of(TimelineAction.READ));
-        resolver.register(TimelineRole.CONTRIBUTOR, Set.of(TimelineAction.UPDATE_METADATA));
-        resolver.register(TimelineRole.MAINTAINER, Set.of(TimelineAction.MIGRATE, TimelineAction.MERGE));
+    public TimelinePolicy timelinePolicy() {
+        var resolver = new TimelinePolicy();
+        resolver.allow(TimelineRole.VIEWER, Set.of(TimelineAction.READ));
+        resolver.allow(TimelineRole.CONTRIBUTOR, Set.of(TimelineAction.UPDATE_METADATA));
+        resolver.allow(TimelineRole.MAINTAINER, Set.of(TimelineAction.MIGRATE, TimelineAction.MERGE));
         resolver.extend(TimelineRole.CONTRIBUTOR, TimelineRole.VIEWER);
         resolver.extend(TimelineRole.MAINTAINER, TimelineRole.CONTRIBUTOR);
 
@@ -88,11 +88,11 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public DomainPermissionGuard timelinePermissionGuard(
+    public DomainAuthorizer timelineAuthorizer(
             AccessControlPort port,
-            TimelinePermissionRegistry registry,
+            TimelinePolicy registry,
             RoleTranslator timelineRoleTranslator
     ) {
-        return new DefaultPermissionGuard(port, registry, timelineRoleTranslator);
+        return new DefaultAuthorizer(port, registry, timelineRoleTranslator);
     }
 }

@@ -7,17 +7,17 @@ import com.lilamaris.capstone.domain.model.common.domain.id.DomainRef;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class DefaultPermissionGuard implements DomainPermissionGuard {
+public class DefaultAuthorizer implements DomainAuthorizer {
     private final AccessControlPort accessControlPort;
-    private final DomainPermissionRegistry registry;
+    private final DomainPolicy registry;
     private final RoleTranslator roleTranslator;
 
     @Override
-    public void check(CanonicalActor actor, DomainRef ref, DomainAction action) {
+    public void authorize(CanonicalActor actor, DomainRef ref, DomainAction action) {
         var accessControl = accessControlPort.getBy(actor, ref)
                 .orElseThrow(ResourceForbiddenException::new);
         var role = roleTranslator.toRoleName(accessControl.getScopedRole());
-        if (!registry.can(role, action)) {
+        if (!registry.allows(role, action)) {
             throw new ResourceForbiddenException();
         }
     }
