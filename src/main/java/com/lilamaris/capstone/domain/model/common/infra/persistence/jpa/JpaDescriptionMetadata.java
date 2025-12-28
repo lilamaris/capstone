@@ -32,6 +32,10 @@ public class JpaDescriptionMetadata implements DescriptionMetadata, ToPojo<Descr
         return new JpaDescriptionMetadata(title, details);
     }
 
+    public static JpaDescriptionMetadata from(DescriptionMetadata descriptionMetadata) {
+        return new JpaDescriptionMetadata(descriptionMetadata.title(), descriptionMetadata.details());
+    }
+
     @Override
     public String title() {
         return title;

@@ -30,6 +30,10 @@ public class ApplicationExceptionTranslator {
             log.warn("Resource not found: {}: {}", e.getCode(), e.getMessage(), e);
             throw e;
 
+        } catch (ResourceForbiddenException e) {
+            log.warn("Resource forbidden: {}: {}", e.getCode(), e.getMessage(), e);
+            throw e;
+
         } catch (ApplicationInvariantException e) {
             log.warn("Application invariant: {}: {}", e.getCode(), e.getMessage(), e);
             throw e;

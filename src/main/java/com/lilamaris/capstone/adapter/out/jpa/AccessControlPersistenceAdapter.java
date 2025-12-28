@@ -17,18 +17,18 @@ public class AccessControlPersistenceAdapter implements AccessControlPort {
     private final AccessControlRepository repository;
 
     @Override
-    public boolean hasGrant(CanonicalActor actor, DomainRef domainRef, String scopedRole) {
-        return repository.existsByActor_TypeAndActor_IdAndResource_TypeAndResource_IdAndScopedRole(
-                actor.type(),
-                actor.id().asString(),
-                domainRef.type(),
-                domainRef.id().asString(),
-                scopedRole);
+    public Optional<AccessControl> getById(AccessControlId id) {
+        return repository.findById(id);
     }
 
     @Override
-    public Optional<AccessControl> getById(AccessControlId id) {
-        return repository.findById(id);
+    public Optional<AccessControl> getBy(CanonicalActor actor, DomainRef ref) {
+        return repository.findByActor_TypeAndActor_IdAndResource_TypeAndResource_Id(
+                actor.type(),
+                actor.id().asString(),
+                ref.type(),
+                ref.id().asString()
+        );
     }
 
     @Override

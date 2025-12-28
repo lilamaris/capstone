@@ -8,9 +8,9 @@ import com.lilamaris.capstone.domain.model.common.domain.id.DomainRef;
 import java.util.Optional;
 
 public interface AccessControlPort {
-    boolean hasGrant(CanonicalActor actor, DomainRef domainRef, String scopedRole);
-
     Optional<AccessControl> getById(AccessControlId id);
+
+    Optional<AccessControl> getBy(CanonicalActor actor, DomainRef ref);
 
     AccessControl save(AccessControl domain);
 

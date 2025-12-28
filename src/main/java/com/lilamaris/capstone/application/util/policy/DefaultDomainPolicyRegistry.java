@@ -1,6 +1,7 @@
 package com.lilamaris.capstone.application.util.policy;
 
 import com.lilamaris.capstone.domain.model.common.domain.policy.DomainAction;
+import com.lilamaris.capstone.domain.model.common.domain.policy.DomainPolicyContext;
 import com.lilamaris.capstone.domain.model.common.domain.policy.DomainRole;
 
 import java.util.HashMap;
@@ -9,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DefaultDomainPolicyRegistry {
+public class DefaultDomainPolicyRegistry implements DomainPolicyContext {
     private final Map<String, Set<String>> bindings = new HashMap<>();
 
     public void register(DomainRole role, Set<DomainAction> actions) {

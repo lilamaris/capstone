@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.lilamaris.capstone.application.util.generator.DefaultIdGenerationContext;
 import com.lilamaris.capstone.application.util.generator.OpaqueTokenRawGenerator;
+import com.lilamaris.capstone.application.util.policy.DefaultDomainPolicyRegistry;
 import com.lilamaris.capstone.domain.model.auth.access_control.id.AccessControlId;
 import com.lilamaris.capstone.domain.model.auth.account.id.AccountId;
 import com.lilamaris.capstone.domain.model.auth.refreshToken.id.RefreshTokenId;
@@ -12,13 +13,17 @@ import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotDeltaId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
+import com.lilamaris.capstone.domain.model.capstone.timeline.policy.TimelineAction;
+import com.lilamaris.capstone.domain.model.capstone.timeline.policy.TimelineRole;
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
 import com.lilamaris.capstone.domain.model.common.domain.id.IdGenerationContext;
 import com.lilamaris.capstone.domain.model.common.domain.id.RawGenerator;
+import com.lilamaris.capstone.domain.model.common.domain.policy.DomainPolicyContext;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Configuration
@@ -58,6 +63,19 @@ public class ApplicationConfig {
         registry.register(AccountId.class, AccountId::new, uuidRawGenerator);
 
         registry.register(AccessControlId.class, AccessControlId::new, uuidRawGenerator);
+        return registry;
+    }
+
+    @Bean
+    public DomainPolicyContext policyContext() {
+        var registry = new DefaultDomainPolicyRegistry();
+
+        registry.register(TimelineRole.VIEWER, Set.of(TimelineAction.READ));
+        registry.register(TimelineRole.CONTRIBUTOR, Set.of(TimelineAction.UPDATE_METADATA));
+        registry.register(TimelineRole.MAINTAINER, Set.of(TimelineAction.MIGRATE, TimelineAction.MERGE));
+        registry.extend(TimelineRole.CONTRIBUTOR, TimelineRole.VIEWER);
+        registry.extend(TimelineRole.MAINTAINER, TimelineRole.CONTRIBUTOR);
+
         return registry;
     }
 }
