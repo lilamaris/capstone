@@ -38,6 +38,10 @@ public class ApplicationExceptionTranslator {
             log.warn("Application invariant: {}: {}", e.getCode(), e.getMessage(), e);
             throw e;
 
+        } catch (InfrastructureFailureException e) {
+            log.warn("Infrastructure failure: {}: {}", e.getCode(), e.getMessage(), e);
+            throw e;
+
         } catch (DomainIllegalArgumentException e) {
             log.warn("Domain violation - {}: {}", e.getCode(), e.getMessage(), e);
             throw new DomainViolationException(e.getCode(), "Invalid request");
