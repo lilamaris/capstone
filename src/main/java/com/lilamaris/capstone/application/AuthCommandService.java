@@ -60,8 +60,8 @@ public class AuthCommandService implements AuthCommandUseCase {
             throw new ResourceAlreadyExistsException("Account already exists.");
         }
 
-        var user = User.create(displayName, Role.USER, () -> ids.next(UserId.class));
-        var account = Account.create(user.id(), displayName, email, passwordHash, () -> ids.next(AccountId.class));
+        var user = User.create(displayName, Role.USER, ids.next(UserId.class));
+        var account = Account.create(user.id(), displayName, email, passwordHash, ids.next(AccountId.class));
 
         user = userPort.save(user);
         account = accountPort.save(account);

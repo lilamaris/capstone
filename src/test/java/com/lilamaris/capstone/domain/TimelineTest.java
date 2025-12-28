@@ -2,11 +2,11 @@ package com.lilamaris.capstone.domain;
 
 import com.lilamaris.capstone.application.policy.identity.IdGenerationContext;
 import com.lilamaris.capstone.application.policy.identity.defaults.DefaultIdGenerationContext;
+import com.lilamaris.capstone.application.policy.identity.defaults.RawBasedIdGenerator;
 import com.lilamaris.capstone.domain.model.capstone.timeline.Snapshot;
 import com.lilamaris.capstone.domain.model.capstone.timeline.SnapshotLink;
 import com.lilamaris.capstone.domain.model.capstone.timeline.Timeline;
 import com.lilamaris.capstone.domain.model.capstone.timeline.embed.Effective;
-import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotDeltaId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
-import java.util.function.Supplier;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,33 +27,23 @@ public class TimelineTest {
     private Instant initialValidAt;
 
     private IdGenerationContext ids;
-    private Supplier<TimelineId> timelineIdSupplier;
-    private Supplier<SnapshotId> snapshotIdSupplier;
-    private Supplier<SnapshotLinkId> snapshotLinkIdSupplier;
 
     @BeforeEach
     void run() {
-        var registry = new DefaultIdGenerationContext();
-        var uuidRawGenerator = new SequentialUuidGenerator();
-        registry.register(TimelineId.class, TimelineId::new, uuidRawGenerator);
-        registry.register(SnapshotId.class, SnapshotId::new, uuidRawGenerator);
-        registry.register(SnapshotLinkId.class, SnapshotLinkId::new, uuidRawGenerator);
-        registry.register(SnapshotDeltaId.class, SnapshotDeltaId::new, uuidRawGenerator);
+        var timelineIdGen = new RawBasedIdGenerator<>(TimelineId.class, TimelineId::new, new SequentialUuidGenerator());
+        var snapshotIdGen = new RawBasedIdGenerator<>(SnapshotId.class, SnapshotId::new, new SequentialUuidGenerator());
+        var snapshotLinkIdGen = new RawBasedIdGenerator<>(SnapshotLinkId.class, SnapshotLinkId::new, new SequentialUuidGenerator());
+        ids = new DefaultIdGenerationContext(List.of(timelineIdGen, snapshotIdGen, snapshotLinkIdGen));
 
         initialTxAt = Instant.parse("2025-01-01T00:00:00Z");
         initialValidAt = Instant.parse("2025-01-01T00:00:00Z");
-
-        ids = registry;
-        timelineIdSupplier = () -> ids.next(TimelineId.class);
-        snapshotIdSupplier = () -> ids.next(SnapshotId.class);
-        snapshotLinkIdSupplier = () -> ids.next(SnapshotLinkId.class);
     }
 
     @Test
     void should_create_initial_snapshot() {
-        var initial = Timeline.create("Test Timeline", "Initial", timelineIdSupplier);
+        var initial = Timeline.create("Test Timeline", "Initial", ids.next(TimelineId.class));
 
-        initial.migrate(initialTxAt, initialValidAt, "Test Description", snapshotIdSupplier, snapshotLinkIdSupplier);
+        initial.migrate(initialTxAt, initialValidAt, "Test Description", ids.next(SnapshotId.class), ids.next(SnapshotLinkId.class));
 
         log.info("timeline: {}", initial);
 
@@ -86,15 +76,14 @@ public class TimelineTest {
 
     @Test
     void should_migrate() {
-        var initial = Timeline.create("Test Timeline", "Initial", timelineIdSupplier);
+        var initial = Timeline.create("Test Timeline", "Initial", ids.next(TimelineId.class));
 
-        initial.migrate(initialTxAt, initialValidAt, "Test Description", snapshotIdSupplier, snapshotLinkIdSupplier);
-
+        initial.migrate(initialTxAt, initialValidAt, "Test Description", ids.next(SnapshotId.class), ids.next(SnapshotLinkId.class));
 
         var newTxAt = Instant.parse("2025-02-01T00:00:00Z");
         var newValidAt = Instant.parse("2025-03-01T00:00:00Z");
 
-        initial.migrate(newTxAt, newValidAt, "Migrate #1", snapshotIdSupplier, snapshotLinkIdSupplier);
+        initial.migrate(newTxAt, newValidAt, "Migrate #1", ids.next(SnapshotId.class), ids.next(SnapshotLinkId.class));
 
         assertThat(initial).isInstanceOf(Timeline.class);
         assertThat(initial.getSnapshotList().size()).isEqualTo(3);

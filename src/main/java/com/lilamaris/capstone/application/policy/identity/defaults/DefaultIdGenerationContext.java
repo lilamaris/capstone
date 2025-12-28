@@ -1,36 +1,34 @@
 package com.lilamaris.capstone.application.policy.identity.defaults;
 
 import com.lilamaris.capstone.application.policy.identity.IdGenerationContext;
-import com.lilamaris.capstone.application.policy.identity.IdSpec;
-import com.lilamaris.capstone.application.policy.identity.RawGenerator;
+import com.lilamaris.capstone.application.policy.identity.IdGenerator;
 import com.lilamaris.capstone.domain.model.common.domain.id.DomainId;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class DefaultIdGenerationContext implements IdGenerationContext {
-    private final Map<Class<?>, Binding<?, ?>> bindings;
+    private final Map<Class<? extends DomainId<?>>, IdGenerator<?>> generators;
 
-    public DefaultIdGenerationContext() {
-        this.bindings = new HashMap<>();
+    public DefaultIdGenerationContext(List<IdGenerator<?>> generators) {
+        this.generators = generators.stream()
+                .collect(Collectors.toUnmodifiableMap(
+                        IdGenerator::supports,
+                        Function.identity()
+                ));
     }
 
-    public <T extends DomainId<R>, R> void register(Class<T> idClass, IdSpec<T, R> idSpec, RawGenerator<R> rawGenerator) {
-        var bind = new Binding<>(idSpec, rawGenerator);
-        bindings.put(idClass, bind);
-    }
-
-    @SuppressWarnings("unchecked")
     @Override
-    public <T extends DomainId<R>, R> T next(Class<T> clazz) {
-        var binding = (Binding<T, R>) bindings.get(clazz);
-        if (binding == null) {
-            throw new IllegalStateException("No binding registered for class: " + clazz.getName());
+    public <T extends DomainId<?>> Supplier<T> next(Class<T> type) {
+        @SuppressWarnings("unchecked")
+        var generator = (IdGenerator<T>) generators.get(type);
+        if (generator == null) {
+            throw new IllegalStateException("No generator for: " + type.getName());
         }
 
-        return binding.spec.fromRaw(binding.rawGen.generate());
-    }
-
-    public record Binding<T extends DomainId<R>, R>(IdSpec<T, R> spec, RawGenerator<R> rawGen) {
+        return generator::next;
     }
 }

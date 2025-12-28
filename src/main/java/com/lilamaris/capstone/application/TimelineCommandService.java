@@ -32,7 +32,7 @@ public class TimelineCommandService implements TimelineCommandUseCase {
     @Override
     public TimelineResult.Command create(String title, String details) {
         var domain = Timeline.create(
-                title, details, () -> ids.next(TimelineId.class)
+                title, details, ids.next(TimelineId.class)
         );
         var created = timelinePort.save(domain);
 
@@ -66,8 +66,8 @@ public class TimelineCommandService implements TimelineCommandUseCase {
                 UniversityClock.now(),
                 UniversityClock.at(validAt),
                 details,
-                () -> ids.next(SnapshotId.class),
-                () -> ids.next(SnapshotLinkId.class)
+                ids.next(SnapshotId.class),
+                ids.next(SnapshotLinkId.class)
         );
         var saved = timelinePort.save(timeline);
 
@@ -91,8 +91,8 @@ public class TimelineCommandService implements TimelineCommandUseCase {
                 UniversityClock.now(),
                 validRange,
                 details,
-                () -> ids.next(SnapshotId.class),
-                () -> ids.next(SnapshotLinkId.class)
+                ids.next(SnapshotId.class),
+                ids.next(SnapshotLinkId.class)
         );
         var saved = timelinePort.save(timeline);
 

@@ -38,8 +38,8 @@ public class DefaultOidcIdentityResolver implements OidcIdentityResolver {
                     String.format("User with id '%s' not found.", userId)
             ));
         } else {
-            user = User.create(displayName, Role.USER, () -> ids.next(UserId.class));
-            account = Account.create(user.id(), provider, providerId, email, displayName, () -> ids.next(AccountId.class));
+            user = User.create(displayName, Role.USER, ids.next(UserId.class));
+            account = Account.create(user.id(), provider, providerId, email, displayName, ids.next(AccountId.class));
             user = userPort.save(user);
             account = accountPort.save(account);
             isCreated = true;

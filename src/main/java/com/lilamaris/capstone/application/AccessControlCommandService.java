@@ -28,7 +28,7 @@ public class AccessControlCommandService implements AccessControlUseCase {
                 e.grantee(),
                 e.ref(),
                 e.scopedRole(),
-                () -> ids.next(AccessControlId.class)
+                ids.next(AccessControlId.class)
         );
         accessControlPort.save(domain);
     }

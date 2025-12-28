@@ -30,7 +30,7 @@ public class DefaultSessionIssuer implements SessionIssuer {
         String accessTokenValue = jwtUtil.createAccessToken(userId, displayName, role);
         String refreshTokenValue = jwtUtil.createRefreshToken();
 
-        var refreshToken = RefreshToken.create(userId, () -> ids.next(RefreshTokenId.class));
+        var refreshToken = RefreshToken.create(userId, ids.next(RefreshTokenId.class));
 
         refreshTokenPort.save(refreshToken, jwtUtil.getRefreshTokenExpiration());
 
