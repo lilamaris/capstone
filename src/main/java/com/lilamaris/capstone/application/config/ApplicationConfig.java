@@ -3,16 +3,8 @@ package com.lilamaris.capstone.application.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.lilamaris.capstone.application.port.out.AccessControlPort;
 import com.lilamaris.capstone.application.util.generator.DefaultIdGenerationContext;
 import com.lilamaris.capstone.application.util.generator.OpaqueTokenRawGenerator;
-import com.lilamaris.capstone.application.util.policy.DefaultAuthorizer;
-import com.lilamaris.capstone.application.util.policy.DefaultRoleTranslator;
-import com.lilamaris.capstone.application.util.policy.DomainAuthorizer;
-import com.lilamaris.capstone.application.util.policy.RoleTranslator;
-import com.lilamaris.capstone.application.util.policy.timeline.TimelineAction;
-import com.lilamaris.capstone.application.util.policy.timeline.TimelinePolicy;
-import com.lilamaris.capstone.application.util.policy.timeline.TimelineRole;
 import com.lilamaris.capstone.domain.model.auth.access_control.id.AccessControlId;
 import com.lilamaris.capstone.domain.model.auth.account.id.AccountId;
 import com.lilamaris.capstone.domain.model.auth.refreshToken.id.RefreshTokenId;
@@ -27,7 +19,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Set;
 import java.util.UUID;
 
 @Configuration
@@ -68,31 +59,5 @@ public class ApplicationConfig {
 
         registry.register(AccessControlId.class, AccessControlId::new, uuidRawGenerator);
         return registry;
-    }
-
-    @Bean
-    public TimelinePolicy timelinePolicy() {
-        var resolver = new TimelinePolicy();
-        resolver.allow(TimelineRole.VIEWER, Set.of(TimelineAction.READ));
-        resolver.allow(TimelineRole.CONTRIBUTOR, Set.of(TimelineAction.UPDATE_METADATA));
-        resolver.allow(TimelineRole.MAINTAINER, Set.of(TimelineAction.MIGRATE, TimelineAction.MERGE));
-        resolver.extend(TimelineRole.CONTRIBUTOR, TimelineRole.VIEWER);
-        resolver.extend(TimelineRole.MAINTAINER, TimelineRole.CONTRIBUTOR);
-
-        return resolver;
-    }
-
-    @Bean
-    public RoleTranslator timelineRoleTranslator() {
-        return new DefaultRoleTranslator<>(TimelineRole.class);
-    }
-
-    @Bean
-    public DomainAuthorizer timelineAuthorizer(
-            AccessControlPort port,
-            TimelinePolicy registry,
-            RoleTranslator timelineRoleTranslator
-    ) {
-        return new DefaultAuthorizer(port, registry, timelineRoleTranslator);
     }
 }

@@ -1,9 +1,7 @@
 package com.lilamaris.capstone.application.util.policy;
 
-import java.util.Set;
-
-public interface DomainPolicy {
-    void allow(DomainRole role, Set<DomainAction> action);
-
+public interface DomainPolicy<R extends DomainRole> {
     boolean allows(DomainRole role, DomainAction action);
+
+    R parseRole(String scopedRole);
 }

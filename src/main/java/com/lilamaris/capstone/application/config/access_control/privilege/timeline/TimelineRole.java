@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.application.util.policy.timeline;
+package com.lilamaris.capstone.application.config.access_control.privilege.timeline;
 
 import com.lilamaris.capstone.application.util.policy.DomainRole;
 

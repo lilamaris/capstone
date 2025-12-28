@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.application.util.policy.timeline;
+package com.lilamaris.capstone.application.util.policy.defaults;
 
 import com.lilamaris.capstone.application.util.policy.DomainAction;
 import com.lilamaris.capstone.application.util.policy.DomainPolicy;
@@ -12,8 +12,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-public class TimelinePolicy implements DomainPolicy {
+public class DefaultPolicy<R extends Enum<R> & DomainRole> implements DomainPolicy<R> {
     private final Map<String, Set<String>> bindings = new HashMap<>();
+    private final Class<R> supports;
 
     public void extend(DomainRole child, DomainRole parent) {
         var parentActions = bindings.getOrDefault(parent.name(), Set.of());
@@ -22,7 +23,6 @@ public class TimelinePolicy implements DomainPolicy {
                 .addAll(parentActions);
     }
 
-    @Override
     public void allow(DomainRole role, Set<DomainAction> actions) {
         bindings.put(
                 role.name(),
@@ -37,5 +37,10 @@ public class TimelinePolicy implements DomainPolicy {
         if (role == null || action == null) return false;
         var actions = bindings.get(role.name());
         return actions != null && actions.contains(action.name());
+    }
+
+    @Override
+    public R parseRole(String scopedRole) {
+        return Enum.valueOf(supports, scopedRole);
     }
 }
