@@ -6,6 +6,10 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.lilamaris.capstone.application.port.out.AccessControlPort;
 import com.lilamaris.capstone.application.util.generator.DefaultIdGenerationContext;
 import com.lilamaris.capstone.application.util.generator.OpaqueTokenRawGenerator;
+import com.lilamaris.capstone.application.util.policy.DefaultPermissionGuard;
+import com.lilamaris.capstone.application.util.policy.DefaultRoleTranslator;
+import com.lilamaris.capstone.application.util.policy.DomainPermissionGuard;
+import com.lilamaris.capstone.application.util.policy.RoleTranslator;
 import com.lilamaris.capstone.application.util.policy.timeline.TimelineAction;
 import com.lilamaris.capstone.application.util.policy.timeline.TimelinePermissionRegistry;
 import com.lilamaris.capstone.application.util.policy.timeline.TimelineRole;
@@ -67,9 +71,7 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public TimelinePermissionRegistry timelinePolicyResolver(
-            AccessControlPort accessControlPort
-    ) {
+    public TimelinePermissionRegistry timelinePolicyResolver() {
         var resolver = new TimelinePermissionRegistry();
         resolver.register(TimelineRole.VIEWER, Set.of(TimelineAction.READ));
         resolver.register(TimelineRole.CONTRIBUTOR, Set.of(TimelineAction.UPDATE_METADATA));
@@ -78,5 +80,19 @@ public class ApplicationConfig {
         resolver.extend(TimelineRole.MAINTAINER, TimelineRole.CONTRIBUTOR);
 
         return resolver;
+    }
+
+    @Bean
+    public RoleTranslator timelineRoleTranslator() {
+        return new DefaultRoleTranslator<>(TimelineRole.class);
+    }
+
+    @Bean
+    public DomainPermissionGuard timelinePermissionGuard(
+            AccessControlPort port,
+            TimelinePermissionRegistry registry,
+            RoleTranslator timelineRoleTranslator
+    ) {
+        return new DefaultPermissionGuard(port, registry, timelineRoleTranslator);
     }
 }

@@ -6,8 +6,8 @@ import com.lilamaris.capstone.application.port.in.TimelineCommandUseCase;
 import com.lilamaris.capstone.application.port.in.result.TimelineResult;
 import com.lilamaris.capstone.application.port.out.TimelinePort;
 import com.lilamaris.capstone.application.util.UniversityClock;
+import com.lilamaris.capstone.application.util.policy.DomainPermissionGuard;
 import com.lilamaris.capstone.application.util.policy.timeline.TimelineAction;
-import com.lilamaris.capstone.application.util.policy.timeline.TimelinePermissionGuard;
 import com.lilamaris.capstone.domain.model.capstone.timeline.Timeline;
 import com.lilamaris.capstone.domain.model.capstone.timeline.embed.Effective;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
@@ -27,7 +27,7 @@ public class TimelineCommandService implements TimelineCommandUseCase {
     private final TimelinePort timelinePort;
 
     private final IdGenerationContext ids;
-    private final TimelinePermissionGuard guard;
+    private final DomainPermissionGuard timelinePermissionGuard;
 
     @Override
     public TimelineResult.Command create(String title, String details) {
@@ -42,7 +42,7 @@ public class TimelineCommandService implements TimelineCommandUseCase {
     @Override
     public TimelineResult.Command update(TimelineId id, String title, String details) {
         CanonicalActor actor = ActorContext.get();
-        guard.check(actor, id.ref(), TimelineAction.UPDATE_METADATA);
+        timelinePermissionGuard.check(actor, id.ref(), TimelineAction.UPDATE_METADATA);
 
         var timeline = timelinePort.getById(id).orElseThrow(() -> new ResourceNotFoundException(
                 String.format("Timeline with id '%s' not found.", id)
@@ -55,6 +55,9 @@ public class TimelineCommandService implements TimelineCommandUseCase {
 
     @Override
     public TimelineResult.Command migrate(TimelineId id, LocalDateTime validAt, String details) {
+        CanonicalActor actor = ActorContext.get();
+
+
         var timeline = timelinePort.getById(id).orElseThrow(() -> new ResourceNotFoundException(
                 String.format("Timeline with id '%s' not found.", id)
         ));
