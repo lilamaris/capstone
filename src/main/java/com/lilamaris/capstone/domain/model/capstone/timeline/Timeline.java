@@ -8,6 +8,7 @@ import com.lilamaris.capstone.domain.model.capstone.timeline.exception.TimelineD
 import com.lilamaris.capstone.domain.model.capstone.timeline.exception.TimelineErrorCode;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
+import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotSlotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Describable;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
@@ -50,6 +51,11 @@ public class Timeline implements Identifiable<TimelineId>, Describable {
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private TimelineId id;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "timeline_id", nullable = false)
+    private List<SnapshotSlot> slotList;
+
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "timeline_id", nullable = false)
     private List<Snapshot> snapshotList;
@@ -74,6 +80,7 @@ public class Timeline implements Identifiable<TimelineId>, Describable {
             JpaDescriptionMetadata descriptionMetadata
     ) {
         this.id = requireField(id, "id");
+        this.slotList = new ArrayList<>();
         this.snapshotList = requireField(snapshotList, "snapshotList");
         this.snapshotLinkList = requireField(snapshotLinkList, "snapshotLinkList");
         this.descriptionMetadata = requireField(descriptionMetadata, "descriptionMetadata");
@@ -138,6 +145,74 @@ public class Timeline implements Identifiable<TimelineId>, Describable {
 
     public List<Snapshot> getSnapshotsWithClosedTx() {
         return snapshotList.stream().filter(s -> !s.getTx().isOpen()).toList();
+    }
+
+    private void createInitialSlot(
+            Instant txAt,
+            Instant validAt,
+            Supplier<SnapshotSlotId> snapshotSlotIdSupplier
+    ) {
+        var tx = Effective.create(txAt, Effective.MAX);
+        var valid = Effective.create(validAt, Effective.MAX);
+        var snapshotSlot = SnapshotSlot.create(snapshotSlotIdSupplier.get(), id, tx, valid);
+        var events = snapshotSlot.pullEvent();
+        this.slotList.add(snapshotSlot);
+        eventList.addAll(events);
+    }
+
+    public void migrate(
+            Instant txAt,
+            Instant validAt,
+            Supplier<SnapshotSlotId> snapshotSlotIdSupplier
+    ) {
+        if (snapshotList.isEmpty()) {
+            createInitialSlot(txAt, validAt, snapshotSlotIdSupplier);
+            return;
+        }
+
+        var maybeExactSlot = slotList.stream()
+                .filter(SnapshotSlot.ifEffectiveOpenEqualTo(EffectiveSelector.TX, true))
+                .filter(SnapshotSlot.ifEffectiveEqualTo(EffectiveSelector.VALID, validAt))
+                .toList();
+
+        if (maybeExactSlot.size() > 1) {
+            throw new DomainIllegalStateException(
+                    String.format("More then one snapshot exists for the same valid at: '%s'", validAt)
+            );
+        }
+
+        var parentSlot = maybeExactSlot.stream().findFirst().orElseThrow(() -> new TimelineDomainException(
+                TimelineErrorCode.NO_AVAILABLE_SLOT,
+                String.format(
+                        "No slot match the given criteria valid '%s'", validAt
+                )
+        ));
+
+        parentSlot.close(EffectiveSelector.TX, txAt);
+
+        var newTx = Effective.create(txAt, Effective.MAX);
+        var newValidSplit = parentSlot.getValid().splitAt(validAt);
+        var newValidLeft = newValidSplit.left();
+        var newValidRight = newValidSplit.right();
+
+        var slotLeft = SnapshotSlot.create(
+                snapshotSlotIdSupplier.get(),
+                id,
+                parentSlot.id(),
+                newTx,
+                newValidLeft
+        );
+        var slotRight = SnapshotSlot.create(
+                snapshotSlotIdSupplier.get(),
+                id,
+                slotLeft.id(),
+                newTx,
+                newValidRight
+        );
+
+        eventList.addAll(parentSlot.pullEvent());
+        eventList.addAll(slotLeft.pullEvent());
+        eventList.addAll(slotRight.pullEvent());
     }
 
     public void migrate(
