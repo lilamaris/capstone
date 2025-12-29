@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.domain.model.capstone.timeline.event;
 
-import com.lilamaris.capstone.domain.model.capstone.timeline.EffectiveSelector;
+import com.lilamaris.capstone.domain.model.capstone.timeline.embed.EffectiveSelector;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.common.domain.event.aggregate.AggregateEvent;
 

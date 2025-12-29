@@ -2,6 +2,7 @@ package com.lilamaris.capstone.domain.model.capstone.timeline;
 
 import com.lilamaris.capstone.domain.exception.DomainIllegalStateException;
 import com.lilamaris.capstone.domain.model.capstone.timeline.embed.Effective;
+import com.lilamaris.capstone.domain.model.capstone.timeline.embed.EffectiveSelector;
 import com.lilamaris.capstone.domain.model.capstone.timeline.event.TimelineCreated;
 import com.lilamaris.capstone.domain.model.capstone.timeline.exception.TimelineDomainException;
 import com.lilamaris.capstone.domain.model.capstone.timeline.exception.TimelineErrorCode;
