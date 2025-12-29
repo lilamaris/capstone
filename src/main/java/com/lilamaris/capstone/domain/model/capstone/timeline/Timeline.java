@@ -3,6 +3,8 @@ package com.lilamaris.capstone.domain.model.capstone.timeline;
 import com.lilamaris.capstone.domain.exception.DomainIllegalStateException;
 import com.lilamaris.capstone.domain.model.capstone.timeline.embed.Effective;
 import com.lilamaris.capstone.domain.model.capstone.timeline.event.TimelineCreated;
+import com.lilamaris.capstone.domain.model.capstone.timeline.exception.TimelineDomainException;
+import com.lilamaris.capstone.domain.model.capstone.timeline.exception.TimelineErrorCode;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
@@ -13,8 +15,6 @@ import com.lilamaris.capstone.domain.model.common.domain.event.aggregate.Collect
 import com.lilamaris.capstone.domain.model.common.domain.metadata.DescriptionMetadata;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaDescriptionMetadata;
-import com.lilamaris.capstone.domain.timeline.exception.TimelineDomainException;
-import com.lilamaris.capstone.domain.timeline.exception.TimelineErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -92,7 +92,7 @@ public class Timeline implements Identifiable<TimelineId>, Describable {
                 new ArrayList<>(),
                 descriptionMetadata
         );
-        timeline.onCreated();
+        timeline.registerCreated();
         return timeline;
     }
 
@@ -111,7 +111,7 @@ public class Timeline implements Identifiable<TimelineId>, Describable {
         propagateToTransient();
     }
 
-    private void onCreated() {
+    private void registerCreated() {
         var event = new TimelineCreated(id, Instant.now());
         eventList.add(event);
     }

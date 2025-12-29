@@ -6,8 +6,8 @@ import com.lilamaris.capstone.domain.DomainType;
 import com.lilamaris.capstone.domain.embed.Audit;
 import com.lilamaris.capstone.domain.embed.Effective;
 import com.lilamaris.capstone.domain.exception.DomainInvariantException;
-import com.lilamaris.capstone.domain.timeline.exception.TimelineDomainException;
-import com.lilamaris.capstone.domain.timeline.exception.TimelineErrorCode;
+import com.lilamaris.capstone.domain.model.capstone.timeline.exception.TimelineDomainException;
+import com.lilamaris.capstone.domain.model.capstone.timeline.exception.TimelineErrorCode;
 import lombok.Builder;
 
 import java.time.Instant;

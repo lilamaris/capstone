@@ -4,7 +4,7 @@ import com.lilamaris.capstone.domain.embed.exception.EffectiveDomainException;
 import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.domain.exception.DomainIllegalStateException;
 import com.lilamaris.capstone.domain.exception.DomainInvariantException;
-import com.lilamaris.capstone.domain.timeline.exception.TimelineDomainException;
+import com.lilamaris.capstone.domain.model.capstone.timeline.exception.TimelineDomainException;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

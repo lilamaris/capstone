@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.domain.timeline.exception;
+package com.lilamaris.capstone.domain.model.capstone.timeline.exception;
 
 import com.lilamaris.capstone.domain.exception.DomainException;
 import lombok.Getter;

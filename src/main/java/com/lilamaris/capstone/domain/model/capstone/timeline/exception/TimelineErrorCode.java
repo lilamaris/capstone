@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.domain.timeline.exception;
+package com.lilamaris.capstone.domain.model.capstone.timeline.exception;
 
 public enum TimelineErrorCode {
     SNAPSHOT_LINK_INCONSISTENT,
