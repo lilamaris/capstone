@@ -55,23 +55,12 @@ public class Effective {
         return !time.isBefore(from) && time.isBefore(to);
     }
 
-    public Effective closeAndNext(Instant at) {
-        var split = splitAt(at);
-        apply(split.left());
-        return split.right();
-    }
-
     public void open(Instant at) {
         this.from = at;
     }
 
     public void close(Instant at) {
         this.to = at;
-    }
-
-    public void apply(Effective other) {
-        from = other.from;
-        to = other.to;
     }
 
     public EffectiveSplit splitAt(Instant at) {
