@@ -165,14 +165,14 @@ public class Timeline implements Identifiable<TimelineId>, Describable {
             Instant validAt,
             Supplier<SnapshotSlotId> snapshotSlotIdSupplier
     ) {
-        if (snapshotList.isEmpty()) {
+        if (slotList.isEmpty()) {
             createInitialSlot(txAt, validAt, snapshotSlotIdSupplier);
             return;
         }
 
         var maybeExactSlot = slotList.stream()
                 .filter(SnapshotSlot.ifEffectiveOpenEqualTo(EffectiveSelector.TX, true))
-                .filter(SnapshotSlot.ifEffectiveEqualTo(EffectiveSelector.VALID, validAt))
+                .filter(SnapshotSlot.ifEffectiveContains(EffectiveSelector.VALID, validAt))
                 .toList();
 
         if (maybeExactSlot.size() > 1) {
@@ -189,6 +189,7 @@ public class Timeline implements Identifiable<TimelineId>, Describable {
         ));
 
         parentSlot.close(EffectiveSelector.TX, txAt);
+        eventList.addAll(parentSlot.pullEvent());
 
         var newTx = Effective.create(txAt, Effective.MAX);
         var newValidSplit = parentSlot.getValid().splitAt(validAt);
@@ -202,6 +203,9 @@ public class Timeline implements Identifiable<TimelineId>, Describable {
                 newTx,
                 newValidLeft
         );
+        slotList.add(slotLeft);
+        eventList.addAll(slotLeft.pullEvent());
+
         var slotRight = SnapshotSlot.create(
                 snapshotSlotIdSupplier.get(),
                 id,
@@ -209,9 +213,7 @@ public class Timeline implements Identifiable<TimelineId>, Describable {
                 newTx,
                 newValidRight
         );
-
-        eventList.addAll(parentSlot.pullEvent());
-        eventList.addAll(slotLeft.pullEvent());
+        slotList.add(slotRight);
         eventList.addAll(slotRight.pullEvent());
     }
 

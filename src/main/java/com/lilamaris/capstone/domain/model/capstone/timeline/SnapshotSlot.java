@@ -130,7 +130,7 @@ public class SnapshotSlot implements Identifiable<SnapshotSlotId> {
         }
     }
 
-    protected static Predicate<SnapshotSlot> ifEffectiveEqualTo(EffectiveSelector selector, Instant at) {
+    protected static Predicate<SnapshotSlot> ifEffectiveContains(EffectiveSelector selector, Instant at) {
         if (selector == EffectiveSelector.TX) {
             return s -> s.getTx().contains(at);
         } else if (selector == EffectiveSelector.VALID) {
@@ -140,7 +140,7 @@ public class SnapshotSlot implements Identifiable<SnapshotSlotId> {
         }
     }
 
-    protected static Predicate<SnapshotSlot> ifEffectiveEqualTo(EffectiveSelector selector, Effective range) {
+    protected static Predicate<SnapshotSlot> ifEffectiveOverlap(EffectiveSelector selector, Effective range) {
         if (selector == EffectiveSelector.TX) {
             return s -> s.getTx().isOverlap(range);
         } else if (selector == EffectiveSelector.VALID) {
