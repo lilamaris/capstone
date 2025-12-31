@@ -54,7 +54,7 @@ public class TimelineController {
     public ResponseEntity<TimelineResult.Command> create(
             @RequestBody TimelineRequest.Create body
     ) {
-        var result = timelineCommandUseCase.create(body.title(), body.details());
+        var result = timelineCommandUseCase.create(body.title(), body.details(), body.initialValidAt());
         return ResponseEntity.ok(result);
     }
 
@@ -64,7 +64,7 @@ public class TimelineController {
             @RequestBody TimelineRequest.Migrate body
     ) {
         var timelineId = new TimelineId(id);
-        var result = timelineCommandUseCase.migrate(timelineId, body.validAt(), body.details());
+        var result = timelineCommandUseCase.migrate(timelineId, body.validAt());
         return ResponseEntity.ok(result);
     }
 
@@ -74,7 +74,7 @@ public class TimelineController {
             @RequestBody TimelineRequest.Merge body
     ) {
         var timelineId = new TimelineId(id);
-        var result = timelineCommandUseCase.merge(timelineId, body.validFrom(), body.validTo(), body.details());
+        var result = timelineCommandUseCase.merge(timelineId, body.validFrom(), body.validTo());
         return ResponseEntity.ok(result);
     }
 

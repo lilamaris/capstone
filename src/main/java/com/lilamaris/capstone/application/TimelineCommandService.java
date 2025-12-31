@@ -10,9 +10,7 @@ import com.lilamaris.capstone.application.port.in.result.TimelineResult;
 import com.lilamaris.capstone.application.port.out.TimelinePort;
 import com.lilamaris.capstone.application.util.UniversityClock;
 import com.lilamaris.capstone.domain.model.capstone.timeline.Timeline;
-import com.lilamaris.capstone.domain.model.capstone.timeline.embed.Effective;
-import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
-import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
+import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotSlotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
 import com.lilamaris.capstone.domain.model.common.defaults.DefaultDescriptionMetadata;
 import com.lilamaris.capstone.domain.model.common.domain.event.actor.CanonicalActor;
@@ -30,9 +28,14 @@ public class TimelineCommandService implements TimelineCommandUseCase {
     private final DomainAuthorizer timelineAuthorizer;
 
     @Override
-    public TimelineResult.Command create(String title, String details) {
+    public TimelineResult.Command create(String title, String details, LocalDateTime initialValidAt) {
         var domain = Timeline.create(
-                title, details, ids.next(TimelineId.class)
+                ids.next(TimelineId.class),
+                ids.next(SnapshotSlotId.class),
+                title,
+                details,
+                UniversityClock.now(),
+                UniversityClock.at(initialValidAt)
         );
         var created = timelinePort.save(domain);
 
@@ -54,7 +57,7 @@ public class TimelineCommandService implements TimelineCommandUseCase {
     }
 
     @Override
-    public TimelineResult.Command migrate(TimelineId id, LocalDateTime validAt, String details) {
+    public TimelineResult.Command migrate(TimelineId id, LocalDateTime validAt) {
         CanonicalActor actor = ActorContext.get();
         timelineAuthorizer.authorize(actor, id.ref(), TimelineAction.MIGRATE);
 
@@ -63,11 +66,9 @@ public class TimelineCommandService implements TimelineCommandUseCase {
         ));
 
         timeline.migrate(
+                ids.next(SnapshotSlotId.class),
                 UniversityClock.now(),
-                UniversityClock.at(validAt),
-                details,
-                ids.next(SnapshotId.class),
-                ids.next(SnapshotLinkId.class)
+                UniversityClock.at(validAt)
         );
         var saved = timelinePort.save(timeline);
 
@@ -75,7 +76,7 @@ public class TimelineCommandService implements TimelineCommandUseCase {
     }
 
     @Override
-    public TimelineResult.Command merge(TimelineId id, LocalDateTime validFrom, LocalDateTime validTo, String details) {
+    public TimelineResult.Command merge(TimelineId id, LocalDateTime validFrom, LocalDateTime validTo) {
         CanonicalActor actor = ActorContext.get();
         timelineAuthorizer.authorize(actor, id.ref(), TimelineAction.MERGE);
 
@@ -83,17 +84,13 @@ public class TimelineCommandService implements TimelineCommandUseCase {
                 String.format("Timeline with id '%s' not found.", id)
         ));
 
-        var validRange = Effective.create(
+        timeline.merge(
+                ids.next(SnapshotSlotId.class),
+                UniversityClock.now(),
                 UniversityClock.at(validFrom),
                 UniversityClock.at(validTo)
         );
-        timeline.mergeValidRange(
-                UniversityClock.now(),
-                validRange,
-                details,
-                ids.next(SnapshotId.class),
-                ids.next(SnapshotLinkId.class)
-        );
+
         var saved = timelinePort.save(timeline);
 
         return TimelineResult.Command.from(saved);

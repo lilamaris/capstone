@@ -1,6 +1,6 @@
-package com.lilamaris.capstone.domain.model.capstone.timeline.event;
+package com.lilamaris.capstone.domain.model.capstone.snapshot.event;
 
-import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotDeltaId;
+import com.lilamaris.capstone.domain.model.capstone.snapshot.id.SnapshotDeltaId;
 import com.lilamaris.capstone.domain.model.common.domain.event.aggregate.AggregateEvent;
 import com.lilamaris.capstone.domain.model.common.domain.id.DomainRef;
 

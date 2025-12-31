@@ -1,11 +1,10 @@
-package com.lilamaris.capstone.domain.model.capstone.timeline;
+package com.lilamaris.capstone.domain.model.capstone.snapshot;
 
-import com.lilamaris.capstone.domain.model.capstone.timeline.embed.Effective;
-import com.lilamaris.capstone.domain.model.capstone.timeline.embed.EffectiveSelector;
-import com.lilamaris.capstone.domain.model.capstone.timeline.event.SnapshotCreated;
-import com.lilamaris.capstone.domain.model.capstone.timeline.event.SnapshotEffectiveChanged;
-import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
-import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
+import com.lilamaris.capstone.domain.model.capstone.snapshot.event.SnapshotCreated;
+import com.lilamaris.capstone.domain.model.capstone.snapshot.id.SnapshotId;
+import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotSlotId;
+import com.lilamaris.capstone.domain.model.common.domain.contract.Auditable;
+import com.lilamaris.capstone.domain.model.common.domain.contract.Describable;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
 import com.lilamaris.capstone.domain.model.common.domain.event.DomainEvent;
 import com.lilamaris.capstone.domain.model.common.domain.metadata.AuditMetadata;
@@ -41,50 +40,33 @@ public class Snapshot implements Identifiable<SnapshotId>, Describable, Auditabl
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private SnapshotId id;
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "from", column = @Column(name = "tx_from")),
-            @AttributeOverride(name = "to", column = @Column(name = "tx_to")),
-    })
-    private Effective tx;
-    @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "from", column = @Column(name = "valid_from")),
-            @AttributeOverride(name = "to", column = @Column(name = "valid_to")),
-    })
-    private Effective valid;
-    @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "timeline_id", insertable = false, updatable = false))
-    private TimelineId timelineId;
+    @AttributeOverride(name = "value", column = @Column(name = "snapshot_slot_id", insertable = false, updatable = false))
+    private SnapshotSlotId snapshotSlotId;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "snapshot_id", nullable = false)
+    private List<SnapshotDelta> snapshotDeltaList;
     @Embedded
     private JpaDescriptionMetadata descriptionMetadata;
-    private Integer versionNo;
 
     protected Snapshot(
             SnapshotId id,
-            Effective tx,
-            Effective valid,
-            TimelineId timelineId,
-            Integer versionNo,
+            SnapshotSlotId snapshotSlotId,
+            List<SnapshotDelta> snapshotDeltaList,
             JpaDescriptionMetadata descriptionMetadata
     ) {
         this.id = requireField(id, "id");
-        this.tx = requireField(tx, "tx");
-        this.valid = requireField(valid, "valid");
-        this.timelineId = requireField(timelineId, "timelineId");
-        this.versionNo = requireField(versionNo, "versionNo");
+        this.snapshotSlotId = requireField(snapshotSlotId, "snapshotSlotId");
+        this.snapshotDeltaList = requireField(snapshotDeltaList, "snapshotDeltaList");
         this.descriptionMetadata = requireField(descriptionMetadata, "descriptionMetadata");
     }
 
-    protected static Snapshot create(
+    public static Snapshot create(
             SnapshotId id,
-            Effective tx,
-            Effective valid,
-            TimelineId timelineId,
-            Integer versionNo,
+            SnapshotSlotId snapshotSlotId,
             String title
     ) {
         var descriptionMetadata = JpaDescriptionMetadata.create(title);
-        var snapshot = new Snapshot(id, tx, valid, timelineId, versionNo, descriptionMetadata);
+        var snapshot = new Snapshot(id, snapshotSlotId, new ArrayList<>(), descriptionMetadata);
         snapshot.registerCreated();
         return snapshot;
     }
@@ -118,14 +100,5 @@ public class Snapshot implements Identifiable<SnapshotId>, Describable, Auditabl
     private void registerCreated() {
         var event = new SnapshotCreated(id, Instant.now());
         eventList.add(event);
-    }
-
-    private void registerEffectiveChanged(EffectiveSelector selector, Instant at) {
-        var event = new SnapshotEffectiveChanged(id, selector, at, Instant.now());
-        eventList.add(event);
-    }
-
-    private void upgrade() {
-        versionNo += 1;
     }
 }

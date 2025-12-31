@@ -6,7 +6,7 @@ import com.lilamaris.capstone.adapter.out.jpa.specification.TimelineSpecificatio
 import com.lilamaris.capstone.application.port.in.condition.SnapshotQueryCondition;
 import com.lilamaris.capstone.application.port.out.TimelinePort;
 import com.lilamaris.capstone.application.util.UniversityClock;
-import com.lilamaris.capstone.domain.model.capstone.timeline.Snapshot;
+import com.lilamaris.capstone.domain.model.capstone.snapshot.Snapshot;
 import com.lilamaris.capstone.domain.model.capstone.timeline.Timeline;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
 import jakarta.transaction.Transactional;

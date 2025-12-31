@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.domain.model.capstone.timeline.id;
+package com.lilamaris.capstone.domain.model.capstone.snapshot.id;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.lilamaris.capstone.domain.model.common.defaults.DefaultUuidDomainId;
@@ -10,11 +10,11 @@ import java.util.UUID;
 
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SnapshotDeltaId extends DefaultUuidDomainId {
+public class SnapshotId extends DefaultUuidDomainId {
     @JsonValue
     protected UUID value;
 
-    public SnapshotDeltaId(UUID value) {
+    public SnapshotId(UUID value) {
         super(value);
     }
 

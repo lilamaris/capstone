@@ -1,6 +1,6 @@
-package com.lilamaris.capstone.domain.model.capstone.timeline.event;
+package com.lilamaris.capstone.domain.model.capstone.snapshot.event;
 
-import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
+import com.lilamaris.capstone.domain.model.capstone.snapshot.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.common.domain.event.aggregate.AggregateEvent;
 
 import java.time.Instant;

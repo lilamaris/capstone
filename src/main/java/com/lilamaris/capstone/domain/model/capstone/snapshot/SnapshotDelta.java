@@ -1,8 +1,9 @@
-package com.lilamaris.capstone.domain.model.capstone.timeline;
+package com.lilamaris.capstone.domain.model.capstone.snapshot;
 
-import com.lilamaris.capstone.domain.model.capstone.timeline.event.SnapshotDeltaCreated;
-import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotDeltaId;
-import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
+import com.lilamaris.capstone.domain.model.capstone.snapshot.event.SnapshotDeltaCreated;
+import com.lilamaris.capstone.domain.model.capstone.snapshot.id.SnapshotDeltaId;
+import com.lilamaris.capstone.domain.model.capstone.snapshot.id.SnapshotId;
+import com.lilamaris.capstone.domain.model.common.domain.contract.Auditable;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
 import com.lilamaris.capstone.domain.model.common.domain.event.DomainEvent;
 import com.lilamaris.capstone.domain.model.common.domain.metadata.AuditMetadata;
@@ -37,8 +38,8 @@ public class SnapshotDelta implements Identifiable<SnapshotDeltaId>, Auditable {
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private SnapshotDeltaId id;
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "snapshot_link_id", nullable = false, updatable = false))
-    private SnapshotLinkId snapshotLinkId;
+    @AttributeOverride(name = "value", column = @Column(name = "snapshot_id", nullable = false, updatable = false))
+    private SnapshotId snapshotId;
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "type", column = @Column(name = "resource_type")),
@@ -47,15 +48,15 @@ public class SnapshotDelta implements Identifiable<SnapshotDeltaId>, Auditable {
     private JpaDomainRef resourceRef;
     private String jsonPatch;
 
-    protected SnapshotDelta(SnapshotDeltaId id, SnapshotLinkId snapshotLinkId, JpaDomainRef resourceRef, String jsonPatch) {
+    protected SnapshotDelta(SnapshotDeltaId id, SnapshotId snapshotId, JpaDomainRef resourceRef, String jsonPatch) {
         this.id = requireField(id, "id");
-        this.snapshotLinkId = requireField(snapshotLinkId, "snapshotLinkId");
+        this.snapshotId = requireField(snapshotId, "snapshotId");
         this.resourceRef = requireField(resourceRef, "resourceRef");
         this.jsonPatch = requireField(jsonPatch, "jsonPatch");
     }
 
-    protected static SnapshotDelta create(SnapshotDeltaId id, SnapshotLinkId snapshotLinkId, JpaDomainRef resourceRef, String jsonPatch) {
-        var delta = new SnapshotDelta(id, snapshotLinkId, resourceRef, jsonPatch);
+    protected static SnapshotDelta create(SnapshotDeltaId id, SnapshotId snapshotId, JpaDomainRef resourceRef, String jsonPatch) {
+        var delta = new SnapshotDelta(id, snapshotId, resourceRef, jsonPatch);
         delta.registerCreated();
         return delta;
     }
@@ -64,7 +65,6 @@ public class SnapshotDelta implements Identifiable<SnapshotDeltaId>, Auditable {
         var event = new SnapshotDeltaCreated(id, resourceRef.toPOJO(), Instant.now());
         eventList.add(event);
     }
-
 
     @Override
     public final SnapshotDeltaId id() {

@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.adapter.out.jpa.specification;
 
-import com.lilamaris.capstone.domain.model.capstone.timeline.Snapshot;
+import com.lilamaris.capstone.domain.model.capstone.snapshot.Snapshot;
 import com.lilamaris.capstone.domain.model.capstone.timeline.embed.Effective;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
 import org.springframework.data.jpa.domain.Specification;

@@ -5,14 +5,13 @@ import com.lilamaris.capstone.application.port.in.condition.SnapshotQueryConditi
 import com.lilamaris.capstone.application.port.in.result.SnapshotResult;
 import com.lilamaris.capstone.application.port.in.result.TimelineResult;
 import com.lilamaris.capstone.application.port.out.TimelinePort;
-import com.lilamaris.capstone.domain.model.capstone.timeline.Snapshot;
+import com.lilamaris.capstone.domain.model.capstone.snapshot.Snapshot;
 import com.lilamaris.capstone.domain.model.capstone.timeline.Timeline;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -34,9 +33,6 @@ public class TimelineQueryService implements TimelineQueryUseCase {
     @Override
     public List<SnapshotResult.Query> getSnapshot(SnapshotQueryCondition condition) {
         List<Snapshot> snapshotList = timelinePort.getSnapshot(condition);
-        return snapshotList.stream()
-                .sorted(Comparator.comparing(snapshot -> snapshot.getTx().getFrom()))
-                .map(SnapshotResult.Query::from)
-                .toList();
+        return List.of();
     }
 }
