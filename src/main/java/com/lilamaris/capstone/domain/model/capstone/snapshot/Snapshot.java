@@ -8,6 +8,8 @@ import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
 import com.lilamaris.capstone.domain.model.common.domain.event.DomainEvent;
+import com.lilamaris.capstone.domain.model.common.domain.metadata.AuditMetadata;
+import com.lilamaris.capstone.domain.model.common.domain.metadata.DescriptionMetadata;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaDescriptionMetadata;
 import jakarta.persistence.*;
@@ -29,7 +31,7 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 @Entity
 @Table(name = "timeline_snapshot")
 @EntityListeners(AuditingEntityListener.class)
-public class Snapshot implements Identifiable<SnapshotId> {
+public class Snapshot implements Identifiable<SnapshotId>, Describable, Auditable {
     @Embedded
     private final JpaAuditMetadata audit = new JpaAuditMetadata();
     @Transient
@@ -92,24 +94,19 @@ public class Snapshot implements Identifiable<SnapshotId> {
         return id;
     }
 
-    protected void open(EffectiveSelector selector, Instant at) {
-        if (selector == EffectiveSelector.TX) {
-            tx.open(at);
-        } else {
-            valid.open(at);
-        }
-        upgrade();
-        registerEffectiveChanged(selector, at);
+    @Override
+    public DescriptionMetadata descriptionMetadata() {
+        return descriptionMetadata;
     }
 
-    protected void close(EffectiveSelector selector, Instant at) {
-        if (selector == EffectiveSelector.TX) {
-            tx.close(at);
-        } else {
-            valid.close(at);
-        }
-        upgrade();
-        registerEffectiveChanged(selector, at);
+    @Override
+    public AuditMetadata auditMetadata() {
+        return audit;
+    }
+
+    @Override
+    public void updateDescription(DescriptionMetadata descriptionMetadata) {
+        this.descriptionMetadata = JpaDescriptionMetadata.from(descriptionMetadata);
     }
 
     protected List<DomainEvent> pullEvent() {

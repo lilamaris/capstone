@@ -2,7 +2,9 @@ package com.lilamaris.capstone.domain.model.capstone.user;
 
 import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
+import com.lilamaris.capstone.domain.model.common.domain.contract.Auditable;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
+import com.lilamaris.capstone.domain.model.common.domain.metadata.AuditMetadata;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaAuditMetadata;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -19,7 +21,7 @@ import java.util.function.Supplier;
 @Entity
 @Table(name = "usr")
 @EntityListeners(AuditingEntityListener.class)
-public class User implements Identifiable<UserId> {
+public class User implements Identifiable<UserId>, Auditable {
     @Embedded
     private final JpaAuditMetadata audit = new JpaAuditMetadata();
     @Getter(AccessLevel.NONE)
@@ -53,5 +55,10 @@ public class User implements Identifiable<UserId> {
     @Override
     public UserId id() {
         return id;
+    }
+
+    @Override
+    public AuditMetadata auditMetadata() {
+        return audit;
     }
 }

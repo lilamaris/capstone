@@ -5,6 +5,7 @@ import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotDeltaId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
 import com.lilamaris.capstone.domain.model.common.domain.event.DomainEvent;
+import com.lilamaris.capstone.domain.model.common.domain.metadata.AuditMetadata;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaDomainRef;
 import jakarta.persistence.*;
@@ -26,7 +27,7 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 @Entity
 @Table(name = "timeline_snapshot_delta")
 @EntityListeners(AuditingEntityListener.class)
-public class SnapshotDelta implements Identifiable<SnapshotDeltaId> {
+public class SnapshotDelta implements Identifiable<SnapshotDeltaId>, Auditable {
     @Embedded
     private final JpaAuditMetadata audit = new JpaAuditMetadata();
     @Transient
@@ -68,5 +69,10 @@ public class SnapshotDelta implements Identifiable<SnapshotDeltaId> {
     @Override
     public final SnapshotDeltaId id() {
         return id;
+    }
+
+    @Override
+    public AuditMetadata auditMetadata() {
+        return audit;
     }
 }

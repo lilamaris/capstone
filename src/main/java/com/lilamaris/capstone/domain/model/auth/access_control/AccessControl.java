@@ -1,10 +1,12 @@
 package com.lilamaris.capstone.domain.model.auth.access_control;
 
 import com.lilamaris.capstone.domain.model.auth.access_control.id.AccessControlId;
+import com.lilamaris.capstone.domain.model.common.domain.contract.Auditable;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
 import com.lilamaris.capstone.domain.model.common.domain.event.actor.CanonicalActor;
 import com.lilamaris.capstone.domain.model.common.domain.event.aggregate.AggregateEvent;
 import com.lilamaris.capstone.domain.model.common.domain.id.DomainRef;
+import com.lilamaris.capstone.domain.model.common.domain.metadata.AuditMetadata;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaActor;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaDomainRef;
@@ -26,7 +28,7 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 @Entity
 @Table(name = "_access_control")
 @EntityListeners(AuditingEntityListener.class)
-public class AccessControl implements Identifiable<AccessControlId> {
+public class AccessControl implements Identifiable<AccessControlId>, Auditable {
     @Embedded
     private final JpaAuditMetadata audit = new JpaAuditMetadata();
     @Getter(AccessLevel.NONE)
@@ -82,5 +84,10 @@ public class AccessControl implements Identifiable<AccessControlId> {
     @Override
     public AccessControlId id() {
         return id;
+    }
+
+    @Override
+    public AuditMetadata auditMetadata() {
+        return audit;
     }
 }

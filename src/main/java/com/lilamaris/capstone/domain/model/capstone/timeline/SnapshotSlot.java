@@ -1,17 +1,19 @@
 package com.lilamaris.capstone.domain.model.capstone.timeline;
 
 import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
+import com.lilamaris.capstone.domain.model.capstone.snapshot.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.embed.Effective;
 import com.lilamaris.capstone.domain.model.capstone.timeline.embed.EffectiveSelector;
 import com.lilamaris.capstone.domain.model.capstone.timeline.event.SnapshotSlotCreated;
 import com.lilamaris.capstone.domain.model.capstone.timeline.event.SnapshotSlotEffectiveUpdated;
 import com.lilamaris.capstone.domain.model.capstone.timeline.event.SnapshotSlotOccupied;
 import com.lilamaris.capstone.domain.model.capstone.timeline.event.SnapshotSlotUnoccupied;
-import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotSlotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
+import com.lilamaris.capstone.domain.model.common.domain.contract.Auditable;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
 import com.lilamaris.capstone.domain.model.common.domain.event.DomainEvent;
+import com.lilamaris.capstone.domain.model.common.domain.metadata.AuditMetadata;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaAuditMetadata;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -34,7 +36,7 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 @Entity
 @Table(name = "timeline_snapshot_slot")
 @EntityListeners(AuditingEntityListener.class)
-public class SnapshotSlot implements Identifiable<SnapshotSlotId> {
+public class SnapshotSlot implements Identifiable<SnapshotSlotId>, Auditable {
     @Embedded
     private final JpaAuditMetadata audit = new JpaAuditMetadata();
 
@@ -153,6 +155,11 @@ public class SnapshotSlot implements Identifiable<SnapshotSlotId> {
     @Override
     public SnapshotSlotId id() {
         return id;
+    }
+
+    @Override
+    public AuditMetadata auditMetadata() {
+        return audit;
     }
 
     protected boolean isRoot() {

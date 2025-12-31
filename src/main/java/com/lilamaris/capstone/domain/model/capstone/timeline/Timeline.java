@@ -10,10 +10,12 @@ import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotLinkId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotSlotId;
 import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
+import com.lilamaris.capstone.domain.model.common.domain.contract.Auditable;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Describable;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
 import com.lilamaris.capstone.domain.model.common.domain.event.DomainEvent;
 import com.lilamaris.capstone.domain.model.common.domain.event.aggregate.CollectedDomainEvent;
+import com.lilamaris.capstone.domain.model.common.domain.metadata.AuditMetadata;
 import com.lilamaris.capstone.domain.model.common.domain.metadata.DescriptionMetadata;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaDescriptionMetadata;
@@ -42,7 +44,7 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 @Entity
 @Table(name = "timeline_root")
 @EntityListeners(AuditingEntityListener.class)
-public class Timeline implements Identifiable<TimelineId>, Describable {
+public class Timeline implements Identifiable<TimelineId>, Describable, Auditable {
     @Embedded
     private final JpaAuditMetadata audit = new JpaAuditMetadata();
     @Transient
@@ -132,6 +134,11 @@ public class Timeline implements Identifiable<TimelineId>, Describable {
     @Override
     public DescriptionMetadata descriptionMetadata() {
         return descriptionMetadata;
+    }
+
+    @Override
+    public AuditMetadata auditMetadata() {
+        return audit;
     }
 
     @Override

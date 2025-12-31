@@ -3,7 +3,9 @@ package com.lilamaris.capstone.domain.model.auth.account;
 import com.lilamaris.capstone.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.domain.model.auth.account.id.AccountId;
 import com.lilamaris.capstone.domain.model.capstone.user.id.UserId;
+import com.lilamaris.capstone.domain.model.common.domain.contract.Auditable;
 import com.lilamaris.capstone.domain.model.common.domain.contract.Identifiable;
+import com.lilamaris.capstone.domain.model.common.domain.metadata.AuditMetadata;
 import com.lilamaris.capstone.domain.model.common.infra.persistence.jpa.JpaAuditMetadata;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -23,7 +25,7 @@ import static com.lilamaris.capstone.domain.model.util.Validation.requireField;
 @Entity
 @Table(name = "account_root")
 @EntityListeners(AuditingEntityListener.class)
-public class Account implements Identifiable<AccountId> {
+public class Account implements Identifiable<AccountId>, Auditable {
     @Embedded
     private final JpaAuditMetadata audit = new JpaAuditMetadata();
     @Getter(AccessLevel.NONE)
@@ -104,6 +106,11 @@ public class Account implements Identifiable<AccountId> {
     @Override
     public final AccountId id() {
         return id;
+    }
+
+    @Override
+    public AuditMetadata auditMetadata() {
+        return audit;
     }
 
     public boolean challengeHash(String rawPassword, PasswordEncoder encoder) {
