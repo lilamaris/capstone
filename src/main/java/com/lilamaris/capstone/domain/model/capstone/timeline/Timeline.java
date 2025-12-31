@@ -268,6 +268,46 @@ public class Timeline implements Identifiable<TimelineId>, Describable {
         propagateToTransient();
     }
 
+    public void merge(
+            Instant txAt,
+            Effective validRange,
+            Supplier<SnapshotSlotId> snapshotSlotIdSupplier
+    ) {
+        checkAnySlotExists();
+
+        var candidateSlots = slotList.stream()
+                .filter(SnapshotSlot.ifEffectiveOpenEqualTo(EffectiveSelector.TX, true))
+                .filter(SnapshotSlot.ifEffectiveOverlap(EffectiveSelector.VALID, validRange))
+                .sorted(SnapshotSlot.sortAsc(EffectiveSelector.VALID))
+                .toList();
+
+        if (candidateSlots.isEmpty()) {
+            throw new TimelineDomainException(TimelineErrorCode.NO_AVAILABLE_SLOT, "No slot matched the given criteria valid range" + validRange);
+        }
+
+        candidateSlots.forEach(slot -> {
+            slot.close(EffectiveSelector.TX, txAt);
+            eventList.addAll(slot.pullEvent());
+        });
+
+        var earliestSlot = candidateSlots.getFirst();
+        var latestSlot = candidateSlots.getLast();
+
+        var mergedTx = Effective.create(txAt, Effective.MAX);
+        var mergedValid = Effective.create(
+                earliestSlot.getValid().getFrom(),
+                latestSlot.getValid().getTo()
+        );
+        var mergedSlot = SnapshotSlot.create(
+                snapshotSlotIdSupplier.get(),
+                id,
+                mergedTx,
+                mergedValid
+        );
+        slotList.add(mergedSlot);
+        eventList.addAll(mergedSlot.pullEvent());
+    }
+
     public void mergeValidRange(
             Instant txAt,
             Effective validRange,
@@ -326,6 +366,12 @@ public class Timeline implements Identifiable<TimelineId>, Describable {
         eventList.addAll(snapshot.pullEvent());
         eventList.addAll(link.pullEvent());
         propagateToTransient();
+    }
+
+    private void checkAnySlotExists() {
+        if (slotList.isEmpty()) {
+            throw new TimelineDomainException(TimelineErrorCode.EMPTY_SLOT, "No slot exists on this timeline.");
+        }
     }
 
     private Comparator<Snapshot> sortAsc(EffectiveSelector selector) {

@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -79,10 +80,14 @@ public class TimelineTest {
 
     @Test
     void should_migrate_slot() {
-        var initial = getTimelineInitialMigrated();
+        var timeline = getTimelineInitialMigrated();
 
-        initial.migrate(initialTxAt, initialValidAt, ids.next(SnapshotSlotId.class));
-        log.info("timeline: {}", initial);
+        var operateTxAt = initialTxAt.plus(1, ChronoUnit.DAYS);
+        var operateValidAt = initialValidAt.plus(3, ChronoUnit.DAYS);
+        timeline.migrate(operateTxAt, operateValidAt, ids.next(SnapshotSlotId.class));
+
+        var slots = timeline.getSlotList();
+        assertThat(slots).hasSize(3);
 
     }
 
