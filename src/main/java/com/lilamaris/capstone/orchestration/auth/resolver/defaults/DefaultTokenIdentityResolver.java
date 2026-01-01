@@ -1,7 +1,7 @@
-package com.lilamaris.capstone.auth.application.resolver.defaults;
+package com.lilamaris.capstone.orchestration.auth.resolver.defaults;
 
-import com.lilamaris.capstone.auth.application.resolver.AuthIdentity;
-import com.lilamaris.capstone.auth.application.resolver.TokenIdentityResolver;
+import com.lilamaris.capstone.orchestration.auth.resolver.AuthIdentity;
+import com.lilamaris.capstone.orchestration.auth.resolver.TokenIdentityResolver;
 import com.lilamaris.capstone.refresh_token.application.port.out.RefreshTokenPort;
 import com.lilamaris.capstone.refresh_token.domain.id.RefreshTokenId;
 import com.lilamaris.capstone.shared.application.exception.ResourceNotFoundException;

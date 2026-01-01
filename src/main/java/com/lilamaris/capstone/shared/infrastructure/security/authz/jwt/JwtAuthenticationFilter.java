@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.shared.infrastructure.security.authz.jwt;
 
-import com.lilamaris.capstone.auth.application.util.JwtUtil;
+import com.lilamaris.capstone.orchestration.auth.util.JwtUtil;
 import com.lilamaris.capstone.shared.application.exception.ApplicationInvariantException;
 import com.lilamaris.capstone.shared.infrastructure.security.util.SecurityUserDetailsMapper;
 import jakarta.servlet.FilterChain;

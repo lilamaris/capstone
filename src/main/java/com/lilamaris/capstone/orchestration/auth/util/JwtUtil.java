@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.auth.application.util;
+package com.lilamaris.capstone.orchestration.auth.util;
 
 import com.lilamaris.capstone.shared.application.exception.ApplicationInvariantException;
 import com.lilamaris.capstone.shared.application.util.UniversityClock;

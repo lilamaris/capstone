@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.shared.infrastructure.security.authn.credential.provider;
 
-import com.lilamaris.capstone.auth.application.port.in.AuthCommandUseCase;
-import com.lilamaris.capstone.auth.application.result.AuthResult;
+import com.lilamaris.capstone.orchestration.auth.contract.TokenAuth;
+import com.lilamaris.capstone.orchestration.auth.result.AuthResult;
 import com.lilamaris.capstone.shared.application.exception.DomainViolationException;
 import com.lilamaris.capstone.shared.infrastructure.security.authn.credential.token.RefreshTokenAuthenticationToken;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class RefreshTokenProvider implements AuthenticationProvider {
-    private final AuthCommandUseCase authCommandUseCase;
+    private final TokenAuth tokenAuth;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -24,7 +24,7 @@ public class RefreshTokenProvider implements AuthenticationProvider {
             var token = (RefreshTokenAuthenticationToken) authentication;
             var refreshToken = token.getRefreshToken();
 
-            tokenResult = authCommandUseCase.refresh(refreshToken);
+            tokenResult = tokenAuth.reissue(refreshToken);
         } catch (DomainViolationException e) {
             throw e;
         } catch (Exception e) {

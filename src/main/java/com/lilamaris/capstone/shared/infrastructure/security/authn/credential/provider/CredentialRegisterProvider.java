@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.shared.infrastructure.security.authn.credential.provider;
 
-import com.lilamaris.capstone.auth.application.port.in.AuthCommandUseCase;
-import com.lilamaris.capstone.auth.application.result.AuthResult;
+import com.lilamaris.capstone.orchestration.auth.contract.CredentialAuth;
+import com.lilamaris.capstone.orchestration.auth.result.AuthResult;
 import com.lilamaris.capstone.shared.application.exception.DomainViolationException;
 import com.lilamaris.capstone.shared.infrastructure.security.authn.credential.token.CredentialRegisterAuthenticationToken;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class CredentialRegisterProvider implements AuthenticationProvider {
-    private final AuthCommandUseCase authCommandUseCase;
+    private final CredentialAuth credentialRegister;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -30,7 +30,7 @@ public class CredentialRegisterProvider implements AuthenticationProvider {
             var displayName = token.getDisplayName();
             var passwordHash = passwordEncoder.encode(rawPassword);
 
-            tokenResult = authCommandUseCase.credentialRegister(email, passwordHash, displayName);
+            tokenResult = credentialRegister.register(email, passwordHash, displayName);
         } catch (DomainViolationException e) {
             throw e;
         } catch (Exception e) {

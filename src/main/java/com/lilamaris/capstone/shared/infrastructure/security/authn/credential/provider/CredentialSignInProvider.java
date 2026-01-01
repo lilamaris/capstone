@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.shared.infrastructure.security.authn.credential.provider;
 
-import com.lilamaris.capstone.auth.application.port.in.AuthCommandUseCase;
-import com.lilamaris.capstone.auth.application.result.AuthResult;
+import com.lilamaris.capstone.orchestration.auth.contract.CredentialAuth;
+import com.lilamaris.capstone.orchestration.auth.result.AuthResult;
 import com.lilamaris.capstone.shared.application.exception.DomainViolationException;
 import com.lilamaris.capstone.shared.infrastructure.security.authn.credential.token.CredentialSignInAuthenticationToken;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import java.util.function.Function;
 @Component
 @RequiredArgsConstructor
 public class CredentialSignInProvider implements AuthenticationProvider {
-    private final AuthCommandUseCase authCommandUseCase;
+    private final CredentialAuth credentialAuth;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -31,7 +31,7 @@ public class CredentialSignInProvider implements AuthenticationProvider {
             var rawPassword = token.getRawPassword();
             Function<String, Boolean> challenge = (hash) -> passwordEncoder.matches(rawPassword, hash);
 
-            tokenResult = authCommandUseCase.credentialSignIn(email, challenge);
+            tokenResult = credentialAuth.signIn(email, challenge);
         } catch (DomainViolationException e) {
             throw e;
         } catch (Exception e) {

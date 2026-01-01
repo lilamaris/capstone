@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.auth.application.result;
+package com.lilamaris.capstone.orchestration.auth.result;
 
 import lombok.Builder;
 

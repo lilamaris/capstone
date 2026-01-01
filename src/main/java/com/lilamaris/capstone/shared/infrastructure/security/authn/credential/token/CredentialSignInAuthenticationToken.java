@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.shared.infrastructure.security.authn.credential.token;
 
-import com.lilamaris.capstone.auth.application.result.AuthResult;
+import com.lilamaris.capstone.orchestration.auth.result.AuthResult;
 import lombok.Getter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 

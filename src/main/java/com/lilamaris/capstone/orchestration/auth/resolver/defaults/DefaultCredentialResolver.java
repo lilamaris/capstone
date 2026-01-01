@@ -1,9 +1,9 @@
-package com.lilamaris.capstone.auth.application.resolver.defaults;
+package com.lilamaris.capstone.orchestration.auth.resolver.defaults;
 
 import com.lilamaris.capstone.account.application.port.out.AccountPort;
 import com.lilamaris.capstone.account.domain.Provider;
-import com.lilamaris.capstone.auth.application.resolver.AuthIdentity;
-import com.lilamaris.capstone.auth.application.resolver.CredentialIdentityResolver;
+import com.lilamaris.capstone.orchestration.auth.resolver.AuthIdentity;
+import com.lilamaris.capstone.orchestration.auth.resolver.CredentialIdentityResolver;
 import com.lilamaris.capstone.shared.application.exception.ApplicationInvariantException;
 import com.lilamaris.capstone.shared.application.exception.ResourceNotFoundException;
 import com.lilamaris.capstone.user.application.port.out.UserPort;

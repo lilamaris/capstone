@@ -1,9 +1,9 @@
-package com.lilamaris.capstone.auth.application.resolver.defaults;
+package com.lilamaris.capstone.orchestration.auth.resolver.defaults;
 
-import com.lilamaris.capstone.auth.application.resolver.AuthIdentity;
-import com.lilamaris.capstone.auth.application.resolver.SessionIssuer;
-import com.lilamaris.capstone.auth.application.result.AuthResult;
-import com.lilamaris.capstone.auth.application.util.JwtUtil;
+import com.lilamaris.capstone.orchestration.auth.resolver.AuthIdentity;
+import com.lilamaris.capstone.orchestration.auth.resolver.SessionIssuer;
+import com.lilamaris.capstone.orchestration.auth.result.AuthResult;
+import com.lilamaris.capstone.orchestration.auth.util.JwtUtil;
 import com.lilamaris.capstone.refresh_token.application.port.out.RefreshTokenPort;
 import com.lilamaris.capstone.refresh_token.domain.RefreshToken;
 import com.lilamaris.capstone.refresh_token.domain.id.RefreshTokenId;

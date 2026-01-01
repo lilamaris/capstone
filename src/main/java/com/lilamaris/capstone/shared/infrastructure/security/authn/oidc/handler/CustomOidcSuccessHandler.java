@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.shared.infrastructure.security.authn.oidc.handler;
 
-import com.lilamaris.capstone.auth.application.port.in.AuthCommandUseCase;
-import com.lilamaris.capstone.auth.application.result.AuthResult;
+import com.lilamaris.capstone.orchestration.auth.contract.OidcAuth;
+import com.lilamaris.capstone.orchestration.auth.result.AuthResult;
 import com.lilamaris.capstone.shared.application.exception.DomainViolationException;
 import com.lilamaris.capstone.shared.infrastructure.security.authn.oidc.NormalizedProfile;
 import com.lilamaris.capstone.shared.infrastructure.security.util.ResponseWriter;
@@ -18,7 +18,7 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class CustomOidcSuccessHandler implements AuthenticationSuccessHandler {
-    private final AuthCommandUseCase authCommandUseCase;
+    private final OidcAuth oidcAuth;
 
     private final ResponseWriter writer;
 
@@ -37,7 +37,7 @@ public class CustomOidcSuccessHandler implements AuthenticationSuccessHandler {
             var email = principal.getEmail();
             var displayName = principal.getDisplayName();
 
-            tokenResult = authCommandUseCase.oidcSignIn(provider, providerId, email, displayName);
+            tokenResult = oidcAuth.signIn(provider, providerId, email, displayName);
         } catch (DomainViolationException e) {
             throw e;
         } catch (Exception e) {

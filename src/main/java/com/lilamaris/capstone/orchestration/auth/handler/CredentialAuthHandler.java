@@ -1,13 +1,14 @@
-package com.lilamaris.capstone.auth.application.service;
+package com.lilamaris.capstone.orchestration.auth.handler;
 
 import com.lilamaris.capstone.account.application.port.out.AccountPort;
 import com.lilamaris.capstone.account.domain.Account;
 import com.lilamaris.capstone.account.domain.Provider;
 import com.lilamaris.capstone.account.domain.id.AccountId;
-import com.lilamaris.capstone.auth.application.port.in.AuthCommandUseCase;
-import com.lilamaris.capstone.auth.application.resolver.*;
-import com.lilamaris.capstone.auth.application.result.AuthResult;
-import com.lilamaris.capstone.refresh_token.domain.id.RefreshTokenId;
+import com.lilamaris.capstone.orchestration.auth.resolver.AuthIdentity;
+import com.lilamaris.capstone.orchestration.auth.resolver.CredentialIdentityResolver;
+import com.lilamaris.capstone.orchestration.auth.resolver.SessionIssuer;
+import com.lilamaris.capstone.orchestration.auth.result.AuthResult;
+import com.lilamaris.capstone.orchestration.auth.contract.CredentialAuth;
 import com.lilamaris.capstone.shared.application.exception.ResourceAlreadyExistsException;
 import com.lilamaris.capstone.shared.application.identity.IdGenerationContext;
 import com.lilamaris.capstone.user.application.port.out.UserPort;
@@ -15,17 +16,15 @@ import com.lilamaris.capstone.user.domain.Role;
 import com.lilamaris.capstone.user.domain.User;
 import com.lilamaris.capstone.user.domain.id.UserId;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.function.Function;
 
-@Service
+@Component
 @RequiredArgsConstructor
-public class AuthCommandService implements AuthCommandUseCase {
+public class CredentialAuthHandler implements CredentialAuth {
     private final CredentialIdentityResolver credentialIdentityResolver;
-    private final OidcIdentityResolver oidcIdentityResolver;
-    private final TokenIdentityResolver tokenIdentityResolver;
     private final SessionIssuer sessionIssuer;
 
     private final IdGenerationContext ids;
@@ -33,29 +32,7 @@ public class AuthCommandService implements AuthCommandUseCase {
     private final UserPort userPort;
 
     @Override
-    @Transactional
-    public AuthResult.Token refresh(String refreshToken) {
-        var identity = tokenIdentityResolver.resolve(new RefreshTokenId(refreshToken));
-        return sessionIssuer.issue(identity);
-
-    }
-
-    @Override
-    @Transactional
-    public AuthResult.Token oidcSignIn(Provider provider, String providerId, String email, String displayName) {
-        var identity = oidcIdentityResolver.resolve(provider, providerId, email, displayName);
-        return sessionIssuer.issue(identity);
-    }
-
-    @Override
-    @Transactional
-    public AuthResult.Token credentialSignIn(String email, Function<String, Boolean> challengeFunction) {
-        var identity = credentialIdentityResolver.resolve(email, challengeFunction);
-        return sessionIssuer.issue(identity);
-    }
-
-    @Override
-    public AuthResult.Token credentialRegister(String email, String passwordHash, String displayName) {
+    public AuthResult.Token register(String email, String passwordHash, String displayName) {
         if (accountPort.isExists(Provider.LOCAL, email)) {
             throw new ResourceAlreadyExistsException("Account already exists.");
         }
@@ -67,6 +44,13 @@ public class AuthCommandService implements AuthCommandUseCase {
         account = accountPort.save(account);
 
         var identity = new AuthIdentity(user, account, true);
+        return sessionIssuer.issue(identity);
+    }
+
+    @Override
+    @Transactional
+    public AuthResult.Token signIn(String email, Function<String, Boolean> challengeFunction) {
+        var identity = credentialIdentityResolver.resolve(email, challengeFunction);
         return sessionIssuer.issue(identity);
     }
 }

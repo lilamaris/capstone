@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.shared.infrastructure.security.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lilamaris.capstone.auth.application.result.AuthResult;
+import com.lilamaris.capstone.orchestration.auth.result.AuthResult;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.shared.infrastructure.security.util;
 
-import com.lilamaris.capstone.auth.application.util.JwtUtil;
+import com.lilamaris.capstone.orchestration.auth.util.JwtUtil;
 import com.lilamaris.capstone.shared.infrastructure.security.SecurityUserDetails;
 import com.lilamaris.capstone.user.domain.Role;
 import com.lilamaris.capstone.user.domain.id.UserId;

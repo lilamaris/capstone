@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.auth.application.resolver;
+package com.lilamaris.capstone.orchestration.auth.resolver;
 
 import java.util.function.Function;
 

@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.shared.infrastructure.security.authn.handler;
 
-import com.lilamaris.capstone.auth.application.result.AuthResult;
+import com.lilamaris.capstone.orchestration.auth.result.AuthResult;
 import com.lilamaris.capstone.shared.infrastructure.security.util.ResponseWriter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
