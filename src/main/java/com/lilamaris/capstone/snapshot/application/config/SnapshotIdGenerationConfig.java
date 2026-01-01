@@ -1,0 +1,24 @@
+package com.lilamaris.capstone.snapshot.application.config;
+
+import com.lilamaris.capstone.shared.application.identity.IdGenerator;
+import com.lilamaris.capstone.shared.application.identity.RawGenerator;
+import com.lilamaris.capstone.shared.application.identity.defaults.RawBasedIdGenerator;
+import com.lilamaris.capstone.snapshot.domain.id.SnapshotDeltaId;
+import com.lilamaris.capstone.snapshot.domain.id.SnapshotId;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.UUID;
+
+@Configuration
+public class SnapshotIdGenerationConfig {
+    @Bean
+    public IdGenerator<SnapshotId> snapshotIdIdGenerator(RawGenerator<UUID> uuid) {
+        return new RawBasedIdGenerator<>(SnapshotId.class, SnapshotId::new, uuid);
+    }
+
+    @Bean
+    public IdGenerator<SnapshotDeltaId> snapshotDeltaIdIdGenerator(RawGenerator<UUID> uuid) {
+        return new RawBasedIdGenerator<>(SnapshotDeltaId.class, SnapshotDeltaId::new, uuid);
+    }
+}
