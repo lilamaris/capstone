@@ -1,10 +1,10 @@
 package com.lilamaris.capstone.orchestration.auth.handler;
 
 import com.lilamaris.capstone.account.domain.Provider;
+import com.lilamaris.capstone.orchestration.auth.contract.OidcAuth;
 import com.lilamaris.capstone.orchestration.auth.resolver.OidcIdentityResolver;
 import com.lilamaris.capstone.orchestration.auth.resolver.SessionIssuer;
 import com.lilamaris.capstone.orchestration.auth.result.AuthResult;
-import com.lilamaris.capstone.orchestration.auth.contract.OidcAuth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;

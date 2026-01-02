@@ -1,10 +1,10 @@
 package com.lilamaris.capstone.orchestration.auth.handler;
 
-import com.lilamaris.capstone.refresh_token.domain.id.RefreshTokenId;
+import com.lilamaris.capstone.orchestration.auth.contract.TokenAuth;
 import com.lilamaris.capstone.orchestration.auth.resolver.SessionIssuer;
 import com.lilamaris.capstone.orchestration.auth.resolver.TokenIdentityResolver;
 import com.lilamaris.capstone.orchestration.auth.result.AuthResult;
-import com.lilamaris.capstone.orchestration.auth.contract.TokenAuth;
+import com.lilamaris.capstone.refresh_token.domain.id.RefreshTokenId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;

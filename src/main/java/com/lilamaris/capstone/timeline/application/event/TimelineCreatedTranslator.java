@@ -1,11 +1,11 @@
 package com.lilamaris.capstone.timeline.application.event;
 
-import com.lilamaris.capstone.shared.application.config.access_control.privilege.timeline.TimelineRole;
 import com.lilamaris.capstone.shared.application.context.ActorContext;
 import com.lilamaris.capstone.shared.domain.event.DomainEvent;
 import com.lilamaris.capstone.shared.domain.event.boundary.EventTranslator;
 import com.lilamaris.capstone.shared.domain.event.canonical.ResourceCreated;
 import com.lilamaris.capstone.shared.domain.event.canonical.ResourceGranted;
+import com.lilamaris.capstone.timeline.application.policy.access_control.TimelineRole;
 import com.lilamaris.capstone.timeline.domain.event.TimelineCreated;
 import org.springframework.stereotype.Component;
 
