@@ -1,8 +1,9 @@
 package com.lilamaris.capstone.shared.infrastructure.security.authz.jwt;
 
-import com.lilamaris.capstone.orchestration.auth.util.JwtUtil;
+import com.lilamaris.capstone.orchestration.auth.contract.TokenAuth;
+import com.lilamaris.capstone.shared.application.context.ActorContext;
 import com.lilamaris.capstone.shared.application.exception.ApplicationInvariantException;
-import com.lilamaris.capstone.shared.infrastructure.security.util.SecurityUserDetailsMapper;
+import com.lilamaris.capstone.shared.domain.event.actor.UserActor;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,12 +11,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 
 @Component
 @RequiredArgsConstructor
@@ -23,7 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String AUTH_HEADER = "Authorization";
     private static final String AUTH_HEADER_PREFIX = "Bearer ";
 
-    private final JwtUtil jwtUtil;
+    private final TokenAuth tokenAuth;
 
     @Override
     protected void doFilterInternal(
@@ -35,10 +38,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             var token = resolveToken(request);
 
             if (StringUtils.hasText(token)) {
-                var claims = jwtUtil.parseToken(token);
-                var principal = SecurityUserDetailsMapper.fromClaims(claims);
-                var authentication = new UsernamePasswordAuthenticationToken(principal, token, principal.getAuthorities());
+                var claims = tokenAuth.parseToken(token);
+                var actor = UserActor.of(claims.getSubject());
+                var authorities = Collections.singletonList(new SimpleGrantedAuthority(actor.type().name()));
+                var authentication = new UsernamePasswordAuthenticationToken(actor, token, authorities);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                ActorContext.set(actor);
             }
         } catch (ApplicationInvariantException e) {
             request.setAttribute("jwtException", e);

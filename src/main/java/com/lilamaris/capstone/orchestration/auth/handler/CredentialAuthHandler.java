@@ -10,7 +10,7 @@ import com.lilamaris.capstone.orchestration.auth.resolver.CredentialIdentityReso
 import com.lilamaris.capstone.orchestration.auth.resolver.SessionIssuer;
 import com.lilamaris.capstone.orchestration.auth.result.AuthResult;
 import com.lilamaris.capstone.shared.application.exception.ResourceAlreadyExistsException;
-import com.lilamaris.capstone.shared.application.identity.IdGenerationContext;
+import com.lilamaris.capstone.shared.application.identity.contract.IdGenerationContext;
 import com.lilamaris.capstone.user.application.port.out.UserPort;
 import com.lilamaris.capstone.user.domain.Role;
 import com.lilamaris.capstone.user.domain.User;
