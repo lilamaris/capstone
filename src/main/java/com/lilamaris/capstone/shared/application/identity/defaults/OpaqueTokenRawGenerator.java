@@ -1,6 +1,6 @@
-package com.lilamaris.capstone.shared.application.identity.raw;
+package com.lilamaris.capstone.shared.application.identity.defaults;
 
-import com.lilamaris.capstone.shared.application.identity.RawGenerator;
+import com.lilamaris.capstone.shared.application.identity.contract.RawGenerator;
 
 import java.security.SecureRandom;
 import java.util.Base64;

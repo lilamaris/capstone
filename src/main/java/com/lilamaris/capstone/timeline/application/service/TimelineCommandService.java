@@ -2,8 +2,7 @@ package com.lilamaris.capstone.timeline.application.service;
 
 import com.lilamaris.capstone.shared.application.access_control.contract.DomainAuthorizer;
 import com.lilamaris.capstone.shared.application.context.ActorContext;
-import com.lilamaris.capstone.shared.application.exception.ResourceNotFoundException;
-import com.lilamaris.capstone.shared.application.identity.IdGenerationContext;
+import com.lilamaris.capstone.shared.application.identity.contract.IdGenerationContext;
 import com.lilamaris.capstone.shared.application.util.UniversityClock;
 import com.lilamaris.capstone.shared.domain.defaults.DefaultDescriptionMetadata;
 import com.lilamaris.capstone.shared.domain.event.actor.CanonicalActor;
@@ -23,6 +22,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class TimelineCommandService implements TimelineCommandUseCase {
     private final TimelinePort timelinePort;
+    private final TimelineResourceUtil resourceUtil;
 
     private final IdGenerationContext ids;
     private final DomainAuthorizer timelineAuthorizer;
@@ -47,9 +47,7 @@ public class TimelineCommandService implements TimelineCommandUseCase {
         CanonicalActor actor = ActorContext.get();
         timelineAuthorizer.authorize(actor, id.ref(), TimelineAction.UPDATE_METADATA);
 
-        var timeline = timelinePort.getById(id).orElseThrow(() -> new ResourceNotFoundException(
-                String.format("Timeline with id '%s' not found.", id)
-        ));
+        var timeline = resourceUtil.getTimeline(id);
 
         timeline.updateDescription(new DefaultDescriptionMetadata(title, details));
 
@@ -61,9 +59,7 @@ public class TimelineCommandService implements TimelineCommandUseCase {
         CanonicalActor actor = ActorContext.get();
         timelineAuthorizer.authorize(actor, id.ref(), TimelineAction.MIGRATE);
 
-        var timeline = timelinePort.getById(id).orElseThrow(() -> new ResourceNotFoundException(
-                String.format("Timeline with id '%s' not found.", id)
-        ));
+        var timeline = resourceUtil.getTimeline(id);
 
         timeline.migrate(
                 ids.next(SnapshotSlotId.class),
@@ -80,9 +76,7 @@ public class TimelineCommandService implements TimelineCommandUseCase {
         CanonicalActor actor = ActorContext.get();
         timelineAuthorizer.authorize(actor, id.ref(), TimelineAction.MERGE);
 
-        var timeline = timelinePort.getById(id).orElseThrow(() -> new ResourceNotFoundException(
-                String.format("Timeline with id '%s' not found.", id)
-        ));
+        var timeline = resourceUtil.getTimeline(id);
 
         timeline.merge(
                 ids.next(SnapshotSlotId.class),

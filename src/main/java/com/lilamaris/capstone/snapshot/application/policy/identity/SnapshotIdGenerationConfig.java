@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.snapshot.application.policy.identity;
 
-import com.lilamaris.capstone.shared.application.identity.IdGenerator;
-import com.lilamaris.capstone.shared.application.identity.RawGenerator;
+import com.lilamaris.capstone.shared.application.identity.contract.IdGenerator;
+import com.lilamaris.capstone.shared.application.identity.contract.RawGenerator;
 import com.lilamaris.capstone.shared.application.identity.defaults.RawBasedIdGenerator;
 import com.lilamaris.capstone.snapshot.domain.id.SnapshotDeltaId;
 import com.lilamaris.capstone.snapshot.domain.id.SnapshotId;

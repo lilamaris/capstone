@@ -4,8 +4,8 @@ import com.lilamaris.capstone.access_control.application.port.out.AccessControlP
 import com.lilamaris.capstone.shared.application.access_control.contract.DomainAuthorizer;
 import com.lilamaris.capstone.shared.application.access_control.contract.DomainPolicy;
 import com.lilamaris.capstone.shared.application.access_control.contract.DomainPolicyDirectory;
-import com.lilamaris.capstone.shared.application.access_control.policy.defaults.DefaultAuthorizer;
-import com.lilamaris.capstone.shared.application.access_control.policy.defaults.DefaultPolicyDirectory;
+import com.lilamaris.capstone.shared.application.access_control.defaults.DefaultAuthorizer;
+import com.lilamaris.capstone.shared.application.access_control.defaults.DefaultPolicyDirectory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

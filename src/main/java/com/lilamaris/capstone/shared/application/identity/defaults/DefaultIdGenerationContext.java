@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.shared.application.identity.defaults;
 
-import com.lilamaris.capstone.shared.application.identity.IdGenerationContext;
-import com.lilamaris.capstone.shared.application.identity.IdGenerator;
+import com.lilamaris.capstone.shared.application.identity.contract.IdGenerationContext;
+import com.lilamaris.capstone.shared.application.identity.contract.IdGenerator;
 import com.lilamaris.capstone.shared.domain.id.DomainId;
 
 import java.util.List;

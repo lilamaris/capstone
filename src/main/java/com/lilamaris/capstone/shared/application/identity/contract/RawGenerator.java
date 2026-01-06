@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.shared.application.identity;
+package com.lilamaris.capstone.shared.application.identity.contract;
 
 @FunctionalInterface
 public interface RawGenerator<R> {

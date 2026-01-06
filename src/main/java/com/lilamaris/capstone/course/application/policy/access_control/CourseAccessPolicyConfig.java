@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.course.application.policy.access_control;
 
 import com.lilamaris.capstone.shared.application.access_control.contract.DomainPolicy;
-import com.lilamaris.capstone.shared.application.access_control.policy.defaults.DefaultPolicy;
+import com.lilamaris.capstone.shared.application.access_control.defaults.DefaultPolicy;
 import com.lilamaris.capstone.shared.domain.type.ResourceDomainType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

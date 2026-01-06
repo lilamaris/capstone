@@ -1,10 +1,10 @@
 package com.lilamaris.capstone.shared.application.config;
 
-import com.lilamaris.capstone.shared.application.identity.IdGenerationContext;
-import com.lilamaris.capstone.shared.application.identity.IdGenerator;
-import com.lilamaris.capstone.shared.application.identity.RawGenerator;
+import com.lilamaris.capstone.shared.application.identity.contract.IdGenerationContext;
+import com.lilamaris.capstone.shared.application.identity.contract.IdGenerator;
+import com.lilamaris.capstone.shared.application.identity.contract.RawGenerator;
 import com.lilamaris.capstone.shared.application.identity.defaults.DefaultIdGenerationContext;
-import com.lilamaris.capstone.shared.application.identity.raw.OpaqueTokenRawGenerator;
+import com.lilamaris.capstone.shared.application.identity.defaults.OpaqueTokenRawGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.shared.application.access_control.policy.defaults;
+package com.lilamaris.capstone.shared.application.access_control.defaults;
 
 import com.lilamaris.capstone.access_control.application.port.out.AccessControlPort;
 import com.lilamaris.capstone.shared.application.access_control.contract.DomainAction;

@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.timeline.application.policy.identity;
 
-import com.lilamaris.capstone.shared.application.identity.IdGenerator;
-import com.lilamaris.capstone.shared.application.identity.RawGenerator;
+import com.lilamaris.capstone.shared.application.identity.contract.IdGenerator;
+import com.lilamaris.capstone.shared.application.identity.contract.RawGenerator;
 import com.lilamaris.capstone.shared.application.identity.defaults.RawBasedIdGenerator;
 import com.lilamaris.capstone.timeline.domain.id.SnapshotSlotId;
 import com.lilamaris.capstone.timeline.domain.id.TimelineId;

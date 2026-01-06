@@ -1,8 +1,8 @@
 package com.lilamaris.capstone.shared.application.identity.defaults;
 
-import com.lilamaris.capstone.shared.application.identity.IdGenerator;
-import com.lilamaris.capstone.shared.application.identity.IdSpec;
-import com.lilamaris.capstone.shared.application.identity.RawGenerator;
+import com.lilamaris.capstone.shared.application.identity.contract.IdGenerator;
+import com.lilamaris.capstone.shared.application.identity.contract.IdSpec;
+import com.lilamaris.capstone.shared.application.identity.contract.RawGenerator;
 import com.lilamaris.capstone.shared.domain.id.DomainId;
 import lombok.RequiredArgsConstructor;
 

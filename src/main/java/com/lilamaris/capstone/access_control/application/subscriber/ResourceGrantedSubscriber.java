@@ -3,7 +3,7 @@ package com.lilamaris.capstone.access_control.application.subscriber;
 import com.lilamaris.capstone.access_control.application.port.out.AccessControlPort;
 import com.lilamaris.capstone.access_control.domain.AccessControl;
 import com.lilamaris.capstone.access_control.domain.id.AccessControlId;
-import com.lilamaris.capstone.shared.application.identity.IdGenerationContext;
+import com.lilamaris.capstone.shared.application.identity.contract.IdGenerationContext;
 import com.lilamaris.capstone.shared.domain.event.canonical.ResourceGranted;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
