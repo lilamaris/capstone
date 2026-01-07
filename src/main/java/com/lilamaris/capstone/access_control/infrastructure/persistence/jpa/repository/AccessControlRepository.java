@@ -6,6 +6,7 @@ import com.lilamaris.capstone.shared.domain.event.actor.ActorType;
 import com.lilamaris.capstone.shared.domain.type.DomainType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface AccessControlRepository extends JpaRepository<AccessControl, AccessControlId> {
@@ -14,5 +15,11 @@ public interface AccessControlRepository extends JpaRepository<AccessControl, Ac
             String actorId,
             DomainType resourceType,
             String resourceId
+    );
+
+    List<AccessControl> findByActor_TypeAndActor_IdAndResource_Type(
+            ActorType type,
+            String actorId,
+            DomainType resourceType
     );
 }
