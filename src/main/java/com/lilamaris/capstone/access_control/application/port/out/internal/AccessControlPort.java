@@ -12,10 +12,6 @@ import java.util.Optional;
 public interface AccessControlPort {
     Optional<AccessControl> getById(AccessControlId id);
 
-    Optional<AccessControl> getByActorAndRef(CanonicalActor actor, DomainRef ref);
-
-    List<AccessControl> getByActorAndType(CanonicalActor actor, DomainType type);
-
     AccessControl save(AccessControl domain);
 
     void delete(AccessControlId id);

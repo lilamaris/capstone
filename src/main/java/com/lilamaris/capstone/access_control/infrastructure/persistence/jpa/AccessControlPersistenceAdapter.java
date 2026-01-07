@@ -1,8 +1,8 @@
 package com.lilamaris.capstone.access_control.infrastructure.persistence.jpa;
 
-import com.lilamaris.capstone.access_control.application.port.out.external.AuthorizationEntry;
+import com.lilamaris.capstone.shared.application.access_control.contract.AuthorizationEntry;
 import com.lilamaris.capstone.access_control.application.port.out.external.AuthorizationQuery;
-import com.lilamaris.capstone.access_control.application.port.out.external.ResourceMembershipEntry;
+import com.lilamaris.capstone.shared.application.access_control.contract.ResourceMembershipEntry;
 import com.lilamaris.capstone.access_control.application.port.out.external.ResourceMembershipQuery;
 import com.lilamaris.capstone.access_control.application.port.out.internal.AccessControlPort;
 import com.lilamaris.capstone.access_control.domain.AccessControl;
@@ -29,25 +29,6 @@ public class AccessControlPersistenceAdapter implements
     @Override
     public Optional<AccessControl> getById(AccessControlId id) {
         return repository.findById(id);
-    }
-
-    @Override
-    public Optional<AccessControl> getByActorAndRef(CanonicalActor actor, DomainRef ref) {
-        return repository.findByActor_TypeAndActor_IdAndResource_TypeAndResource_Id(
-                actor.type(),
-                actor.id().asString(),
-                ref.type(),
-                ref.id().asString()
-        );
-    }
-
-    @Override
-    public List<AccessControl> getByActorAndType(CanonicalActor actor, DomainType type) {
-        return repository.findByActor_TypeAndActor_IdAndResource_Type(
-                actor.type(),
-                actor.id().asString(),
-                type
-        );
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.access_control.application.port.out.external;
+package com.lilamaris.capstone.shared.application.access_control.contract;
 
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
 
