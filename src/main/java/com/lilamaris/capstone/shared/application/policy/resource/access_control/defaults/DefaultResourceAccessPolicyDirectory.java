@@ -5,14 +5,21 @@ import com.lilamaris.capstone.shared.application.policy.resource.access_control.
 import com.lilamaris.capstone.shared.domain.type.DomainType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class DefaultResourceAccessPolicyDirectory implements ResourceAccessPolicyDirectory {
-    private final Map<DomainType, ResourceAccessPolicy> policies = new HashMap<>();
+    private final Map<DomainType, ResourceAccessPolicy> policies;
 
-    public void addPolicy(ResourceAccessPolicy policy) {
-        policies.put(policy.support(), policy);
+    public DefaultResourceAccessPolicyDirectory(List<ResourceAccessPolicy> policies) {
+        this.policies = policies.stream()
+                .collect(Collectors.toUnmodifiableMap(
+                        ResourceAccessPolicy::support,
+                        Function.identity()
+                ));
     }
 
     @Override

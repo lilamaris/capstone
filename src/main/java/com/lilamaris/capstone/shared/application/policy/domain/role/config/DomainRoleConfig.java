@@ -14,8 +14,6 @@ public class DomainRoleConfig {
     public DomainRoleGraphDefinitionDirectory roleGraphDefinitionDirectory(
             List<DomainRoleGraphDefinition<?>> definitions
     ) {
-        var dir = new DefaultDomainRoleGraphDefinitionDirectory();
-        definitions.forEach(dir::addDefinition);
-        return dir;
+        return new DefaultDomainRoleGraphDefinitionDirectory(definitions);
     }
 }

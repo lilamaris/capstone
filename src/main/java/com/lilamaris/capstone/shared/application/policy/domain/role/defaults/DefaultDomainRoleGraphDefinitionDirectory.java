@@ -6,14 +6,21 @@ import com.lilamaris.capstone.shared.application.policy.domain.role.port.in.Doma
 import com.lilamaris.capstone.shared.domain.type.DomainType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class DefaultDomainRoleGraphDefinitionDirectory implements DomainRoleGraphDefinitionDirectory {
-    private final Map<DomainType, DomainRoleGraphDefinition<? extends DomainRole>> definitions = new HashMap<>();
+    private final Map<DomainType, DomainRoleGraphDefinition<? extends DomainRole>> definitions;
 
-    public void addDefinition(DomainRoleGraphDefinition<?> definition) {
-        definitions.put(definition.support(), definition);
+    public DefaultDomainRoleGraphDefinitionDirectory(List<DomainRoleGraphDefinition<?>> definitions) {
+        this.definitions = definitions.stream()
+                .collect(Collectors.toUnmodifiableMap(
+                        DomainRoleGraphDefinition::support,
+                        Function.identity()
+                ));
     }
 
     @Override

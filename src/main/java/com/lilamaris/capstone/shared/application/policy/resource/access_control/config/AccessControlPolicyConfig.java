@@ -14,8 +14,6 @@ public class AccessControlPolicyConfig {
     public ResourceAccessPolicyDirectory domainPolicyDirectory(
             List<ResourceAccessPolicy> policies
     ) {
-        var dir = new DefaultResourceAccessPolicyDirectory();
-        policies.forEach(dir::addPolicy);
-        return dir;
+        return new DefaultResourceAccessPolicyDirectory(policies);
     }
 }
