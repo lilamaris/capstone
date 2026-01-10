@@ -1,7 +1,7 @@
-package com.lilamaris.capstone.shared.application.identity.defaults;
+package com.lilamaris.capstone.shared.application.policy.identity.defaults;
 
-import com.lilamaris.capstone.shared.application.identity.contract.IdGenerationContext;
-import com.lilamaris.capstone.shared.application.identity.contract.IdGenerator;
+import com.lilamaris.capstone.shared.application.policy.identity.port.in.IdGenerationDirectory;
+import com.lilamaris.capstone.shared.application.policy.identity.port.in.IdGenerator;
 import com.lilamaris.capstone.shared.domain.id.DomainId;
 
 import java.util.List;
@@ -10,10 +10,10 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class DefaultIdGenerationContext implements IdGenerationContext {
+public class DefaultIdGenerationDirectory implements IdGenerationDirectory {
     private final Map<Class<? extends DomainId<?>>, IdGenerator<?>> generators;
 
-    public DefaultIdGenerationContext(List<IdGenerator<?>> generators) {
+    public DefaultIdGenerationDirectory(List<IdGenerator<?>> generators) {
         this.generators = generators.stream()
                 .collect(Collectors.toUnmodifiableMap(
                         IdGenerator::supports,

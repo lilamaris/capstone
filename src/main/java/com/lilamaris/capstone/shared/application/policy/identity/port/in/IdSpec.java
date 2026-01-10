@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.shared.application.identity.contract;
+package com.lilamaris.capstone.shared.application.policy.identity.port.in;
 
 import com.lilamaris.capstone.shared.domain.id.DomainId;
 

@@ -1,9 +1,9 @@
 package com.lilamaris.capstone.access_control.application.subscriber;
 
-import com.lilamaris.capstone.access_control.application.port.out.internal.AccessControlPort;
+import com.lilamaris.capstone.access_control.application.port.out.AccessControlPort;
 import com.lilamaris.capstone.access_control.domain.AccessControl;
 import com.lilamaris.capstone.access_control.domain.id.AccessControlId;
-import com.lilamaris.capstone.shared.application.identity.contract.IdGenerationContext;
+import com.lilamaris.capstone.shared.application.policy.identity.port.in.IdGenerationDirectory;
 import com.lilamaris.capstone.shared.domain.event.canonical.ResourceGranted;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ResourceGrantedSubscriber {
     private final AccessControlPort accessControlPort;
-    private final IdGenerationContext ids;
+    private final IdGenerationDirectory ids;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @EventListener

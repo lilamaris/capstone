@@ -1,9 +1,9 @@
 package com.lilamaris.capstone.account.application.policy.identity;
 
 import com.lilamaris.capstone.account.domain.id.AccountId;
-import com.lilamaris.capstone.shared.application.identity.contract.IdGenerator;
-import com.lilamaris.capstone.shared.application.identity.contract.RawGenerator;
-import com.lilamaris.capstone.shared.application.identity.defaults.RawBasedIdGenerator;
+import com.lilamaris.capstone.shared.application.policy.identity.defaults.RawBasedIdGenerator;
+import com.lilamaris.capstone.shared.application.policy.identity.port.in.IdGenerator;
+import com.lilamaris.capstone.shared.application.policy.identity.port.in.RawGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
