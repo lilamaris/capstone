@@ -1,8 +1,8 @@
 package com.lilamaris.capstone.timeline.application.service;
 
-import com.lilamaris.capstone.shared.application.access_control.contract.DomainAuthorizer;
 import com.lilamaris.capstone.shared.application.context.ActorContext;
-import com.lilamaris.capstone.shared.application.identity.contract.IdGenerationContext;
+import com.lilamaris.capstone.shared.application.policy.access_control.port.in.ResourceAuthorizer;
+import com.lilamaris.capstone.shared.application.policy.identity.port.in.IdGenerationDirectory;
 import com.lilamaris.capstone.shared.application.util.UniversityClock;
 import com.lilamaris.capstone.shared.domain.defaults.DefaultDescriptionMetadata;
 import com.lilamaris.capstone.shared.domain.event.actor.CanonicalActor;
@@ -24,8 +24,8 @@ public class TimelineCommandService implements TimelineCommandUseCase {
     private final TimelinePort timelinePort;
     private final TimelineResourceUtil resourceUtil;
 
-    private final IdGenerationContext ids;
-    private final DomainAuthorizer timelineAuthorizer;
+    private final IdGenerationDirectory ids;
+    private final ResourceAuthorizer authorizer;
 
     @Override
     public TimelineResult.CommandCompressed create(String title, String details, LocalDateTime initialValidAt) {
@@ -45,7 +45,7 @@ public class TimelineCommandService implements TimelineCommandUseCase {
     @Override
     public TimelineResult.CommandCompressed update(TimelineId id, String title, String details) {
         CanonicalActor actor = ActorContext.get();
-        timelineAuthorizer.authorize(actor, id.ref(), TimelineAction.UPDATE_METADATA);
+        authorizer.authorize(actor, id.ref(), TimelineAction.UPDATE_METADATA);
 
         var timeline = resourceUtil.getTimeline(id);
 
@@ -57,7 +57,7 @@ public class TimelineCommandService implements TimelineCommandUseCase {
     @Override
     public TimelineResult.Command migrate(TimelineId id, LocalDateTime validAt) {
         CanonicalActor actor = ActorContext.get();
-        timelineAuthorizer.authorize(actor, id.ref(), TimelineAction.MIGRATE);
+        authorizer.authorize(actor, id.ref(), TimelineAction.MIGRATE);
 
         var timeline = resourceUtil.getTimeline(id);
 
@@ -74,7 +74,7 @@ public class TimelineCommandService implements TimelineCommandUseCase {
     @Override
     public TimelineResult.Command merge(TimelineId id, LocalDateTime validFrom, LocalDateTime validTo) {
         CanonicalActor actor = ActorContext.get();
-        timelineAuthorizer.authorize(actor, id.ref(), TimelineAction.MERGE);
+        authorizer.authorize(actor, id.ref(), TimelineAction.MERGE);
 
         var timeline = resourceUtil.getTimeline(id);
 

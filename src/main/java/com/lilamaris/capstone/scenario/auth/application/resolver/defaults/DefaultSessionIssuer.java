@@ -6,7 +6,7 @@ import com.lilamaris.capstone.refresh_token.domain.id.RefreshTokenId;
 import com.lilamaris.capstone.scenario.auth.application.resolver.AuthIdentity;
 import com.lilamaris.capstone.scenario.auth.application.resolver.SessionIssuer;
 import com.lilamaris.capstone.scenario.auth.application.result.AuthResult;
-import com.lilamaris.capstone.shared.application.identity.contract.IdGenerationContext;
+import com.lilamaris.capstone.shared.application.policy.identity.port.in.IdGenerationDirectory;
 import com.lilamaris.capstone.shared.application.util.UniversityClock;
 import com.lilamaris.capstone.user.domain.Role;
 import com.lilamaris.capstone.user.domain.id.UserId;
@@ -25,7 +25,7 @@ public class DefaultSessionIssuer implements SessionIssuer {
     public static final String AUTHORITIES_KEY = "role";
 
     private final RefreshTokenPort refreshTokenPort;
-    private final IdGenerationContext ids;
+    private final IdGenerationDirectory ids;
 
     private final Duration accessTokenExpiration;
     private final Duration refreshTokenExpiration;

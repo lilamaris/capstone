@@ -5,7 +5,7 @@ import com.lilamaris.capstone.shared.domain.contract.Auditable;
 import com.lilamaris.capstone.shared.domain.contract.Identifiable;
 import com.lilamaris.capstone.shared.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.shared.domain.metadata.AuditMetadata;
-import com.lilamaris.capstone.shared.domain.persistence.persistence.jpa.JpaAuditMetadata;
+import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.user.domain.id.UserId;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

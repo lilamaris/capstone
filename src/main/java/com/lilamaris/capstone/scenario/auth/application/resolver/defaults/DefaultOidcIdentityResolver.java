@@ -7,7 +7,7 @@ import com.lilamaris.capstone.account.domain.id.AccountId;
 import com.lilamaris.capstone.scenario.auth.application.resolver.AuthIdentity;
 import com.lilamaris.capstone.scenario.auth.application.resolver.OidcIdentityResolver;
 import com.lilamaris.capstone.shared.application.exception.ResourceNotFoundException;
-import com.lilamaris.capstone.shared.application.identity.contract.IdGenerationContext;
+import com.lilamaris.capstone.shared.application.policy.identity.port.in.IdGenerationDirectory;
 import com.lilamaris.capstone.user.application.port.out.UserPort;
 import com.lilamaris.capstone.user.domain.Role;
 import com.lilamaris.capstone.user.domain.User;
@@ -21,7 +21,7 @@ public class DefaultOidcIdentityResolver implements OidcIdentityResolver {
     private final AccountPort accountPort;
     private final UserPort userPort;
 
-    private final IdGenerationContext ids;
+    private final IdGenerationDirectory ids;
 
     @Override
     public AuthIdentity resolve(Provider provider, String providerId, String email, String displayName) {

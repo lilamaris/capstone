@@ -8,8 +8,8 @@ import com.lilamaris.capstone.shared.domain.event.aggregate.CollectedDomainEvent
 import com.lilamaris.capstone.shared.domain.exception.DomainIllegalStateException;
 import com.lilamaris.capstone.shared.domain.metadata.AuditMetadata;
 import com.lilamaris.capstone.shared.domain.metadata.DescriptionMetadata;
-import com.lilamaris.capstone.shared.domain.persistence.persistence.jpa.JpaAuditMetadata;
-import com.lilamaris.capstone.shared.domain.persistence.persistence.jpa.JpaDescriptionMetadata;
+import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaAuditMetadata;
+import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaDescriptionMetadata;
 import com.lilamaris.capstone.timeline.domain.embed.Effective;
 import com.lilamaris.capstone.timeline.domain.embed.EffectiveSelector;
 import com.lilamaris.capstone.timeline.domain.event.TimelineCreated;
@@ -130,7 +130,7 @@ public class Timeline implements Identifiable<TimelineId>, Describable, Auditabl
     ) {
         var tx = Effective.create(txAt, Effective.MAX);
         var valid = Effective.create(validAt, Effective.MAX);
-        var snapshotSlot = SnapshotSlot.create(snapshotSlotIdSupplier.get(), id, tx, valid);
+        var snapshotSlot = SnapshotSlot.create(snapshotSlotIdSupplier, id, tx, valid);
         var events = snapshotSlot.pullEvent();
         this.slotList.add(snapshotSlot);
         eventList.addAll(events);
@@ -170,7 +170,7 @@ public class Timeline implements Identifiable<TimelineId>, Describable, Auditabl
         var newValidRight = newValidSplit.right();
 
         var slotLeft = SnapshotSlot.create(
-                snapshotSlotIdSupplier.get(),
+                snapshotSlotIdSupplier,
                 id,
                 parentSlot.id(),
                 newTx,
@@ -180,7 +180,7 @@ public class Timeline implements Identifiable<TimelineId>, Describable, Auditabl
         eventList.addAll(slotLeft.pullEvent());
 
         var slotRight = SnapshotSlot.create(
-                snapshotSlotIdSupplier.get(),
+                snapshotSlotIdSupplier,
                 id,
                 slotLeft.id(),
                 newTx,
@@ -224,7 +224,7 @@ public class Timeline implements Identifiable<TimelineId>, Describable, Auditabl
                 latestSlot.getValid().getTo()
         );
         var mergedSlot = SnapshotSlot.create(
-                snapshotSlotIdSupplier.get(),
+                snapshotSlotIdSupplier,
                 id,
                 mergedTx,
                 mergedValid

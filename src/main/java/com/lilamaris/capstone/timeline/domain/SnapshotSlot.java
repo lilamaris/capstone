@@ -5,14 +5,11 @@ import com.lilamaris.capstone.shared.domain.contract.Identifiable;
 import com.lilamaris.capstone.shared.domain.event.DomainEvent;
 import com.lilamaris.capstone.shared.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.shared.domain.metadata.AuditMetadata;
-import com.lilamaris.capstone.shared.domain.persistence.persistence.jpa.JpaAuditMetadata;
-import com.lilamaris.capstone.snapshot.domain.id.SnapshotId;
+import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.timeline.domain.embed.Effective;
 import com.lilamaris.capstone.timeline.domain.embed.EffectiveSelector;
 import com.lilamaris.capstone.timeline.domain.event.SnapshotSlotCreated;
 import com.lilamaris.capstone.timeline.domain.event.SnapshotSlotEffectiveUpdated;
-import com.lilamaris.capstone.timeline.domain.event.SnapshotSlotOccupied;
-import com.lilamaris.capstone.timeline.domain.event.SnapshotSlotUnoccupied;
 import com.lilamaris.capstone.timeline.domain.id.SnapshotSlotId;
 import com.lilamaris.capstone.timeline.domain.id.TimelineId;
 import jakarta.persistence.*;
@@ -27,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import static com.lilamaris.capstone.shared.domain.util.Validation.requireField;
 
@@ -57,10 +55,6 @@ public class SnapshotSlot implements Identifiable<SnapshotSlotId>, Auditable {
     private SnapshotSlotId parentSlotId;
 
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "snapshot_id"))
-    private SnapshotId snapshotId;
-
-    @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "from", column = @Column(name = "tx_from")),
             @AttributeOverride(name = "to", column = @Column(name = "tx_to")),
@@ -77,37 +71,37 @@ public class SnapshotSlot implements Identifiable<SnapshotSlotId>, Auditable {
             SnapshotSlotId id,
             TimelineId timelineId,
             SnapshotSlotId parentSlotId,
-            SnapshotId snapshotId,
             Effective tx,
             Effective valid
     ) {
         this.id = requireField(id, "id");
         this.timelineId = requireField(timelineId, "timelineId");
         this.parentSlotId = parentSlotId;
-        this.snapshotId = snapshotId;
         this.tx = requireField(tx, "tx");
         this.valid = requireField(valid, "valid");
     }
 
     protected static SnapshotSlot create(
-            SnapshotSlotId id,
+            Supplier<SnapshotSlotId> idSupplier,
             TimelineId timelineId,
             SnapshotSlotId parentSlotId,
             Effective tx,
             Effective valid
     ) {
-        var snapshotSlot = new SnapshotSlot(id, timelineId, parentSlotId, null, tx, valid);
+        var id = idSupplier.get();
+        var snapshotSlot = new SnapshotSlot(id, timelineId, parentSlotId, tx, valid);
         snapshotSlot.registerCreated();
         return snapshotSlot;
     }
 
     protected static SnapshotSlot create(
-            SnapshotSlotId id,
+            Supplier<SnapshotSlotId> idSupplier,
             TimelineId timelineId,
             Effective tx,
             Effective valid
     ) {
-        var snapshotSlot = new SnapshotSlot(id, timelineId, null, null, tx, valid);
+        var id = idSupplier.get();
+        var snapshotSlot = new SnapshotSlot(id, timelineId, null, tx, valid);
         snapshotSlot.registerCreated();
         return snapshotSlot;
     }
@@ -162,12 +156,8 @@ public class SnapshotSlot implements Identifiable<SnapshotSlotId>, Auditable {
         return audit;
     }
 
-    protected boolean isRoot() {
+    public boolean isRoot() {
         return this.parentSlotId == null;
-    }
-
-    protected boolean isOccupied() {
-        return this.snapshotId != null;
     }
 
     protected void open(EffectiveSelector selector, Instant at) {
@@ -192,16 +182,6 @@ public class SnapshotSlot implements Identifiable<SnapshotSlotId>, Auditable {
         registerEffectiveUpdated();
     }
 
-    protected void attachSnapshot(SnapshotId snapshotId) {
-        this.snapshotId = snapshotId;
-        registerOccupied();
-    }
-
-    protected void detachSnapshot() {
-        this.snapshotId = null;
-        registerUnoccupied();
-    }
-
     protected List<DomainEvent> pullEvent() {
         var copy = List.copyOf(eventList);
         eventList.clear();
@@ -210,16 +190,6 @@ public class SnapshotSlot implements Identifiable<SnapshotSlotId>, Auditable {
 
     private void registerCreated() {
         var event = new SnapshotSlotCreated(id, Instant.now());
-        eventList.add(event);
-    }
-
-    private void registerOccupied() {
-        var event = new SnapshotSlotOccupied(id, snapshotId, Instant.now());
-        eventList.add(event);
-    }
-
-    private void registerUnoccupied() {
-        var event = new SnapshotSlotUnoccupied(id, Instant.now());
         eventList.add(event);
     }
 

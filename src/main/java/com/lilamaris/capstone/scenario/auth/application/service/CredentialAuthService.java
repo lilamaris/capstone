@@ -10,7 +10,7 @@ import com.lilamaris.capstone.scenario.auth.application.resolver.CredentialIdent
 import com.lilamaris.capstone.scenario.auth.application.resolver.SessionIssuer;
 import com.lilamaris.capstone.scenario.auth.application.result.AuthResult;
 import com.lilamaris.capstone.shared.application.exception.ResourceAlreadyExistsException;
-import com.lilamaris.capstone.shared.application.identity.contract.IdGenerationContext;
+import com.lilamaris.capstone.shared.application.policy.identity.port.in.IdGenerationDirectory;
 import com.lilamaris.capstone.user.application.port.out.UserPort;
 import com.lilamaris.capstone.user.domain.Role;
 import com.lilamaris.capstone.user.domain.User;
@@ -27,7 +27,7 @@ public class CredentialAuthService implements CredentialAuthUseCase {
     private final CredentialIdentityResolver credentialIdentityResolver;
     private final SessionIssuer sessionIssuer;
 
-    private final IdGenerationContext ids;
+    private final IdGenerationDirectory ids;
     private final AccountPort accountPort;
     private final UserPort userPort;
 

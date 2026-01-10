@@ -1,9 +1,9 @@
 package com.lilamaris.capstone.timeline.application.policy.access_control;
 
-import com.lilamaris.capstone.shared.application.access_control.contract.AccessManageable;
-import com.lilamaris.capstone.shared.application.access_control.contract.DomainAction;
+import com.lilamaris.capstone.shared.application.policy.access_control.port.in.ResourceAction;
+import com.lilamaris.capstone.shared.application.policy.access_control.port.in.ResourceAuthorityManageable;
 
-public enum TimelineAction implements DomainAction, AccessManageable {
+public enum TimelineAction implements ResourceAction, ResourceAuthorityManageable {
     READ,
     UPDATE_METADATA,
     MIGRATE,
@@ -12,12 +12,12 @@ public enum TimelineAction implements DomainAction, AccessManageable {
     REVOKE_ROLE;
 
     @Override
-    public DomainAction grantAction() {
+    public ResourceAction grantAction() {
         return GRANT_ROLE;
     }
 
     @Override
-    public DomainAction revokeAction() {
+    public ResourceAction revokeAction() {
         return REVOKE_ROLE;
     }
 }

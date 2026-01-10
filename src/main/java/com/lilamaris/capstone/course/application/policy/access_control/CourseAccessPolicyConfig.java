@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.course.application.policy.access_control;
 
-import com.lilamaris.capstone.shared.application.access_control.contract.DomainPolicy;
-import com.lilamaris.capstone.shared.application.access_control.defaults.DefaultPolicy;
+import com.lilamaris.capstone.shared.application.policy.access_control.defaults.DefaultResourceAccessPolicy;
+import com.lilamaris.capstone.shared.application.policy.access_control.port.in.ResourceAccessPolicy;
 import com.lilamaris.capstone.shared.domain.type.ResourceDomainType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,12 +11,12 @@ import java.util.Set;
 @Configuration
 public class CourseAccessPolicyConfig {
     @Bean
-    public DomainPolicy<CourseRole> coursePolicy() {
-        var policy = new DefaultPolicy<>(ResourceDomainType.COURSE, CourseRole.class);
-        policy.allow(CourseRole.VIEWER, Set.of(CourseAction.READ));
-        policy.allow(CourseRole.MAINTAINER, Set.of(CourseAction.UPDATE_METADATA, CourseAction.GRANT_ROLE, CourseAction.REVOKE_ROLE));
-        policy.extend(CourseRole.MAINTAINER, CourseRole.VIEWER);
-
+    public ResourceAccessPolicy coursePolicy() {
+        var policy = new DefaultResourceAccessPolicy(ResourceDomainType.COURSE);
+        policy.allow(CourseAction.READ, Set.of(CourseRole.VIEWER));
+        policy.allow(CourseAction.UPDATE_METADATA, Set.of(CourseRole.MAINTAINER));
+        policy.allow(CourseAction.GRANT_ROLE, Set.of(CourseRole.MAINTAINER));
+        policy.allow(CourseAction.REVOKE_ROLE, Set.of(CourseRole.MAINTAINER));
         return policy;
     }
 }
