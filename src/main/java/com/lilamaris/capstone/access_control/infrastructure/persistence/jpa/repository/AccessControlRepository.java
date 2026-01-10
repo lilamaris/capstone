@@ -10,16 +10,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AccessControlRepository extends JpaRepository<AccessControl, AccessControlId> {
-    Optional<AccessControl> findByActor_TypeAndActor_IdAndResource_TypeAndResource_Id(
+    Optional<AccessControl> findByActor_TypeAndActor_IdAndResource_Type_NameAndResource_Id(
             ActorType type,
             String actorId,
-            DomainType resourceType,
+            String resourceType,
             String resourceId
-    );
-
-    List<AccessControl> findByActor_TypeAndActor_IdAndResource_Type(
-            ActorType type,
-            String actorId,
-            DomainType resourceType
     );
 }

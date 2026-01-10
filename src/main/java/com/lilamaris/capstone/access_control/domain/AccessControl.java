@@ -3,13 +3,13 @@ package com.lilamaris.capstone.access_control.domain;
 import com.lilamaris.capstone.access_control.domain.id.AccessControlId;
 import com.lilamaris.capstone.shared.domain.contract.Auditable;
 import com.lilamaris.capstone.shared.domain.contract.Identifiable;
+import com.lilamaris.capstone.shared.domain.event.DomainEvent;
 import com.lilamaris.capstone.shared.domain.event.actor.CanonicalActor;
-import com.lilamaris.capstone.shared.domain.event.aggregate.AggregateEvent;
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
 import com.lilamaris.capstone.shared.domain.metadata.AuditMetadata;
-import com.lilamaris.capstone.shared.domain.persistence.persistence.jpa.JpaActor;
-import com.lilamaris.capstone.shared.domain.persistence.persistence.jpa.JpaAuditMetadata;
-import com.lilamaris.capstone.shared.domain.persistence.persistence.jpa.JpaDomainRef;
+import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaActor;
+import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaAuditMetadata;
+import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaDomainRef;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -31,26 +32,26 @@ import static com.lilamaris.capstone.shared.domain.util.Validation.requireField;
 public class AccessControl implements Identifiable<AccessControlId>, Auditable {
     @Embedded
     private final JpaAuditMetadata audit = new JpaAuditMetadata();
+
+    @Transient
+    private final List<DomainEvent> eventList = new ArrayList<>();
+
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private AccessControlId id;
+
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "type", column = @Column(name = "actor_type")),
-            @AttributeOverride(name = "id", column = @Column(name = "actor_id"))
-    })
     private JpaActor actor;
+
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "type", column = @Column(name = "resource_type")),
-            @AttributeOverride(name = "id", column = @Column(name = "resource_id"))
+            @AttributeOverride(name = "type.name", column = @Column(name = "resource_type", nullable = false)),
+            @AttributeOverride(name = "id", column = @Column(name = "resource_id", nullable = false))
     })
     private JpaDomainRef resource;
-    private String scopedRole;
 
-    @Transient
-    private List<AggregateEvent> eventList;
+    private String scopedRole;
 
     protected AccessControl(
             AccessControlId id,
@@ -60,7 +61,7 @@ public class AccessControl implements Identifiable<AccessControlId>, Auditable {
     ) {
         this.id = requireField(id, "id");
         this.actor = requireField(actor, "actor");
-        this.resource = requireField(resource, "resourceRef");
+        this.resource = requireField(resource, "resource");
         this.scopedRole = requireField(scopedRole, "scopedRole");
     }
 

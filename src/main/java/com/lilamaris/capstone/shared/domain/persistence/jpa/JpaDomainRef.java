@@ -1,11 +1,10 @@
-package com.lilamaris.capstone.shared.domain.persistence.persistence.jpa;
+package com.lilamaris.capstone.shared.domain.persistence.jpa;
 
 import com.lilamaris.capstone.shared.domain.defaults.DefaultDomainRef;
 import com.lilamaris.capstone.shared.domain.defaults.DefaultExternalizableId;
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
 import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
-import com.lilamaris.capstone.shared.domain.persistence.persistence.ToPojo;
-import com.lilamaris.capstone.shared.domain.type.CoreDomainType;
+import com.lilamaris.capstone.shared.domain.persistence.ToPojo;
 import com.lilamaris.capstone.shared.domain.type.DomainType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -19,9 +18,9 @@ import static com.lilamaris.capstone.shared.domain.util.Validation.requireField;
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class JpaDomainRef implements DomainRef, ToPojo<DomainRef> {
-    @Enumerated(EnumType.STRING)
-    @Column(name = "ref_type", nullable = false)
-    private CoreDomainType type;
+    @Embedded
+    @AttributeOverride(name = "name", column = @Column(name = "ref_type", nullable = false))
+    private JpaDomainTypeToken type;
 
     @Column(name = "ref_id", nullable = false)
     private String id;
@@ -29,7 +28,7 @@ public class JpaDomainRef implements DomainRef, ToPojo<DomainRef> {
     @Transient
     private ExternalizableId externalizableId;
 
-    protected JpaDomainRef(CoreDomainType type, String id) {
+    protected JpaDomainRef(JpaDomainTypeToken type, String id) {
         this.type = requireField(type, "ref_type");
         this.id = requireField(id, "ref_id");
         externalizableId = new DefaultExternalizableId(id);
@@ -37,14 +36,14 @@ public class JpaDomainRef implements DomainRef, ToPojo<DomainRef> {
 
     public static JpaDomainRef from(DomainRef ref) {
         return new JpaDomainRef(
-                (CoreDomainType) ref.type(),
+                JpaDomainTypeToken.from(ref.type()),
                 ref.id().asString()
         );
     }
 
     public static JpaDomainRef from(DomainType type, ExternalizableId id) {
         return new JpaDomainRef(
-                (CoreDomainType) type,
+                JpaDomainTypeToken.from(type),
                 id.asString()
         );
     }
@@ -65,6 +64,6 @@ public class JpaDomainRef implements DomainRef, ToPojo<DomainRef> {
 
     @Override
     public DefaultDomainRef toPOJO() {
-        return new DefaultDomainRef(type, id());
+        return new DefaultDomainRef(type.toPOJO(), id());
     }
 }

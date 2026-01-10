@@ -1,8 +1,8 @@
-package com.lilamaris.capstone.shared.domain.persistence.persistence.jpa;
+package com.lilamaris.capstone.shared.domain.persistence.jpa;
 
 import com.lilamaris.capstone.shared.domain.defaults.DefaultDescriptionMetadata;
 import com.lilamaris.capstone.shared.domain.metadata.DescriptionMetadata;
-import com.lilamaris.capstone.shared.domain.persistence.persistence.ToPojo;
+import com.lilamaris.capstone.shared.domain.persistence.ToPojo;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.Getter;

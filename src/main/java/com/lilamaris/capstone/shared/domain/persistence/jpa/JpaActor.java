@@ -1,11 +1,11 @@
-package com.lilamaris.capstone.shared.domain.persistence.persistence.jpa;
+package com.lilamaris.capstone.shared.domain.persistence.jpa;
 
 import com.lilamaris.capstone.shared.domain.defaults.DefaultActor;
 import com.lilamaris.capstone.shared.domain.defaults.DefaultExternalizableId;
 import com.lilamaris.capstone.shared.domain.event.actor.ActorType;
 import com.lilamaris.capstone.shared.domain.event.actor.CanonicalActor;
 import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
-import com.lilamaris.capstone.shared.domain.persistence.persistence.ToPojo;
+import com.lilamaris.capstone.shared.domain.persistence.ToPojo;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

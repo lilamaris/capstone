@@ -1,28 +1,25 @@
 package com.lilamaris.capstone.access_control.infrastructure.persistence.jpa;
 
-import com.lilamaris.capstone.shared.application.access_control.contract.AuthorizationEntry;
-import com.lilamaris.capstone.access_control.application.port.out.external.AuthorizationQuery;
-import com.lilamaris.capstone.shared.application.access_control.contract.ResourceMembershipEntry;
-import com.lilamaris.capstone.access_control.application.port.out.external.ResourceMembershipQuery;
-import com.lilamaris.capstone.access_control.application.port.out.internal.AccessControlPort;
+import com.lilamaris.capstone.access_control.application.port.out.AccessControlPort;
 import com.lilamaris.capstone.access_control.domain.AccessControl;
 import com.lilamaris.capstone.access_control.domain.id.AccessControlId;
 import com.lilamaris.capstone.access_control.infrastructure.persistence.jpa.repository.AccessControlRepository;
+import com.lilamaris.capstone.shared.application.policy.access_control.port.out.ResourceAuthorityEntry;
+import com.lilamaris.capstone.shared.application.policy.access_control.port.out.ResourceAuthorityQuery;
 import com.lilamaris.capstone.shared.domain.event.actor.CanonicalActor;
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
-import com.lilamaris.capstone.shared.domain.type.DomainType;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class AccessControlPersistenceAdapter implements
         AccessControlPort,
-        AuthorizationQuery,
-        ResourceMembershipQuery
+        ResourceAuthorityQuery
 {
     private final AccessControlRepository repository;
 
@@ -42,27 +39,18 @@ public class AccessControlPersistenceAdapter implements
     }
 
     @Override
-    public Optional<AuthorizationEntry> getAuthorization(CanonicalActor actor, DomainRef ref) {
-        return repository.findByActor_TypeAndActor_IdAndResource_TypeAndResource_Id(
-                        actor.type(),
-                        actor.id().asString(),
-                        ref.type(),
-                        ref.id().asString()
-                )
-                .map(accessControl -> new AuthorizationEntry(accessControl.getScopedRole()));
-    }
+    public Optional<ResourceAuthorityEntry> getAuthorization(CanonicalActor actor, DomainRef ref) {
+        var actorType = actor.type();
+        var actorId = actor.id().asString();
+        var resourceType = ref.type().name();
+        var resourceId = ref.id().asString();
 
-    @Override
-    public List<ResourceMembershipEntry> getMembershipByType(CanonicalActor actor, DomainType type) {
-        return repository.findByActor_TypeAndActor_IdAndResource_Type(
-                        actor.type(),
-                        actor.id().asString(),
-                        type
+        return repository.findByActor_TypeAndActor_IdAndResource_Type_NameAndResource_Id(
+                        actorType,
+                        actorId,
+                        resourceType,
+                        resourceId
                 )
-                .stream()
-                .map(
-                accessControl -> new ResourceMembershipEntry(accessControl.getResource(), accessControl.getScopedRole())
-                )
-                .toList();
+                .map(accessControl -> new ResourceAuthorityEntry(accessControl.getScopedRole()));
     }
 }
