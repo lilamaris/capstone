@@ -1,12 +1,12 @@
-package com.lilamaris.capstone.course.application.policy.access_control;
+package com.lilamaris.capstone.timeline.application.policy.privilege;
 
 import com.lilamaris.capstone.shared.application.policy.resource.access_control.port.in.ResourceAction;
 import com.lilamaris.capstone.shared.application.policy.resource.access_control.port.in.ResourceAuthorityManageable;
 
-public enum CourseAction implements ResourceAction, ResourceAuthorityManageable {
-    READ,
+public enum TimelineAction implements ResourceAction, ResourceAuthorityManageable {
     UPDATE_METADATA,
-    OFFER,
+    MIGRATE,
+    MERGE,
     GRANT_ROLE,
     REVOKE_ROLE;
 

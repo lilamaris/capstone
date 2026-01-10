@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.timeline.application.policy.role;
+package com.lilamaris.capstone.timeline.application.policy.privilege;
 
 import com.lilamaris.capstone.shared.application.policy.domain.role.port.in.DomainRole;
 

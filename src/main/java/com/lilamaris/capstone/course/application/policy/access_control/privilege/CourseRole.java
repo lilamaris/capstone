@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.course.application.policy.access_control;
+package com.lilamaris.capstone.course.application.policy.access_control.privilege;
 
 import com.lilamaris.capstone.shared.application.policy.domain.role.port.in.DomainRole;
 
