@@ -22,6 +22,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static com.lilamaris.capstone.shared.domain.util.Validation.requireField;
 
@@ -34,40 +35,43 @@ import static com.lilamaris.capstone.shared.domain.util.Validation.requireField;
 public class Snapshot implements Persistable<SnapshotId>, Identifiable<SnapshotId>, Describable, Auditable {
     @Embedded
     private final JpaAuditMetadata audit = new JpaAuditMetadata();
+
     @Transient
     private final List<DomainEvent> eventList = new ArrayList<>();
+
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private SnapshotId id;
-    @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "snapshot_slot_id", insertable = false, updatable = false))
-    private SnapshotSlotId snapshotSlotId;
+
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "snapshot_id", nullable = false)
     private List<SnapshotDelta> snapshotDeltaList;
+
     @Embedded
     private JpaDescriptionMetadata descriptionMetadata;
 
     protected Snapshot(
             SnapshotId id,
-            SnapshotSlotId snapshotSlotId,
             List<SnapshotDelta> snapshotDeltaList,
             JpaDescriptionMetadata descriptionMetadata
     ) {
         this.id = requireField(id, "id");
-        this.snapshotSlotId = requireField(snapshotSlotId, "snapshotSlotId");
         this.snapshotDeltaList = requireField(snapshotDeltaList, "snapshotDeltaList");
         this.descriptionMetadata = requireField(descriptionMetadata, "descriptionMetadata");
     }
 
     public static Snapshot create(
-            SnapshotId id,
-            SnapshotSlotId snapshotSlotId,
-            String title
+            Supplier<SnapshotId> idSupplier,
+            String title,
+            String details
     ) {
-        var descriptionMetadata = JpaDescriptionMetadata.create(title);
-        var snapshot = new Snapshot(id, snapshotSlotId, new ArrayList<>(), descriptionMetadata);
+        var descriptionMetadata = JpaDescriptionMetadata.create(title, details);
+        var snapshot = new Snapshot(
+                idSupplier.get(),
+                new ArrayList<>(),
+                descriptionMetadata
+        );
         snapshot.registerCreated();
         return snapshot;
     }

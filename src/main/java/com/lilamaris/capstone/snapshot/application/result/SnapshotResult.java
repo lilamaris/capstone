@@ -12,7 +12,6 @@ import java.util.List;
 public class SnapshotResult {
     public record Command(
             SnapshotId id,
-            SnapshotSlotId snapshotSlotId,
             List<SnapshotDeltaResult> snapshotDeltaList,
             DescriptionResult description
     ) {
@@ -20,7 +19,6 @@ public class SnapshotResult {
             var snapshotDeltaList = domain.getSnapshotDeltaList().stream().map(SnapshotDeltaResult::from).toList();
             return new Command(
                     domain.id(),
-                    domain.getSnapshotSlotId(),
                     snapshotDeltaList,
                     DescriptionResult.from(domain)
             );
@@ -29,7 +27,6 @@ public class SnapshotResult {
 
     public record Query(
             SnapshotId id,
-            SnapshotSlotId snapshotSlotId,
             List<SnapshotDeltaResult> snapshotDeltaList,
             DescriptionResult description
     ) {
@@ -37,7 +34,6 @@ public class SnapshotResult {
             var snapshotDeltaList = domain.getSnapshotDeltaList().stream().map(SnapshotDeltaResult::from).toList();
             return new Query(
                     domain.id(),
-                    domain.getSnapshotSlotId(),
                     snapshotDeltaList,
                     DescriptionResult.from(domain)
             );
