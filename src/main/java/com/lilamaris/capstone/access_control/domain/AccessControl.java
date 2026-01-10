@@ -46,8 +46,8 @@ public class AccessControl implements Identifiable<AccessControlId>, Auditable {
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "type.name", column = @Column(name = "resource_type", nullable = false)),
-            @AttributeOverride(name = "id", column = @Column(name = "resource_id", nullable = false))
+            @AttributeOverride(name = "type.name", column = @Column(name = "resource_type")),
+            @AttributeOverride(name = "id", column = @Column(name = "resource_id"))
     })
     private JpaDomainRef resource;
 

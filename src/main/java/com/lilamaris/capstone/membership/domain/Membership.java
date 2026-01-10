@@ -30,15 +30,11 @@ public class Membership implements Identifiable<MembershipId>, Auditable {
     private MembershipId id;
 
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "type", column = @Column(name = "actor_type")),
-            @AttributeOverride(name = "id", column = @Column(name = "actor_id"))
-    })
     private JpaActor actor;
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "type", column = @Column(name = "resource_type")),
+            @AttributeOverride(name = "type.name", column = @Column(name = "resource_type")),
             @AttributeOverride(name = "id", column = @Column(name = "resource_id"))
     })
     private JpaDomainRef resource;
