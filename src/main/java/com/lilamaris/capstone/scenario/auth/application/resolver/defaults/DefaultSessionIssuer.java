@@ -6,7 +6,7 @@ import com.lilamaris.capstone.refresh_token.domain.id.RefreshTokenId;
 import com.lilamaris.capstone.scenario.auth.application.resolver.AuthIdentity;
 import com.lilamaris.capstone.scenario.auth.application.resolver.SessionIssuer;
 import com.lilamaris.capstone.scenario.auth.application.result.AuthResult;
-import com.lilamaris.capstone.shared.application.policy.identity.port.in.IdGenerationDirectory;
+import com.lilamaris.capstone.shared.application.policy.domain.identity.port.in.IdGenerationDirectory;
 import com.lilamaris.capstone.shared.application.util.UniversityClock;
 import com.lilamaris.capstone.user.domain.Role;
 import com.lilamaris.capstone.user.domain.id.UserId;

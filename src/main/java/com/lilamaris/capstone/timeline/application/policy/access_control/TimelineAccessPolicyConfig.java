@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.timeline.application.policy.access_control;
 
-import com.lilamaris.capstone.shared.application.policy.access_control.defaults.DefaultResourceAccessPolicy;
-import com.lilamaris.capstone.shared.application.policy.access_control.port.in.ResourceAccessPolicy;
+import com.lilamaris.capstone.shared.application.policy.resource.access_control.defaults.DefaultResourceAccessPolicy;
+import com.lilamaris.capstone.shared.application.policy.resource.access_control.port.in.ResourceAccessPolicy;
 import com.lilamaris.capstone.shared.domain.type.CoreDomainType;
 import com.lilamaris.capstone.timeline.application.policy.role.TimelineRole;
 import org.springframework.context.annotation.Bean;

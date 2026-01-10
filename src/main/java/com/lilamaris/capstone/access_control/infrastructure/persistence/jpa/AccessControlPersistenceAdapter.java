@@ -4,8 +4,8 @@ import com.lilamaris.capstone.access_control.application.port.out.AccessControlP
 import com.lilamaris.capstone.access_control.domain.AccessControl;
 import com.lilamaris.capstone.access_control.domain.id.AccessControlId;
 import com.lilamaris.capstone.access_control.infrastructure.persistence.jpa.repository.AccessControlRepository;
-import com.lilamaris.capstone.shared.application.policy.access_control.port.out.ResourceAuthorityEntry;
-import com.lilamaris.capstone.shared.application.policy.access_control.port.out.ResourceAuthorityQuery;
+import com.lilamaris.capstone.shared.application.policy.resource.access_control.port.out.ResourceAuthorityEntry;
+import com.lilamaris.capstone.shared.application.policy.resource.access_control.port.out.ResourceAuthorityQuery;
 import com.lilamaris.capstone.shared.domain.event.actor.CanonicalActor;
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
 import lombok.RequiredArgsConstructor;

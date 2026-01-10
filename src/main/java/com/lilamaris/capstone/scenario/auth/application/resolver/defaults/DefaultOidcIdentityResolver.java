@@ -7,7 +7,7 @@ import com.lilamaris.capstone.account.domain.id.AccountId;
 import com.lilamaris.capstone.scenario.auth.application.resolver.AuthIdentity;
 import com.lilamaris.capstone.scenario.auth.application.resolver.OidcIdentityResolver;
 import com.lilamaris.capstone.shared.application.exception.ResourceNotFoundException;
-import com.lilamaris.capstone.shared.application.policy.identity.port.in.IdGenerationDirectory;
+import com.lilamaris.capstone.shared.application.policy.domain.identity.port.in.IdGenerationDirectory;
 import com.lilamaris.capstone.user.application.port.out.UserPort;
 import com.lilamaris.capstone.user.domain.Role;
 import com.lilamaris.capstone.user.domain.User;

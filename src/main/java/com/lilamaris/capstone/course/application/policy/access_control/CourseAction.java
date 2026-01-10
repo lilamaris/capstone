@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.course.application.policy.access_control;
 
-import com.lilamaris.capstone.shared.application.policy.access_control.port.in.ResourceAction;
-import com.lilamaris.capstone.shared.application.policy.access_control.port.in.ResourceAuthorityManageable;
+import com.lilamaris.capstone.shared.application.policy.resource.access_control.port.in.ResourceAction;
+import com.lilamaris.capstone.shared.application.policy.resource.access_control.port.in.ResourceAuthorityManageable;
 
 public enum CourseAction implements ResourceAction, ResourceAuthorityManageable {
     READ,
