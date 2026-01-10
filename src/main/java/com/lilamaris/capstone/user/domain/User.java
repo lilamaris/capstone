@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.function.Supplier;
@@ -21,7 +22,7 @@ import java.util.function.Supplier;
 @Entity
 @Table(name = "capstone_user")
 @EntityListeners(AuditingEntityListener.class)
-public class User implements Identifiable<UserId>, Auditable {
+public class User implements Persistable<UserId>, Identifiable<UserId>, Auditable {
     @Embedded
     private final JpaAuditMetadata audit = new JpaAuditMetadata();
     @Getter(AccessLevel.NONE)
@@ -60,5 +61,24 @@ public class User implements Identifiable<UserId>, Auditable {
     @Override
     public AuditMetadata auditMetadata() {
         return audit;
+    }
+
+    @Transient
+    private boolean isNew = true;
+
+    @Override
+    public UserId getId() {
+        return id;
+    }
+
+    @Override
+    public boolean isNew() {
+        return isNew;
+    }
+
+    @PostLoad
+    @PostPersist
+    private void markNotNew() {
+        this.isNew = false;
     }
 }

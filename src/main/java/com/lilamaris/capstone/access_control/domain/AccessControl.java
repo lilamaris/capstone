@@ -15,6 +15,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ import static com.lilamaris.capstone.shared.domain.util.Validation.requireField;
 @Entity
 @Table(name = "access_control")
 @EntityListeners(AuditingEntityListener.class)
-public class AccessControl implements Identifiable<AccessControlId>, Auditable {
+public class AccessControl implements Persistable<AccessControlId>, Identifiable<AccessControlId>, Auditable {
     @Embedded
     private final JpaAuditMetadata audit = new JpaAuditMetadata();
 
@@ -90,5 +91,24 @@ public class AccessControl implements Identifiable<AccessControlId>, Auditable {
     @Override
     public AuditMetadata auditMetadata() {
         return audit;
+    }
+
+    @Transient
+    private boolean isNew = true;
+
+    @Override
+    public AccessControlId getId() {
+        return id;
+    }
+
+    @Override
+    public boolean isNew() {
+        return isNew;
+    }
+
+    @PostLoad
+    @PostPersist
+    private void markNotNew() {
+        this.isNew = false;
     }
 }

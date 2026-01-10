@@ -16,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
@@ -30,7 +31,7 @@ import static com.lilamaris.capstone.shared.domain.util.Validation.requireField;
 @Entity
 @Table(name = "snapshot")
 @EntityListeners(AuditingEntityListener.class)
-public class Snapshot implements Identifiable<SnapshotId>, Describable, Auditable {
+public class Snapshot implements Persistable<SnapshotId>, Identifiable<SnapshotId>, Describable, Auditable {
     @Embedded
     private final JpaAuditMetadata audit = new JpaAuditMetadata();
     @Transient
@@ -100,5 +101,24 @@ public class Snapshot implements Identifiable<SnapshotId>, Describable, Auditabl
     private void registerCreated() {
         var event = new SnapshotCreated(id, Instant.now());
         eventList.add(event);
+    }
+
+    @Transient
+    private boolean isNew = true;
+
+    @Override
+    public SnapshotId getId() {
+        return id;
+    }
+
+    @Override
+    public boolean isNew() {
+        return isNew;
+    }
+
+    @PostLoad
+    @PostPersist
+    private void markNotNew() {
+        this.isNew = false;
     }
 }

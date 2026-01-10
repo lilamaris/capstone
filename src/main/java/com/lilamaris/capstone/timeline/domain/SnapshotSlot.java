@@ -17,6 +17,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
@@ -34,7 +35,7 @@ import static com.lilamaris.capstone.shared.domain.util.Validation.requireField;
 @Entity
 @Table(name = "timeline_snapshot_slot")
 @EntityListeners(AuditingEntityListener.class)
-public class SnapshotSlot implements Identifiable<SnapshotSlotId>, Auditable {
+public class SnapshotSlot implements Persistable<SnapshotSlotId>, Identifiable<SnapshotSlotId>, Auditable {
     @Embedded
     private final JpaAuditMetadata audit = new JpaAuditMetadata();
 
@@ -196,5 +197,24 @@ public class SnapshotSlot implements Identifiable<SnapshotSlotId>, Auditable {
     private void registerEffectiveUpdated() {
         var event = new SnapshotSlotEffectiveUpdated(id, tx, valid, Instant.now());
         eventList.add(event);
+    }
+
+    @Transient
+    private boolean isNew = true;
+
+    @Override
+    public SnapshotSlotId getId() {
+        return id;
+    }
+
+    @Override
+    public boolean isNew() {
+        return isNew;
+    }
+
+    @PostLoad
+    @PostPersist
+    private void markNotNew() {
+        this.isNew = false;
     }
 }

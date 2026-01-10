@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.data.domain.AfterDomainEventPublication;
 import org.springframework.data.domain.DomainEvents;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
@@ -39,7 +40,7 @@ import static com.lilamaris.capstone.shared.domain.util.Validation.requireField;
 @Entity
 @Table(name = "timeline")
 @EntityListeners(AuditingEntityListener.class)
-public class Timeline implements Identifiable<TimelineId>, Describable, Auditable {
+public class Timeline implements Persistable<TimelineId>, Identifiable<TimelineId>, Describable, Auditable {
     @Embedded
     private final JpaAuditMetadata audit = new JpaAuditMetadata();
 
@@ -237,6 +238,25 @@ public class Timeline implements Identifiable<TimelineId>, Describable, Auditabl
         if (slotList.isEmpty()) {
             throw new TimelineDomainException(TimelineErrorCode.EMPTY_SLOT, "No slot exists on this timeline.");
         }
+    }
+
+    @Transient
+    private boolean isNew = true;
+
+    @Override
+    public TimelineId getId() {
+        return id;
+    }
+
+    @Override
+    public boolean isNew() {
+        return isNew;
+    }
+
+    @PostLoad
+    @PostPersist
+    private void markNotNew() {
+        this.isNew = false;
     }
 }
 

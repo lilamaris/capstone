@@ -12,6 +12,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -25,7 +26,7 @@ import static com.lilamaris.capstone.shared.domain.util.Validation.requireField;
 @Entity
 @Table(name = "account")
 @EntityListeners(AuditingEntityListener.class)
-public class Account implements Identifiable<AccountId>, Auditable {
+public class Account implements Persistable<AccountId>, Identifiable<AccountId>, Auditable {
     @Embedded
     private final JpaAuditMetadata audit = new JpaAuditMetadata();
     @Getter(AccessLevel.NONE)
@@ -121,5 +122,24 @@ public class Account implements Identifiable<AccountId>, Auditable {
         }
 
         return encoder.matches(rawPassword, passwordHash);
+    }
+
+    @Transient
+    private boolean isNew = true;
+
+    @Override
+    public AccountId getId() {
+        return id;
+    }
+
+    @Override
+    public boolean isNew() {
+        return isNew;
+    }
+
+    @PostLoad
+    @PostPersist
+    private void markNotNew() {
+        this.isNew = false;
     }
 }
