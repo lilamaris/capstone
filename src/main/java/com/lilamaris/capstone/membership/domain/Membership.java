@@ -10,10 +10,7 @@ import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaActor;
 import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaDomainRef;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -25,7 +22,15 @@ import static com.lilamaris.capstone.shared.domain.util.Validation.requireField;
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "membership")
+@Table(
+        name = "membership",
+        indexes = {
+                @Index(
+                        name = "membership_lookup_idx",
+                        columnList = "actor_type, actor_id, resource_type, resource_id"
+                )
+        }
+)
 @EntityListeners(AuditingEntityListener.class)
 public class Membership implements Persistable<MembershipId>, Identifiable<MembershipId>, Auditable {
     @Embedded
@@ -46,11 +51,10 @@ public class Membership implements Persistable<MembershipId>, Identifiable<Membe
     })
     private JpaDomainRef resource;
 
+    @Setter
+    @Enumerated(EnumType.STRING)
     private MembershipStatus status;
 
-    private Boolean canDiscover;
-
-    private Boolean canRead;
     @Transient
     private boolean isNew = true;
 
@@ -58,14 +62,12 @@ public class Membership implements Persistable<MembershipId>, Identifiable<Membe
             MembershipId id,
             JpaActor actor,
             JpaDomainRef resource,
-            MembershipStatus status,
-            Boolean canDiscover
+            MembershipStatus status
     ) {
         this.id = requireField(id, "id");
         this.actor = requireField(actor, "actor");
         this.resource = requireField(resource, "resource");
         this.status = requireField(status, "status");
-        this.canDiscover = requireField(canDiscover, "canDiscover");
     }
 
     public static Membership create(
@@ -79,17 +81,10 @@ public class Membership implements Persistable<MembershipId>, Identifiable<Membe
                 idSupplier.get(),
                 act,
                 ref,
-                MembershipStatus.SUSPENDED,
-                false
+                MembershipStatus.SUSPENDED
         );
         membership.registerCreated();
         return membership;
-    }
-
-    public void setStatus(MembershipStatus status) {
-        this.status = status;
-        this.canDiscover = !status.equals(MembershipStatus.SUSPENDED);
-        this.canRead = status.equals(MembershipStatus.ACTIVE);
     }
 
     @Override
