@@ -1,16 +1,14 @@
 package com.lilamaris.capstone.timeline.infrastructure.web.controller;
 
-import com.lilamaris.capstone.timeline.application.condition.SnapshotQueryCondition;
 import com.lilamaris.capstone.timeline.application.port.in.TimelineCommandUseCase;
 import com.lilamaris.capstone.timeline.application.port.in.TimelineQueryUseCase;
 import com.lilamaris.capstone.timeline.domain.id.TimelineId;
 import com.lilamaris.capstone.timeline.infrastructure.web.request.TimelineRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.time.Clock;
 import java.util.UUID;
 
 @RestController
@@ -19,6 +17,8 @@ import java.util.UUID;
 public class TimelineController {
     private final TimelineCommandUseCase timelineCommandUseCase;
     private final TimelineQueryUseCase timelineQueryUseCase;
+
+    private final Clock clock;
 
     @GetMapping
     public ResponseEntity<?> getAll(
@@ -29,23 +29,11 @@ public class TimelineController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getCompressedById(
+    public ResponseEntity<?> getById(
             @PathVariable("id") UUID id
     ) {
         var timelineId = new TimelineId(id);
-        var result = timelineQueryUseCase.getCompressedById(timelineId);
-        return ResponseEntity.ok(result);
-    }
-
-    @GetMapping("/{id}/snapshots")
-    public ResponseEntity<?> getSnapshots(
-            @PathVariable("id") UUID id,
-            @RequestParam(name = "txAt", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime txAt,
-            @RequestParam(name = "validAt", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime validAt
-    ) {
-        var timelineId = new TimelineId(id);
-        var condition = SnapshotQueryCondition.create(timelineId, txAt, validAt);
-        var result = timelineQueryUseCase.getSnapshot(condition);
+        var result = timelineQueryUseCase.getById(timelineId);
         return ResponseEntity.ok(result);
     }
 

@@ -23,13 +23,21 @@ public class DefaultDomainRefResolverDirectory implements DomainRefResolverDirec
     }
 
     @Override
-    public <T extends DomainId<?>> T resolve(DomainRef ref) {
+    public <T extends DomainId<?>> T resolve(DomainRef ref, Class<T> expect) {
         @SuppressWarnings("unchecked")
         var resolver = (DomainRefResolver<T>) resolvers.get(ref.type());
         if (resolver == null) {
             throw new IllegalArgumentException(
                     "Unsupported ref: " + ref
             );
+        }
+
+        var id = resolver.resolve(ref);
+        if (!id.getClass().equals(expect)) {
+            throw new IllegalArgumentException(String.format(
+                    "Resolved id not matched with expect. resolved: '%s', expect: '%s'",
+                    id.getClass(), expect
+            ));
         }
 
         return resolver.resolve(ref);

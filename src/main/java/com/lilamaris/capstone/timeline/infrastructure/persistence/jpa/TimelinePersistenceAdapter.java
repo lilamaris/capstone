@@ -1,19 +1,19 @@
 package com.lilamaris.capstone.timeline.infrastructure.persistence.jpa;
 
-import com.lilamaris.capstone.shared.application.util.UniversityClock;
-import com.lilamaris.capstone.snapshot.domain.Snapshot;
-import com.lilamaris.capstone.snapshot.infrastructure.persistence.jpa.repository.SnapshotRepository;
-import com.lilamaris.capstone.timeline.application.condition.SnapshotQueryCondition;
 import com.lilamaris.capstone.timeline.application.port.out.TimelinePort;
+import com.lilamaris.capstone.timeline.domain.SnapshotSlot;
 import com.lilamaris.capstone.timeline.domain.Timeline;
+import com.lilamaris.capstone.timeline.domain.id.SnapshotSlotId;
 import com.lilamaris.capstone.timeline.domain.id.TimelineId;
+import com.lilamaris.capstone.timeline.infrastructure.persistence.jpa.repository.SnapshotSlotRepository;
 import com.lilamaris.capstone.timeline.infrastructure.persistence.jpa.repository.TimelineRepository;
-import com.lilamaris.capstone.timeline.infrastructure.persistence.jpa.specification.TimelineSpecification;
+import com.lilamaris.capstone.timeline.infrastructure.persistence.jpa.specification.SnapshotSlotSpecification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +21,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TimelinePersistenceAdapter implements TimelinePort {
     private final TimelineRepository timelineRepository;
-    private final SnapshotRepository snapshotRepository;
+    private final SnapshotSlotRepository snapshotSlotRepository;
 
     @Override
     public List<Timeline> getAll() {
@@ -29,26 +29,27 @@ public class TimelinePersistenceAdapter implements TimelinePort {
     }
 
     @Override
-    public List<Snapshot> getSnapshot(SnapshotQueryCondition condition) {
-        Specification<Snapshot> spec = Specification.unrestricted();
+    public List<Timeline> getAllByIds(List<TimelineId> ids) {
+        return timelineRepository.findAllById(ids);
+    }
 
-        spec = spec.and(TimelineSpecification.timelineEqual(condition.timelineId()));
-        if (condition.hasValidAt())
-            spec = spec.and(TimelineSpecification.betweenValid(UniversityClock.at(condition.validAt())));
-        if (condition.hasTxAt()) spec = spec.and(TimelineSpecification.betweenTx(UniversityClock.at(condition.txAt())));
-        else spec = spec.and(TimelineSpecification.isOpenTx());
+    @Override
+    public List<SnapshotSlot> getSlotsByTxTime(TimelineId id, Instant txAt) {
+        Specification<SnapshotSlot> spec = Specification.unrestricted();
+        spec = spec.and(SnapshotSlotSpecification.timelineEqual(id));
+        spec = spec.and(SnapshotSlotSpecification.betweenTx(txAt));
 
-        return snapshotRepository.findAll(spec);
+        return snapshotSlotRepository.findAll(spec);
+    }
+
+    @Override
+    public Optional<SnapshotSlot> getSlot(SnapshotSlotId snapshotSlotId) {
+        return snapshotSlotRepository.findById(snapshotSlotId);
     }
 
     @Override
     public Optional<Timeline> getById(TimelineId id) {
         return timelineRepository.findById(id);
-    }
-
-    @Override
-    public List<Timeline> getByIds(List<TimelineId> ids) {
-        return timelineRepository.findAllById(ids);
     }
 
     @Override

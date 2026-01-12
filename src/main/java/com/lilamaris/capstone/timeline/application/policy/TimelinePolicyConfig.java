@@ -45,6 +45,13 @@ public class TimelinePolicyConfig {
     }
 
     @Bean
+    public DomainRefResolver<SnapshotSlotId> snapshotSlotIdDomainRefResolver(
+            RawParser<UUID> uuidRawParser
+    ) {
+        return new DefaultDomainRefResolver<>(CoreDomainType.SNAPSHOT_SLOT, uuidRawParser, SnapshotSlotId::new);
+    }
+
+    @Bean
     public DomainRoleGraphDefinition<TimelineRole> timelineRoleRoleGraphDefinition() {
         var definition = new DefaultDomainRoleGraphDefinition<>(CoreDomainType.TIMELINE, TimelineRole.class);
         definition.extend(TimelineRole.CONTRIBUTOR, TimelineRole.MEMBER);

@@ -41,31 +41,12 @@ public class TimelineResult {
 
     public record Query(
             TimelineId id,
-            List<SnapshotSlotResult> snapshotSlotList,
             DescriptionResult description,
             AuditResult audit
     ) {
         public static Query from(Timeline domain) {
-            var snapshotSlotList = domain.getSlotList().stream().map(SnapshotSlotResult::from).toList();
             return new Query(
                     domain.id(),
-                    snapshotSlotList,
-                    DescriptionResult.from(domain),
-                    AuditResult.from(domain)
-            );
-        }
-    }
-
-    public record QueryCompressed(
-            TimelineId id,
-            Integer snapshotSlotNumber,
-            DescriptionResult description,
-            AuditResult audit
-    ) {
-        public static QueryCompressed from(Timeline domain) {
-            return new QueryCompressed(
-                    domain.id(),
-                    domain.getSlotList().size(),
                     DescriptionResult.from(domain),
                     AuditResult.from(domain)
             );

@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.course.domain.id;
+package com.lilamaris.capstone.slot_occupancy.domain.id;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.lilamaris.capstone.shared.domain.defaults.DefaultUuidDomainId;
@@ -10,16 +10,12 @@ import java.util.UUID;
 
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CourseOfferId extends DefaultUuidDomainId {
+public class SlotOccupancyId extends DefaultUuidDomainId {
     @JsonValue
     protected UUID value;
 
-    public CourseOfferId(UUID value) {
+    public SlotOccupancyId(UUID value) {
         super(value);
-    }
-
-    public static CourseOfferId newId() {
-        return new CourseOfferId(newUuid());
     }
 
     @Override

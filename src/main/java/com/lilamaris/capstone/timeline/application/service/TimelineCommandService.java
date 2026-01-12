@@ -1,12 +1,12 @@
 package com.lilamaris.capstone.timeline.application.service;
 
 import com.lilamaris.capstone.shared.application.context.ActorContext;
-import com.lilamaris.capstone.shared.application.policy.resource.access_control.port.in.ResourceAuthorizer;
 import com.lilamaris.capstone.shared.application.policy.domain.identity.port.in.IdGenerationDirectory;
+import com.lilamaris.capstone.shared.application.policy.resource.access_control.port.in.ResourceAuthorizer;
 import com.lilamaris.capstone.shared.application.util.UniversityClock;
 import com.lilamaris.capstone.shared.domain.defaults.DefaultDescriptionMetadata;
 import com.lilamaris.capstone.shared.domain.event.actor.CanonicalActor;
-import com.lilamaris.capstone.timeline.application.policy.access_control.TimelineAction;
+import com.lilamaris.capstone.timeline.application.policy.privilege.TimelineAction;
 import com.lilamaris.capstone.timeline.application.port.in.TimelineCommandUseCase;
 import com.lilamaris.capstone.timeline.application.port.out.TimelinePort;
 import com.lilamaris.capstone.timeline.application.result.TimelineResult;

@@ -4,5 +4,5 @@ import com.lilamaris.capstone.shared.domain.id.DomainId;
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
 
 public interface DomainRefResolverDirectory {
-    <T extends DomainId<?>> T resolve(DomainRef ref);
+    <T extends DomainId<?>> T resolve(DomainRef ref, Class<T> expect);
 }
