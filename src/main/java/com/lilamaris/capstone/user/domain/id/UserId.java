@@ -6,7 +6,7 @@ import com.lilamaris.capstone.shared.domain.defaults.DefaultDomainRef;
 import com.lilamaris.capstone.shared.domain.defaults.DefaultUuidDomainId;
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
 import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
-import com.lilamaris.capstone.shared.domain.type.CoreDomainType;
+import com.lilamaris.capstone.shared.domain.type.AggregateDomainType;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -35,7 +35,7 @@ public class UserId extends DefaultUuidDomainId implements Referenceable, Extern
 
     @Override
     public DomainRef ref() {
-        return new DefaultDomainRef(CoreDomainType.USER, this);
+        return new DefaultDomainRef(AggregateDomainType.USER, this);
     }
 
     @Override

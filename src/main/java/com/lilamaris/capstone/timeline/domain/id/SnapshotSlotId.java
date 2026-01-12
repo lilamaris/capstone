@@ -6,7 +6,7 @@ import com.lilamaris.capstone.shared.domain.defaults.DefaultDomainRef;
 import com.lilamaris.capstone.shared.domain.defaults.DefaultUuidDomainId;
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
 import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
-import com.lilamaris.capstone.shared.domain.type.CoreDomainType;
+import com.lilamaris.capstone.shared.domain.type.InternalAggregateDomainType;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -35,7 +35,7 @@ public class SnapshotSlotId extends DefaultUuidDomainId implements Referenceable
 
     @Override
     public DomainRef ref() {
-        return new DefaultDomainRef(CoreDomainType.SNAPSHOT_SLOT, this);
+        return new DefaultDomainRef(InternalAggregateDomainType.SNAPSHOT_SLOT, this);
     }
 
     @Override

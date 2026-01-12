@@ -1,8 +1,8 @@
 package com.lilamaris.capstone.shared.domain.type;
 
-public enum CoreDomainType implements DomainType {
+public enum AggregateDomainType implements DomainType {
     TIMELINE,
-    SNAPSHOT_SLOT,
     SNAPSHOT,
-    USER
+    USER,
+    COURSE
 }

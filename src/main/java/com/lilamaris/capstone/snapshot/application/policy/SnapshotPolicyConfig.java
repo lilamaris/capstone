@@ -10,7 +10,7 @@ import com.lilamaris.capstone.shared.application.policy.domain.role.defaults.Def
 import com.lilamaris.capstone.shared.application.policy.domain.role.port.in.DomainRoleGraphDefinition;
 import com.lilamaris.capstone.shared.application.policy.resource.access_control.defaults.DefaultResourceAccessPolicy;
 import com.lilamaris.capstone.shared.application.policy.resource.access_control.port.in.ResourceAccessPolicy;
-import com.lilamaris.capstone.shared.domain.type.CoreDomainType;
+import com.lilamaris.capstone.shared.domain.type.AggregateDomainType;
 import com.lilamaris.capstone.snapshot.application.policy.previlege.SnapshotAction;
 import com.lilamaris.capstone.snapshot.application.policy.previlege.SnapshotRole;
 import com.lilamaris.capstone.snapshot.domain.id.SnapshotDeltaId;
@@ -39,12 +39,12 @@ public class SnapshotPolicyConfig {
     public DomainRefResolver<SnapshotId> snapshotIdDomainRefResolver(
             RawParser<UUID> uuidRawParser
     ) {
-        return new DefaultDomainRefResolver<>(CoreDomainType.SNAPSHOT, uuidRawParser, SnapshotId::new);
+        return new DefaultDomainRefResolver<>(AggregateDomainType.SNAPSHOT, uuidRawParser, SnapshotId::new);
     }
 
     @Bean
     public DomainRoleGraphDefinition<SnapshotRole> snapshotRoleDomainRoleGraphDefinition() {
-        var definition = new DefaultDomainRoleGraphDefinition<>(CoreDomainType.SNAPSHOT, SnapshotRole.class);
+        var definition = new DefaultDomainRoleGraphDefinition<>(AggregateDomainType.SNAPSHOT, SnapshotRole.class);
         definition.extend(SnapshotRole.CONTRIBUTOR, SnapshotRole.MEMBER);
         definition.extend(SnapshotRole.MAINTAINER, SnapshotRole.CONTRIBUTOR);
         definition.setOwner(SnapshotRole.MAINTAINER);
@@ -53,7 +53,7 @@ public class SnapshotPolicyConfig {
 
     @Bean
     public ResourceAccessPolicy snapshotResourceAccessPolicy() {
-        var policy = new DefaultResourceAccessPolicy(CoreDomainType.SNAPSHOT);
+        var policy = new DefaultResourceAccessPolicy(AggregateDomainType.SNAPSHOT);
         policy.allow(SnapshotAction.UPDATE_METADATA, Set.of(SnapshotRole.CONTRIBUTOR));
         return policy;
     }

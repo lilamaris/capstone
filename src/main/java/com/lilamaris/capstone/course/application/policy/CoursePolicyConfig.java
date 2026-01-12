@@ -13,7 +13,7 @@ import com.lilamaris.capstone.shared.application.policy.domain.role.defaults.Def
 import com.lilamaris.capstone.shared.application.policy.domain.role.port.in.DomainRoleGraphDefinition;
 import com.lilamaris.capstone.shared.application.policy.resource.access_control.defaults.DefaultResourceAccessPolicy;
 import com.lilamaris.capstone.shared.application.policy.resource.access_control.port.in.ResourceAccessPolicy;
-import com.lilamaris.capstone.shared.domain.type.ResourceDomainType;
+import com.lilamaris.capstone.shared.domain.type.AggregateDomainType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -33,19 +33,19 @@ public class CoursePolicyConfig {
     public DomainRefResolver<CourseId> courseIdDomainRefResolver(
             RawParser<UUID> uuidRawParser
     ) {
-        return new DefaultDomainRefResolver<>(ResourceDomainType.COURSE, uuidRawParser, CourseId::new);
+        return new DefaultDomainRefResolver<>(AggregateDomainType.COURSE, uuidRawParser, CourseId::new);
     }
 
     @Bean
     public DomainRoleGraphDefinition<CourseRole> courseRoleDomainRoleGraphDefinition() {
-        var definition = new DefaultDomainRoleGraphDefinition<>(ResourceDomainType.COURSE, CourseRole.class);
+        var definition = new DefaultDomainRoleGraphDefinition<>(AggregateDomainType.COURSE, CourseRole.class);
         definition.extend(CourseRole.MAINTAINER, CourseRole.VIEWER);
         return definition;
     }
 
     @Bean
     public ResourceAccessPolicy courseResourceAccessPolicy() {
-        var policy = new DefaultResourceAccessPolicy(ResourceDomainType.COURSE);
+        var policy = new DefaultResourceAccessPolicy(AggregateDomainType.COURSE);
         policy.allow(CourseAction.UPDATE_METADATA, Set.of(CourseRole.MAINTAINER));
         return policy;
     }

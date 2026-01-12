@@ -10,7 +10,8 @@ import com.lilamaris.capstone.shared.application.policy.domain.role.defaults.Def
 import com.lilamaris.capstone.shared.application.policy.domain.role.port.in.DomainRoleGraphDefinition;
 import com.lilamaris.capstone.shared.application.policy.resource.access_control.defaults.DefaultResourceAccessPolicy;
 import com.lilamaris.capstone.shared.application.policy.resource.access_control.port.in.ResourceAccessPolicy;
-import com.lilamaris.capstone.shared.domain.type.CoreDomainType;
+import com.lilamaris.capstone.shared.domain.type.AggregateDomainType;
+import com.lilamaris.capstone.shared.domain.type.InternalAggregateDomainType;
 import com.lilamaris.capstone.timeline.application.policy.privilege.TimelineAction;
 import com.lilamaris.capstone.timeline.application.policy.privilege.TimelineRole;
 import com.lilamaris.capstone.timeline.domain.id.SnapshotSlotId;
@@ -41,19 +42,19 @@ public class TimelinePolicyConfig {
     public DomainRefResolver<TimelineId> timelineIdDomainRefResolver(
             RawParser<UUID> uuidRawParser
     ) {
-        return new DefaultDomainRefResolver<>(CoreDomainType.TIMELINE, uuidRawParser, TimelineId::new);
+        return new DefaultDomainRefResolver<>(AggregateDomainType.TIMELINE, uuidRawParser, TimelineId::new);
     }
 
     @Bean
     public DomainRefResolver<SnapshotSlotId> snapshotSlotIdDomainRefResolver(
             RawParser<UUID> uuidRawParser
     ) {
-        return new DefaultDomainRefResolver<>(CoreDomainType.SNAPSHOT_SLOT, uuidRawParser, SnapshotSlotId::new);
+        return new DefaultDomainRefResolver<>(InternalAggregateDomainType.SNAPSHOT_SLOT, uuidRawParser, SnapshotSlotId::new);
     }
 
     @Bean
     public DomainRoleGraphDefinition<TimelineRole> timelineRoleRoleGraphDefinition() {
-        var definition = new DefaultDomainRoleGraphDefinition<>(CoreDomainType.TIMELINE, TimelineRole.class);
+        var definition = new DefaultDomainRoleGraphDefinition<>(AggregateDomainType.TIMELINE, TimelineRole.class);
         definition.extend(TimelineRole.CONTRIBUTOR, TimelineRole.MEMBER);
         definition.extend(TimelineRole.MAINTAINER, TimelineRole.CONTRIBUTOR);
         definition.setOwner(TimelineRole.MAINTAINER);
@@ -62,7 +63,7 @@ public class TimelinePolicyConfig {
 
     @Bean
     public ResourceAccessPolicy timelineRoleResourceAccessPolicy() {
-        var policy = new DefaultResourceAccessPolicy(CoreDomainType.TIMELINE);
+        var policy = new DefaultResourceAccessPolicy(AggregateDomainType.TIMELINE);
         policy.allow(TimelineAction.UPDATE_METADATA, Set.of(TimelineRole.CONTRIBUTOR));
         policy.allow(TimelineAction.MIGRATE, Set.of(TimelineRole.MAINTAINER));
         policy.allow(TimelineAction.MERGE, Set.of(TimelineRole.MAINTAINER));
