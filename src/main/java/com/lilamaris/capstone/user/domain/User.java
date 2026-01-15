@@ -2,7 +2,6 @@ package com.lilamaris.capstone.user.domain;
 
 import com.lilamaris.capstone.shared.domain.contract.Auditable;
 import com.lilamaris.capstone.shared.domain.contract.Identifiable;
-import com.lilamaris.capstone.shared.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.shared.domain.metadata.AuditMetadata;
 import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.user.domain.id.UserId;
@@ -16,6 +15,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.function.Supplier;
 
+import static com.lilamaris.capstone.shared.domain.util.Validation.requireField;
+
 @Getter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -25,26 +26,24 @@ import java.util.function.Supplier;
 public class User implements Persistable<UserId>, Identifiable<UserId>, Auditable {
     @Embedded
     private final JpaAuditMetadata audit = new JpaAuditMetadata();
+
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private UserId id;
-    @Enumerated(EnumType.STRING)
-    private Role role;
+
     private String displayName;
 
-    protected User(UserId id, String displayName, Role role) {
-        if (id == null) throw new DomainIllegalArgumentException("Field 'id' must not be null.");
-        if (displayName == null) throw new DomainIllegalArgumentException("Field 'displayName' must not be null.");
-        if (role == null) throw new DomainIllegalArgumentException("Field 'role' must not be null.");
-
-        this.id = id;
-        this.displayName = displayName;
-        this.role = role;
+    protected User(UserId id, String displayName) {
+        this.id = requireField(id, "id");
+        this.displayName = requireField(displayName, "displayName");
     }
 
-    public static User create(String displayName, Role role, Supplier<UserId> idSupplier) {
-        var user = new User(idSupplier.get(), displayName, role);
+    public static User create(
+            Supplier<UserId> idSupplier,
+            String displayName
+    ) {
+        var user = new User(idSupplier.get(), displayName);
         user.registerCreated();
         return user;
     }
