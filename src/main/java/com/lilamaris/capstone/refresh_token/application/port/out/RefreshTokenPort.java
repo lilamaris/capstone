@@ -9,5 +9,5 @@ import java.time.Duration;
 public interface RefreshTokenPort {
     RefreshToken consume(RefreshTokenId id);
 
-    void save(RefreshToken domain, Duration ttl);
+    void save(RefreshTokenId id, RefreshToken domain, Duration ttl);
 }
