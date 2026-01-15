@@ -35,7 +35,7 @@ public class TimelineId extends DefaultUuidDomainId implements Referenceable, Ex
 
     @Override
     public DomainRef ref() {
-        return new DefaultDomainRef(AggregateDomainType.TIMELINE, this);
+        return DefaultDomainRef.from(AggregateDomainType.TIMELINE, this);
     }
 
     @Override

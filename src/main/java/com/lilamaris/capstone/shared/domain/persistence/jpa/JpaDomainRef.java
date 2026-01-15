@@ -64,6 +64,6 @@ public class JpaDomainRef implements DomainRef, ToPojo<DomainRef> {
 
     @Override
     public DomainRef toPOJO() {
-        return new DefaultDomainRef(type.toPOJO(), id());
+        return DefaultDomainRef.from(this);
     }
 }

@@ -39,7 +39,7 @@ public class CourseId extends DefaultUuidDomainId implements Referenceable, Exte
 
     @Override
     public DomainRef ref() {
-        return new DefaultDomainRef(AggregateDomainType.COURSE, this);
+        return DefaultDomainRef.from(AggregateDomainType.COURSE, this);
     }
 
     @Override

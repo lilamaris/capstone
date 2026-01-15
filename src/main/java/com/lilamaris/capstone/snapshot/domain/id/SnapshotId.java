@@ -40,6 +40,6 @@ public class SnapshotId extends DefaultUuidDomainId implements Referenceable, Ex
 
     @Override
     public DomainRef ref() {
-        return new DefaultDomainRef(AggregateDomainType.SNAPSHOT, this);
+        return DefaultDomainRef.from(AggregateDomainType.SNAPSHOT, this);
     }
 }

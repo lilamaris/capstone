@@ -35,7 +35,7 @@ public class UserId extends DefaultUuidDomainId implements Referenceable, Extern
 
     @Override
     public DomainRef ref() {
-        return new DefaultDomainRef(AggregateDomainType.USER, this);
+        return DefaultDomainRef.from(AggregateDomainType.USER, this);
     }
 
     @Override

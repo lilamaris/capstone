@@ -35,7 +35,7 @@ public class SnapshotSlotId extends DefaultUuidDomainId implements Referenceable
 
     @Override
     public DomainRef ref() {
-        return new DefaultDomainRef(InternalAggregateDomainType.SNAPSHOT_SLOT, this);
+        return DefaultDomainRef.from(InternalAggregateDomainType.SNAPSHOT_SLOT, this);
     }
 
     @Override
