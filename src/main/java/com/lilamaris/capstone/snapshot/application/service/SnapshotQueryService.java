@@ -17,11 +17,11 @@ import java.util.List;
 public class SnapshotQueryService implements
         SnapshotQuery {
     private final SnapshotPort snapshotPort;
-    private final DomainRefResolverDirectory refDir;
+    private final DomainRefResolverDirectory refs;
 
     @Override
     public SnapshotEntry getEntry(DomainRef ref) {
-        var id = refDir.resolve(ref, SnapshotId.class);
+        var id = refs.resolve(ref, SnapshotId.class);
         var snapshot = snapshotPort.getById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(
                         "Snapshot with id '%s' not found.", id
@@ -32,7 +32,7 @@ public class SnapshotQueryService implements
 
     @Override
     public List<SnapshotEntry> getEntries(List<DomainRef> refs) {
-        var ids = refs.stream().map(ref -> refDir.resolve(ref, SnapshotId.class)).toList();
+        var ids = refs.stream().map(ref -> this.refs.resolve(ref, SnapshotId.class)).toList();
         var snapshots = snapshotPort.getByIds(ids);
         return snapshots.stream().map(SnapshotEntry::from).toList();
     }

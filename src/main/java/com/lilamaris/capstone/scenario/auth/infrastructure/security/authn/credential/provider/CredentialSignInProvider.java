@@ -9,17 +9,13 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.function.Function;
 
 @Component
 @RequiredArgsConstructor
 public class CredentialSignInProvider implements AuthenticationProvider {
     private final CredentialAuthUseCase credentialAuthUseCase;
-
-    private final PasswordEncoder passwordEncoder;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -29,9 +25,8 @@ public class CredentialSignInProvider implements AuthenticationProvider {
             var token = (CredentialSignInAuthenticationToken) authentication;
             var email = token.getEmail();
             var rawPassword = token.getRawPassword();
-            Function<String, Boolean> challenge = (hash) -> passwordEncoder.matches(rawPassword, hash);
 
-            tokenResult = credentialAuthUseCase.signIn(email, challenge);
+            tokenResult = credentialAuthUseCase.signIn(email, rawPassword);
         } catch (DomainViolationException e) {
             throw e;
         } catch (Exception e) {

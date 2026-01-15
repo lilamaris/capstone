@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.scenario.auth.infrastructure.security.authn.oidc.vendor;
 
-import com.lilamaris.capstone.account.domain.Provider;
+import com.lilamaris.capstone.scenario.auth.application.port.out.AuthProvider;
 import com.lilamaris.capstone.scenario.auth.infrastructure.security.authn.oidc.NormalizedProfile;
 import com.lilamaris.capstone.scenario.auth.infrastructure.security.authn.oidc.OAuth2ProfileMapper;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -17,7 +17,7 @@ public class GithubProfileMapper implements OAuth2ProfileMapper {
         var displayName = (String) attributes.getOrDefault("name", "");
 
         return NormalizedProfile.builder()
-                .provider(Provider.GITHUB)
+                .authProvider(AuthProvider.GITHUB)
                 .providerId(providerId)
                 .email(email)
                 .displayName(displayName)

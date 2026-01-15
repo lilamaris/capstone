@@ -2,8 +2,7 @@ package com.lilamaris.capstone.scenario.auth.application.port.out;
 
 import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
 
-import java.util.Optional;
-
-public interface AuthUserResolver {
-    Optional<AuthUserEntry> resolve(ExternalizableId externalId);
+public record AuthRefreshTokenConsumeEntry(
+        ExternalizableId principal
+) {
 }

@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AccountVerifyService implements AuthVerifier {
     private final AccountPort accountPort;
-    private final ProviderTranslator translator;
+    private final AuthProviderTranslator translator;
     private final PasswordEncoder encoder;
 
     @Override
-    public VerifiedAccount verify(AuthProvider authProvider, String principalId, String challenge) {
+    public AuthVerifiedAccount verify(AuthProvider authProvider, String principalId, String challenge) {
         var providerIdentity = translator.translate(authProvider);
         var providerType = providerIdentity.internal() ? ProviderType.INTERNAL : ProviderType.EXTERNAL;
 
@@ -27,9 +27,9 @@ public class AccountVerifyService implements AuthVerifier {
 
         var success = encoder.matches(challenge, account.getPasswordHash());
 
-        return new VerifiedAccount(
+        return new AuthVerifiedAccount(
                 success,
-                success ? AccountEntry.from(account) : null
+                success ? AuthAccountEntry.from(account) : null
         );
     }
 }

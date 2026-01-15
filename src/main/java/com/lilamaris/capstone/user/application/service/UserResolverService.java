@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.user.application.service;
 
+import com.lilamaris.capstone.scenario.auth.application.port.out.AuthUserEntry;
 import com.lilamaris.capstone.scenario.auth.application.port.out.AuthUserResolver;
-import com.lilamaris.capstone.scenario.auth.application.port.out.UserEntry;
 import com.lilamaris.capstone.shared.application.policy.domain.identity.port.in.DomainRefResolverDirectory;
 import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
 import com.lilamaris.capstone.shared.domain.type.AggregateDomainType;
@@ -20,8 +20,8 @@ public class UserResolverService implements
     private final DomainRefResolverDirectory refs;
 
     @Override
-    public Optional<UserEntry> resolve(ExternalizableId externalId) {
+    public Optional<AuthUserEntry> resolve(ExternalizableId externalId) {
         var id = refs.resolve(externalId, AggregateDomainType.USER, UserId.class);
-        return userPort.getById(id).map(UserEntry::from);
+        return userPort.getById(id).map(AuthUserEntry::from);
     }
 }

@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.scenario.auth.infrastructure.security.authn.oidc;
 
-import com.lilamaris.capstone.account.domain.Provider;
+import com.lilamaris.capstone.scenario.auth.application.port.out.AuthProvider;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,7 +16,7 @@ import java.util.Map;
 @Getter
 @Builder
 public class NormalizedProfile implements OidcUser, OAuth2User {
-    private Provider provider;
+    private AuthProvider authProvider;
     private String providerId;
     private String email;
     private String displayName;
@@ -42,7 +42,7 @@ public class NormalizedProfile implements OidcUser, OAuth2User {
 
     @Override
     public String getName() {
-        return provider + ":" + providerId;
+        return authProvider + ":" + providerId;
     }
 
     // OidcUser spec

@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.scenario.auth.infrastructure.security.authn.oidc.vendor;
 
-import com.lilamaris.capstone.account.domain.Provider;
+import com.lilamaris.capstone.scenario.auth.application.port.out.AuthProvider;
 import com.lilamaris.capstone.scenario.auth.infrastructure.security.authn.oidc.NormalizedProfile;
 import com.lilamaris.capstone.scenario.auth.infrastructure.security.authn.oidc.OidcProfileMapper;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -20,7 +20,7 @@ public class GoogleProfileMapper implements OidcProfileMapper {
         var userInfo = oidcUser.getUserInfo();
 
         return NormalizedProfile.builder()
-                .provider(Provider.GOOGLE)
+                .authProvider(AuthProvider.GOOGLE)
                 .providerId(providerId)
                 .email(email)
                 .displayName(displayName)

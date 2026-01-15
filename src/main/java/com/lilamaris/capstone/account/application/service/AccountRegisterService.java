@@ -2,12 +2,12 @@ package com.lilamaris.capstone.account.application.service;
 
 import com.lilamaris.capstone.account.application.port.out.AccountPort;
 import com.lilamaris.capstone.account.domain.Account;
-import com.lilamaris.capstone.account.domain.ProviderType;
+import com.lilamaris.capstone.account.domain.InternalProviderType;
 import com.lilamaris.capstone.account.domain.id.AccountId;
-import com.lilamaris.capstone.scenario.auth.application.port.out.AccountEntry;
+import com.lilamaris.capstone.scenario.auth.application.port.out.AuthAccountEntry;
 import com.lilamaris.capstone.scenario.auth.application.port.out.AuthAccountRegistrar;
 import com.lilamaris.capstone.scenario.auth.application.port.out.AuthProvider;
-import com.lilamaris.capstone.scenario.auth.application.port.out.ProviderTranslator;
+import com.lilamaris.capstone.scenario.auth.application.port.out.AuthProviderTranslator;
 import com.lilamaris.capstone.shared.application.policy.domain.identity.port.in.DomainRefResolverDirectory;
 import com.lilamaris.capstone.shared.application.policy.domain.identity.port.in.IdGenerationDirectory;
 import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
@@ -22,12 +22,12 @@ public class AccountRegisterService implements
         AuthAccountRegistrar
 {
     private final AccountPort accountPort;
-    private final ProviderTranslator translator;
+    private final AuthProviderTranslator translator;
     private final IdGenerationDirectory ids;
     private final DomainRefResolverDirectory refs;
 
     @Override
-    public AccountEntry register(
+    public AuthAccountEntry register(
             ExternalizableId externalUserId,
             String email,
             String passwordHash
@@ -36,17 +36,18 @@ public class AccountRegisterService implements
         var account = Account.create(
                 ids.next(AccountId.class),
                 userId,
+                InternalProviderType.PASSWORD.name(),
                 email,
                 passwordHash
         );
 
         var created = accountPort.save(account);
 
-        return AccountEntry.from(created);
+        return AuthAccountEntry.from(created);
     }
 
     @Override
-    public AccountEntry register(
+    public AuthAccountEntry register(
             ExternalizableId externalUserId,
             AuthProvider authProvider,
             String principalId
@@ -63,6 +64,6 @@ public class AccountRegisterService implements
 
         var created = accountPort.save(account);
 
-        return AccountEntry.from(created);
+        return AuthAccountEntry.from(created);
     }
 }

@@ -21,14 +21,6 @@ public class AuthConfig {
     }
 
     @Bean
-    Duration refreshTokenExpiration(
-            @Value("${spring.security.jwt.refreshTokenExpiration}")
-            Duration expiration
-    ) {
-        return expiration;
-    }
-
-    @Bean
     SecureRandom secureRandom() {
         return new SecureRandom();
     }

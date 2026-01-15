@@ -58,7 +58,7 @@ public class Account implements Persistable<AccountId>, Identifiable<AccountId>,
         this.userId = requireField(userId, "userId");
         this.providerType = requireField(providerType, "providerType");
         this.identityProvider = requireField(identityProvider, "identityProvider");
-        this.principalId = requireField(principalId, "principalId");
+        this.principalId = requireField(principalId, "principal");
         this.passwordHash = passwordHash;
     }
 

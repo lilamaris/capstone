@@ -32,7 +32,7 @@ public class CustomOidcSuccessHandler implements AuthenticationSuccessHandler {
 
         try {
             NormalizedProfile principal = (NormalizedProfile) authentication.getPrincipal();
-            var provider = principal.getProvider();
+            var provider = principal.getAuthProvider();
             var providerId = principal.getProviderId();
             var email = principal.getEmail();
             var displayName = principal.getDisplayName();
