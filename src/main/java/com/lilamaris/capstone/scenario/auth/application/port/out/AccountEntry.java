@@ -5,14 +5,12 @@ import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
 
 public record AccountEntry(
         ExternalizableId id,
-        ExternalizableId userId,
-        String displayName
+        ExternalizableId userId
 ) {
     public static AccountEntry from(Account account) {
         return new AccountEntry(
                 account.id(),
-                account.getUserId(),
-                account.getDisplayName()
+                account.getUserId()
         );
     }
 }
