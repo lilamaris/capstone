@@ -3,7 +3,6 @@ package com.lilamaris.capstone.account.domain;
 import com.lilamaris.capstone.account.domain.id.AccountId;
 import com.lilamaris.capstone.shared.domain.contract.Auditable;
 import com.lilamaris.capstone.shared.domain.contract.Identifiable;
-import com.lilamaris.capstone.shared.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.shared.domain.metadata.AuditMetadata;
 import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.user.domain.id.UserId;
@@ -14,7 +13,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.function.Supplier;
 
@@ -29,77 +27,72 @@ import static com.lilamaris.capstone.shared.domain.util.Validation.requireField;
 public class Account implements Persistable<AccountId>, Identifiable<AccountId>, Auditable {
     @Embedded
     private final JpaAuditMetadata audit = new JpaAuditMetadata();
+
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private AccountId id;
+
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "user_id", updatable = false))
     private UserId userId;
+
     @Enumerated(EnumType.STRING)
-    private Provider provider;
-    private String providerId;
-    private String displayName;
-    private String email;
+    private ProviderType providerType;
+
+    private String identityProvider;
+
+    private String principalId;
+
     private String passwordHash;
 
     protected Account(
             AccountId id,
             UserId userId,
-            Provider provider,
-            String providerId,
-            String displayName,
-            String email,
+            ProviderType providerType,
+            String identityProvider,
+            String principalId,
             String passwordHash
     ) {
         this.id = requireField(id, "id");
         this.userId = requireField(userId, "userId");
-        this.provider = requireField(provider, "provider");
-        this.providerId = requireField(providerId, "providerId");
-        this.displayName = requireField(displayName, "displayName");
-        this.email = requireField(email, "email");
+        this.providerType = requireField(providerType, "providerType");
+        this.identityProvider = requireField(identityProvider, "identityProvider");
+        this.principalId = requireField(principalId, "principalId");
         this.passwordHash = passwordHash;
     }
 
     public static Account create(
+            Supplier<AccountId> idSupplier,
             UserId userId,
-            String displayName,
+            String provider,
             String email,
-            String passwordHash,
-            Supplier<AccountId> idSupplier
+            String passwordHash
     ) {
+        requireField(passwordHash, "passwordHash");
+
         return new Account(
                 idSupplier.get(),
                 userId,
-                Provider.LOCAL,
+                ProviderType.INTERNAL,
+                provider,
                 email,
-                displayName,
-                email,
-                requireField(passwordHash, "passwordHash")
+                passwordHash
         );
     }
 
     public static Account create(
+            Supplier<AccountId> idSupplier,
             UserId userId,
-            Provider provider,
-            String providerId,
-            String displayName,
-            String email,
-            Supplier<AccountId> idSupplier
+            String provider,
+            String providerId
     ) {
-        if (provider.equals(Provider.LOCAL)) {
-            throw new DomainIllegalArgumentException(
-                    "Can not create a local account by explicitly specifying the provider."
-            );
-        }
-
         return new Account(
                 idSupplier.get(),
                 userId,
+                ProviderType.EXTERNAL,
                 provider,
                 providerId,
-                displayName,
-                email,
                 null
         );
     }
@@ -112,16 +105,6 @@ public class Account implements Persistable<AccountId>, Identifiable<AccountId>,
     @Override
     public AuditMetadata auditMetadata() {
         return audit;
-    }
-
-    public boolean challengeHash(String rawPassword, PasswordEncoder encoder) {
-        if (!provider.equals(Provider.LOCAL)) {
-            throw new DomainIllegalArgumentException(
-                    "Can not perform challenge hash in not local provider."
-            );
-        }
-
-        return encoder.matches(rawPassword, passwordHash);
     }
 
     @Transient
