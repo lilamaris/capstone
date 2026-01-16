@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SlotOccupancyRepository extends JpaRepository<SlotOccupancy, SlotOccupancyId> {
-    boolean existsBySnapshotSlotIdOrSnapshotId(SlotId slotId, SnapshotId snapshotId);
+    boolean existsBySlotIdOrSnapshotId(SlotId slotId, SnapshotId snapshotId);
 
     Optional<SlotOccupancy> findBySnapshotId(SnapshotId snapshotId);
 
     List<SlotOccupancy> findAllBySnapshotIdIn(Iterable<SnapshotId> snapshotIds);
 
-    Optional<SlotOccupancy> findBySnapshotSlotId(SlotId slotId);
+    Optional<SlotOccupancy> findBySlotId(SlotId slotId);
 
-    List<SlotOccupancy> findAllBySnapshotSlotIdIn(Iterable<SlotId> snapshotSlotIds);
+    List<SlotOccupancy> findAllBySlotIdIn(Iterable<SlotId> slotIds);
 }

@@ -19,7 +19,7 @@ public class SlotOccupancyPersistenceAdapter implements SlotOccupancyPort {
 
     @Override
     public boolean existsBySlotIdOrSnapshotId(SlotId slotId, SnapshotId snapshotId) {
-        return repository.existsBySnapshotSlotIdOrSnapshotId(slotId, snapshotId);
+        return repository.existsBySlotIdOrSnapshotId(slotId, snapshotId);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class SlotOccupancyPersistenceAdapter implements SlotOccupancyPort {
 
     @Override
     public Optional<SlotOccupancy> getBySlotId(SlotId slotId) {
-        return repository.findBySnapshotSlotId(slotId);
+        return repository.findBySlotId(slotId);
     }
 
     @Override
