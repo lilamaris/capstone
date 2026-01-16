@@ -14,7 +14,7 @@ import com.lilamaris.capstone.shared.domain.type.AggregateDomainType;
 import com.lilamaris.capstone.shared.domain.type.InternalAggregateDomainType;
 import com.lilamaris.capstone.timeline.application.policy.privilege.TimelineAction;
 import com.lilamaris.capstone.timeline.application.policy.privilege.TimelineRole;
-import com.lilamaris.capstone.timeline.domain.id.SnapshotSlotId;
+import com.lilamaris.capstone.timeline.domain.id.SlotId;
 import com.lilamaris.capstone.timeline.domain.id.TimelineId;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,10 +32,10 @@ public class TimelinePolicyConfig {
     }
 
     @Bean
-    public IdGenerator<SnapshotSlotId> snapshotSlotIdIdGenerator(
+    public IdGenerator<SlotId> snapshotSlotIdIdGenerator(
             RawGenerator<UUID> uuidRawGenerator
     ) {
-        return new RawBasedIdGenerator<>(SnapshotSlotId.class, SnapshotSlotId::new, uuidRawGenerator);
+        return new RawBasedIdGenerator<>(SlotId.class, SlotId::new, uuidRawGenerator);
     }
 
     @Bean
@@ -46,10 +46,10 @@ public class TimelinePolicyConfig {
     }
 
     @Bean
-    public DomainRefResolver<SnapshotSlotId> snapshotSlotIdDomainRefResolver(
+    public DomainRefResolver<SlotId> snapshotSlotIdDomainRefResolver(
             RawParser<UUID> uuidRawParser
     ) {
-        return new DefaultDomainRefResolver<>(InternalAggregateDomainType.SNAPSHOT_SLOT, uuidRawParser, SnapshotSlotId::new);
+        return new DefaultDomainRefResolver<>(InternalAggregateDomainType.SNAPSHOT_SLOT, uuidRawParser, SlotId::new);
     }
 
     @Bean

@@ -8,9 +8,9 @@ import com.lilamaris.capstone.shared.domain.metadata.AuditMetadata;
 import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.timeline.domain.embed.Effective;
 import com.lilamaris.capstone.timeline.domain.embed.EffectiveSelector;
-import com.lilamaris.capstone.timeline.domain.event.SnapshotSlotCreated;
-import com.lilamaris.capstone.timeline.domain.event.SnapshotSlotEffectiveUpdated;
-import com.lilamaris.capstone.timeline.domain.id.SnapshotSlotId;
+import com.lilamaris.capstone.timeline.domain.event.SlotCreated;
+import com.lilamaris.capstone.timeline.domain.event.SlotEffectiveUpdated;
+import com.lilamaris.capstone.timeline.domain.id.SlotId;
 import com.lilamaris.capstone.timeline.domain.id.TimelineId;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -33,9 +33,9 @@ import static com.lilamaris.capstone.shared.domain.util.Validation.requireField;
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "timeline_snapshot_slot")
+@Table(name = "timeline_slot")
 @EntityListeners(AuditingEntityListener.class)
-public class SnapshotSlot implements Persistable<SnapshotSlotId>, Identifiable<SnapshotSlotId>, Auditable {
+public class Slot implements Persistable<SlotId>, Identifiable<SlotId>, Auditable {
     @Embedded
     private final JpaAuditMetadata audit = new JpaAuditMetadata();
 
@@ -45,7 +45,7 @@ public class SnapshotSlot implements Persistable<SnapshotSlotId>, Identifiable<S
     @Getter(AccessLevel.NONE)
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
-    private SnapshotSlotId id;
+    private SlotId id;
 
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "timeline_id", insertable = false, nullable = false, updatable = false))
@@ -53,7 +53,7 @@ public class SnapshotSlot implements Persistable<SnapshotSlotId>, Identifiable<S
 
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "parent_slot_id"))
-    private SnapshotSlotId parentSlotId;
+    private SlotId parentSlotId;
 
     @Embedded
     @AttributeOverrides({
@@ -68,10 +68,10 @@ public class SnapshotSlot implements Persistable<SnapshotSlotId>, Identifiable<S
     })
     private Effective valid;
 
-    protected SnapshotSlot(
-            SnapshotSlotId id,
+    protected Slot(
+            SlotId id,
             TimelineId timelineId,
-            SnapshotSlotId parentSlotId,
+            SlotId parentSlotId,
             Effective tx,
             Effective valid
     ) {
@@ -82,32 +82,32 @@ public class SnapshotSlot implements Persistable<SnapshotSlotId>, Identifiable<S
         this.valid = requireField(valid, "valid");
     }
 
-    protected static SnapshotSlot create(
-            Supplier<SnapshotSlotId> idSupplier,
+    protected static Slot create(
+            Supplier<SlotId> idSupplier,
             TimelineId timelineId,
-            SnapshotSlotId parentSlotId,
+            SlotId parentSlotId,
             Effective tx,
             Effective valid
     ) {
         var id = idSupplier.get();
-        var snapshotSlot = new SnapshotSlot(id, timelineId, parentSlotId, tx, valid);
+        var snapshotSlot = new Slot(id, timelineId, parentSlotId, tx, valid);
         snapshotSlot.registerCreated();
         return snapshotSlot;
     }
 
-    protected static SnapshotSlot create(
-            Supplier<SnapshotSlotId> idSupplier,
+    protected static Slot create(
+            Supplier<SlotId> idSupplier,
             TimelineId timelineId,
             Effective tx,
             Effective valid
     ) {
         var id = idSupplier.get();
-        var snapshotSlot = new SnapshotSlot(id, timelineId, null, tx, valid);
+        var snapshotSlot = new Slot(id, timelineId, null, tx, valid);
         snapshotSlot.registerCreated();
         return snapshotSlot;
     }
 
-    protected static Comparator<SnapshotSlot> sortAsc(EffectiveSelector selector) {
+    protected static Comparator<Slot> sortAsc(EffectiveSelector selector) {
         if (selector == EffectiveSelector.TX) {
             return Comparator.comparing(s -> s.getTx().getFrom());
         } else if (selector == EffectiveSelector.VALID) {
@@ -117,7 +117,7 @@ public class SnapshotSlot implements Persistable<SnapshotSlotId>, Identifiable<S
         }
     }
 
-    protected static Predicate<SnapshotSlot> ifEffectiveOpenEqualTo(EffectiveSelector selector, boolean state) {
+    protected static Predicate<Slot> ifEffectiveOpenEqualTo(EffectiveSelector selector, boolean state) {
         if (selector == EffectiveSelector.TX) {
             return s -> s.getTx().isOpen() == state;
         } else if (selector == EffectiveSelector.VALID) {
@@ -127,7 +127,7 @@ public class SnapshotSlot implements Persistable<SnapshotSlotId>, Identifiable<S
         }
     }
 
-    protected static Predicate<SnapshotSlot> ifEffectiveContains(EffectiveSelector selector, Instant at) {
+    protected static Predicate<Slot> ifEffectiveContains(EffectiveSelector selector, Instant at) {
         if (selector == EffectiveSelector.TX) {
             return s -> s.getTx().contains(at);
         } else if (selector == EffectiveSelector.VALID) {
@@ -137,7 +137,7 @@ public class SnapshotSlot implements Persistable<SnapshotSlotId>, Identifiable<S
         }
     }
 
-    protected static Predicate<SnapshotSlot> ifEffectiveOverlap(EffectiveSelector selector, Effective range) {
+    protected static Predicate<Slot> ifEffectiveOverlap(EffectiveSelector selector, Effective range) {
         if (selector == EffectiveSelector.TX) {
             return s -> s.getTx().isOverlap(range);
         } else if (selector == EffectiveSelector.VALID) {
@@ -148,7 +148,7 @@ public class SnapshotSlot implements Persistable<SnapshotSlotId>, Identifiable<S
     }
 
     @Override
-    public SnapshotSlotId id() {
+    public SlotId id() {
         return id;
     }
 
@@ -190,12 +190,12 @@ public class SnapshotSlot implements Persistable<SnapshotSlotId>, Identifiable<S
     }
 
     private void registerCreated() {
-        var event = new SnapshotSlotCreated(id, Instant.now());
+        var event = new SlotCreated(id, Instant.now());
         eventList.add(event);
     }
 
     private void registerEffectiveUpdated() {
-        var event = new SnapshotSlotEffectiveUpdated(id, tx, valid, Instant.now());
+        var event = new SlotEffectiveUpdated(id, tx, valid, Instant.now());
         eventList.add(event);
     }
 
@@ -203,7 +203,7 @@ public class SnapshotSlot implements Persistable<SnapshotSlotId>, Identifiable<S
     private boolean isNew = true;
 
     @Override
-    public SnapshotSlotId getId() {
+    public SlotId getId() {
         return id;
     }
 

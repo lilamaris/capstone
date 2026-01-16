@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.snapshot.application.service;
 
-import com.lilamaris.capstone.scenario.slot_occupancy.application.port.out.SnapshotEntry;
-import com.lilamaris.capstone.scenario.slot_occupancy.application.port.out.SnapshotQuery;
+import com.lilamaris.capstone.scenario.occupancy.application.port.out.OccupancySnapshotEntry;
+import com.lilamaris.capstone.scenario.occupancy.application.port.out.OccupancySnapshotQuery;
 import com.lilamaris.capstone.shared.application.exception.ResourceNotFoundException;
 import com.lilamaris.capstone.shared.application.policy.domain.identity.port.in.DomainRefResolverDirectory;
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
@@ -15,25 +15,25 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class SnapshotQueryService implements
-        SnapshotQuery {
+        OccupancySnapshotQuery {
     private final SnapshotPort snapshotPort;
     private final DomainRefResolverDirectory refs;
 
     @Override
-    public SnapshotEntry getEntry(DomainRef ref) {
+    public OccupancySnapshotEntry getEntry(DomainRef ref) {
         var id = refs.resolve(ref, SnapshotId.class);
         var snapshot = snapshotPort.getById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(
                         "Snapshot with id '%s' not found.", id
                 )));
 
-        return SnapshotEntry.from(snapshot);
+        return OccupancySnapshotEntry.from(snapshot);
     }
 
     @Override
-    public List<SnapshotEntry> getEntries(List<DomainRef> refs) {
+    public List<OccupancySnapshotEntry> getEntries(List<DomainRef> refs) {
         var ids = refs.stream().map(ref -> this.refs.resolve(ref, SnapshotId.class)).toList();
         var snapshots = snapshotPort.getByIds(ids);
-        return snapshots.stream().map(SnapshotEntry::from).toList();
+        return snapshots.stream().map(OccupancySnapshotEntry::from).toList();
     }
 }

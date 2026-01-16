@@ -5,7 +5,6 @@ import com.lilamaris.capstone.snapshot.domain.Snapshot;
 import com.lilamaris.capstone.snapshot.domain.SnapshotDelta;
 import com.lilamaris.capstone.snapshot.domain.id.SnapshotDeltaId;
 import com.lilamaris.capstone.snapshot.domain.id.SnapshotId;
-import com.lilamaris.capstone.timeline.domain.id.SnapshotSlotId;
 
 import java.util.List;
 

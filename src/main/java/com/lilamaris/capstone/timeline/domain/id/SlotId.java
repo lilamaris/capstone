@@ -15,11 +15,11 @@ import java.util.UUID;
 
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SnapshotSlotId extends DefaultUuidDomainId implements Referenceable, ExternalizableId {
+public class SlotId extends DefaultUuidDomainId implements Referenceable, ExternalizableId {
     @JsonValue
     protected UUID value;
 
-    public SnapshotSlotId(UUID value) {
+    public SlotId(UUID value) {
         super(value);
     }
 

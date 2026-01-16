@@ -1,9 +1,9 @@
 package com.lilamaris.capstone.timeline.infrastructure.persistence.jpa;
 
 import com.lilamaris.capstone.timeline.application.port.out.TimelinePort;
-import com.lilamaris.capstone.timeline.domain.SnapshotSlot;
+import com.lilamaris.capstone.timeline.domain.Slot;
 import com.lilamaris.capstone.timeline.domain.Timeline;
-import com.lilamaris.capstone.timeline.domain.id.SnapshotSlotId;
+import com.lilamaris.capstone.timeline.domain.id.SlotId;
 import com.lilamaris.capstone.timeline.domain.id.TimelineId;
 import com.lilamaris.capstone.timeline.infrastructure.persistence.jpa.repository.SnapshotSlotRepository;
 import com.lilamaris.capstone.timeline.infrastructure.persistence.jpa.repository.TimelineRepository;
@@ -34,8 +34,8 @@ public class TimelinePersistenceAdapter implements TimelinePort {
     }
 
     @Override
-    public List<SnapshotSlot> getSlotsByTxTime(TimelineId id, Instant txAt) {
-        Specification<SnapshotSlot> spec = Specification.unrestricted();
+    public List<Slot> getSlotsByTxTime(TimelineId id, Instant txAt) {
+        Specification<Slot> spec = Specification.unrestricted();
         spec = spec.and(SnapshotSlotSpecification.timelineEqual(id));
         spec = spec.and(SnapshotSlotSpecification.betweenTx(txAt));
 
@@ -43,8 +43,8 @@ public class TimelinePersistenceAdapter implements TimelinePort {
     }
 
     @Override
-    public Optional<SnapshotSlot> getSlot(SnapshotSlotId snapshotSlotId) {
-        return snapshotSlotRepository.findById(snapshotSlotId);
+    public Optional<Slot> getSlot(SlotId slotId) {
+        return snapshotSlotRepository.findById(slotId);
     }
 
     @Override

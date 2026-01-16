@@ -11,7 +11,7 @@ import com.lilamaris.capstone.timeline.application.port.in.TimelineCommandUseCas
 import com.lilamaris.capstone.timeline.application.port.out.TimelinePort;
 import com.lilamaris.capstone.timeline.application.result.TimelineResult;
 import com.lilamaris.capstone.timeline.domain.Timeline;
-import com.lilamaris.capstone.timeline.domain.id.SnapshotSlotId;
+import com.lilamaris.capstone.timeline.domain.id.SlotId;
 import com.lilamaris.capstone.timeline.domain.id.TimelineId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,7 +31,7 @@ public class TimelineCommandService implements TimelineCommandUseCase {
     public TimelineResult.CommandCompressed create(String title, String details, LocalDateTime initialValidAt) {
         var domain = Timeline.create(
                 ids.next(TimelineId.class),
-                ids.next(SnapshotSlotId.class),
+                ids.next(SlotId.class),
                 title,
                 details,
                 UniversityClock.now(),
@@ -62,7 +62,7 @@ public class TimelineCommandService implements TimelineCommandUseCase {
         var timeline = resourceUtil.getTimeline(id);
 
         timeline.migrate(
-                ids.next(SnapshotSlotId.class),
+                ids.next(SlotId.class),
                 UniversityClock.now(),
                 UniversityClock.at(validAt)
         );
@@ -79,7 +79,7 @@ public class TimelineCommandService implements TimelineCommandUseCase {
         var timeline = resourceUtil.getTimeline(id);
 
         timeline.merge(
-                ids.next(SnapshotSlotId.class),
+                ids.next(SlotId.class),
                 UniversityClock.now(),
                 UniversityClock.at(validFrom),
                 UniversityClock.at(validTo)

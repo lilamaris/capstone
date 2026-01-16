@@ -10,7 +10,7 @@ import com.lilamaris.capstone.slot_occupancy.domain.event.SlotOccupancyCreated;
 import com.lilamaris.capstone.slot_occupancy.domain.event.SlotOccupancyRemoved;
 import com.lilamaris.capstone.slot_occupancy.domain.id.SlotOccupancyId;
 import com.lilamaris.capstone.snapshot.domain.id.SnapshotId;
-import com.lilamaris.capstone.timeline.domain.id.SnapshotSlotId;
+import com.lilamaris.capstone.timeline.domain.id.SlotId;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -50,23 +50,23 @@ public class SlotOccupancy implements Persistable<SlotOccupancyId>, Identifiable
 
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "snapshot_slot_id", nullable = false, updatable = false))
-    private SnapshotSlotId snapshotSlotId;
+    private SlotId slotId;
     @Transient
     private boolean isNew = true;
 
     public SlotOccupancy(
             SlotOccupancyId id,
-            SnapshotSlotId snapshotSlotId,
+            SlotId slotId,
             SnapshotId snapshotId
     ) {
         this.id = requireField(id, "id");
-        this.snapshotSlotId = requireField(snapshotSlotId, "snapshotSlotId");
+        this.slotId = requireField(slotId, "snapshotSlotId");
         this.snapshotId = requireField(snapshotId, "snapshotId");
     }
 
-    public static SlotOccupancy create(Supplier<SlotOccupancyId> idSupplier, SnapshotSlotId snapshotSlotId, SnapshotId snapshotId) {
+    public static SlotOccupancy create(Supplier<SlotOccupancyId> idSupplier, SlotId slotId, SnapshotId snapshotId) {
         var id = idSupplier.get();
-        var slotOccupancy = new SlotOccupancy(id, snapshotSlotId, snapshotId);
+        var slotOccupancy = new SlotOccupancy(id, slotId, snapshotId);
         slotOccupancy.registerCreated();
         return slotOccupancy;
     }

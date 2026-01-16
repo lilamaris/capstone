@@ -1,10 +1,10 @@
-package com.lilamaris.capstone.scenario.slot_occupancy.infrastructure.web.controller;
+package com.lilamaris.capstone.scenario.occupancy.infrastructure.web.controller;
 
-import com.lilamaris.capstone.scenario.slot_occupancy.application.port.in.SlotOccupancyCommandUseCase;
-import com.lilamaris.capstone.scenario.slot_occupancy.application.port.in.SlotOccupancyQueryUseCase;
-import com.lilamaris.capstone.scenario.slot_occupancy.infrastructure.web.request.SlotOccupyRequest;
+import com.lilamaris.capstone.scenario.occupancy.application.port.in.OccupancyCommandUseCase;
+import com.lilamaris.capstone.scenario.occupancy.application.port.in.OccupancyQueryUseCase;
+import com.lilamaris.capstone.scenario.occupancy.infrastructure.web.request.OccupancyRequest;
 import com.lilamaris.capstone.snapshot.domain.id.SnapshotId;
-import com.lilamaris.capstone.timeline.domain.id.SnapshotSlotId;
+import com.lilamaris.capstone.timeline.domain.id.SlotId;
 import com.lilamaris.capstone.timeline.domain.id.TimelineId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -17,9 +17,9 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/timeline")
 @RequiredArgsConstructor
-public class SnapshotSlotOccupancyController {
-    private final SlotOccupancyQueryUseCase slotOccupancyQueryUseCase;
-    private final SlotOccupancyCommandUseCase slotOccupancyCommandUseCase;
+public class OccupancyController {
+    private final OccupancyQueryUseCase occupancyQueryUseCase;
+    private final OccupancyCommandUseCase occupancyCommandUseCase;
 
     @GetMapping("/{id}/view/slot-occupancy")
     public ResponseEntity<?> getSlotOccupancyById(
@@ -30,18 +30,18 @@ public class SnapshotSlotOccupancyController {
     ) {
         var id = new TimelineId(timelineId);
         var tx = txParam.toInstant();
-        var result = slotOccupancyQueryUseCase.getOccupancyFromSlotByTxTime(id, tx);
+        var result = occupancyQueryUseCase.getOccupancyFromSlotByTxTime(id, tx);
         return ResponseEntity.ok(result);
     }
 
     @PostMapping("/{id}/slot/{slotId}/action/occupy")
     public ResponseEntity<?> attachSnapshotToSlot(
             @PathVariable("slotId") UUID snapshotSlotId,
-            @RequestBody SlotOccupyRequest body
+            @RequestBody OccupancyRequest body
     ) {
-        var slotId = new SnapshotSlotId(snapshotSlotId);
+        var slotId = new SlotId(snapshotSlotId);
         var snapshotId = new SnapshotId(body.snapshotId());
-        var result = slotOccupancyCommandUseCase.occupySlot(slotId, snapshotId);
+        var result = occupancyCommandUseCase.occupySlot(slotId, snapshotId);
         return ResponseEntity.ok(result);
     }
 }

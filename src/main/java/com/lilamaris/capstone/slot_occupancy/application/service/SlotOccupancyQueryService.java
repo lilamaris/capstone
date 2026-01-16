@@ -1,9 +1,9 @@
 package com.lilamaris.capstone.slot_occupancy.application.service;
 
-import com.lilamaris.capstone.scenario.slot_occupancy.application.port.out.SlotOccupancyEntry;
-import com.lilamaris.capstone.scenario.slot_occupancy.application.port.out.SlotOccupancyQuery;
+import com.lilamaris.capstone.scenario.occupancy.application.port.out.SlotOccupancyEntry;
+import com.lilamaris.capstone.scenario.occupancy.application.port.out.SlotOccupancyQuery;
 import com.lilamaris.capstone.slot_occupancy.application.port.out.SlotOccupancyPort;
-import com.lilamaris.capstone.timeline.domain.id.SnapshotSlotId;
+import com.lilamaris.capstone.timeline.domain.id.SlotId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,14 +17,14 @@ public class SlotOccupancyQueryService implements
     private final SlotOccupancyPort slotOccupancyPort;
 
     @Override
-    public List<SlotOccupancyEntry> getOccupanciesBySlotIds(List<SnapshotSlotId> ids) {
+    public List<SlotOccupancyEntry> getOccupanciesBySlotIds(List<SlotId> ids) {
         return slotOccupancyPort.getBySlotIds(ids).stream()
                 .map(SlotOccupancyEntry::from)
                 .toList();
     }
 
     @Override
-    public Optional<SlotOccupancyEntry> getOccupancyBySlotId(SnapshotSlotId id) {
+    public Optional<SlotOccupancyEntry> getOccupancyBySlotId(SlotId id) {
         return slotOccupancyPort.getBySlotId(id).map(SlotOccupancyEntry::from);
     }
 }

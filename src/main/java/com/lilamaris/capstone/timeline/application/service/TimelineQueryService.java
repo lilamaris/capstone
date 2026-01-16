@@ -1,14 +1,14 @@
 package com.lilamaris.capstone.timeline.application.service;
 
-import com.lilamaris.capstone.scenario.slot_occupancy.application.port.out.SnapshotSlotEntry;
-import com.lilamaris.capstone.scenario.slot_occupancy.application.port.out.SnapshotSlotQuery;
+import com.lilamaris.capstone.scenario.occupancy.application.port.out.OccupancySlotEntry;
+import com.lilamaris.capstone.scenario.occupancy.application.port.out.OccupancySlotQuery;
 import com.lilamaris.capstone.shared.application.exception.ResourceNotFoundException;
 import com.lilamaris.capstone.shared.application.policy.domain.identity.port.in.DomainRefResolverDirectory;
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
 import com.lilamaris.capstone.timeline.application.port.in.TimelineQueryUseCase;
 import com.lilamaris.capstone.timeline.application.port.out.TimelinePort;
 import com.lilamaris.capstone.timeline.application.result.TimelineResult;
-import com.lilamaris.capstone.timeline.domain.id.SnapshotSlotId;
+import com.lilamaris.capstone.timeline.domain.id.SlotId;
 import com.lilamaris.capstone.timeline.domain.id.TimelineId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TimelineQueryService implements
         TimelineQueryUseCase,
-        SnapshotSlotQuery {
+        OccupancySlotQuery {
     private final TimelinePort timelinePort;
     private final TimelineResourceUtil resourceUtil;
 
@@ -38,20 +38,20 @@ public class TimelineQueryService implements
     }
 
     @Override
-    public List<SnapshotSlotEntry> getEntryByTimelineIdInTxTime(TimelineId timelineId, Instant at) {
+    public List<OccupancySlotEntry> getEntryByTimelineIdInTxTime(TimelineId timelineId, Instant at) {
         return timelinePort.getSlotsByTxTime(timelineId, at).stream()
-                .map(SnapshotSlotEntry::from)
+                .map(OccupancySlotEntry::from)
                 .toList();
     }
 
     @Override
-    public SnapshotSlotEntry getEntry(DomainRef ref) {
-        var id = refDir.resolve(ref, SnapshotSlotId.class);
+    public OccupancySlotEntry getEntry(DomainRef ref) {
+        var id = refDir.resolve(ref, SlotId.class);
         var snapshotSlot = timelinePort.getSlot(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(
                         "SnapshotSlot with id '%s' not found.", id
                 )));
 
-        return SnapshotSlotEntry.from(snapshotSlot);
+        return OccupancySlotEntry.from(snapshotSlot);
     }
 }

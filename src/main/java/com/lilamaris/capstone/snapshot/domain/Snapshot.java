@@ -10,7 +10,6 @@ import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaDescriptionMetadata;
 import com.lilamaris.capstone.snapshot.domain.event.SnapshotCreated;
 import com.lilamaris.capstone.snapshot.domain.id.SnapshotId;
-import com.lilamaris.capstone.timeline.domain.id.SnapshotSlotId;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

@@ -1,17 +1,17 @@
 package com.lilamaris.capstone.timeline.application.result;
 
-import com.lilamaris.capstone.timeline.domain.SnapshotSlot;
-import com.lilamaris.capstone.timeline.domain.id.SnapshotSlotId;
+import com.lilamaris.capstone.timeline.domain.Slot;
+import com.lilamaris.capstone.timeline.domain.id.SlotId;
 import com.lilamaris.capstone.timeline.domain.id.TimelineId;
 
 public record SnapshotSlotResult(
-        SnapshotSlotId id,
+        SlotId id,
         TimelineId timelineId,
-        SnapshotSlotId parentSlotId,
+        SlotId parentSlotId,
         EffectiveResult tx,
         EffectiveResult valid
 ) {
-    public static SnapshotSlotResult from(SnapshotSlot domain) {
+    public static SnapshotSlotResult from(Slot domain) {
         var txResult = EffectiveResult.from(domain.getTx());
         var validResult = EffectiveResult.from(domain.getValid());
         return new SnapshotSlotResult(

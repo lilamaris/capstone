@@ -1,8 +1,8 @@
 package com.lilamaris.capstone.timeline.application.port.out;
 
-import com.lilamaris.capstone.timeline.domain.SnapshotSlot;
+import com.lilamaris.capstone.timeline.domain.Slot;
 import com.lilamaris.capstone.timeline.domain.Timeline;
-import com.lilamaris.capstone.timeline.domain.id.SnapshotSlotId;
+import com.lilamaris.capstone.timeline.domain.id.SlotId;
 import com.lilamaris.capstone.timeline.domain.id.TimelineId;
 
 import java.time.Instant;
@@ -16,9 +16,9 @@ public interface TimelinePort {
 
     Optional<Timeline> getById(TimelineId id);
 
-    List<SnapshotSlot> getSlotsByTxTime(TimelineId id, Instant txAt);
+    List<Slot> getSlotsByTxTime(TimelineId id, Instant txAt);
 
-    Optional<SnapshotSlot> getSlot(SnapshotSlotId snapshotSlotId);
+    Optional<Slot> getSlot(SlotId slotId);
 
     Timeline save(Timeline domain);
 }

@@ -5,7 +5,7 @@ import com.lilamaris.capstone.slot_occupancy.domain.SlotOccupancy;
 import com.lilamaris.capstone.slot_occupancy.domain.id.SlotOccupancyId;
 import com.lilamaris.capstone.slot_occupancy.infrastructure.persistence.jpa.repository.SlotOccupancyRepository;
 import com.lilamaris.capstone.snapshot.domain.id.SnapshotId;
-import com.lilamaris.capstone.timeline.domain.id.SnapshotSlotId;
+import com.lilamaris.capstone.timeline.domain.id.SlotId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -18,8 +18,8 @@ public class SlotOccupancyPersistenceAdapter implements SlotOccupancyPort {
     private final SlotOccupancyRepository repository;
 
     @Override
-    public boolean existsBySlotIdOrSnapshotId(SnapshotSlotId snapshotSlotId, SnapshotId snapshotId) {
-        return repository.existsBySnapshotSlotIdOrSnapshotId(snapshotSlotId, snapshotId);
+    public boolean existsBySlotIdOrSnapshotId(SlotId slotId, SnapshotId snapshotId) {
+        return repository.existsBySnapshotSlotIdOrSnapshotId(slotId, snapshotId);
     }
 
     @Override
@@ -33,12 +33,12 @@ public class SlotOccupancyPersistenceAdapter implements SlotOccupancyPort {
     }
 
     @Override
-    public Optional<SlotOccupancy> getBySlotId(SnapshotSlotId slotId) {
+    public Optional<SlotOccupancy> getBySlotId(SlotId slotId) {
         return repository.findBySnapshotSlotId(slotId);
     }
 
     @Override
-    public List<SlotOccupancy> getBySlotIds(List<SnapshotSlotId> slotIds) {
+    public List<SlotOccupancy> getBySlotIds(List<SlotId> slotIds) {
         return List.of();
     }
 

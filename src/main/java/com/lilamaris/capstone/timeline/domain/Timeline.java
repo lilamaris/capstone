@@ -15,7 +15,7 @@ import com.lilamaris.capstone.timeline.domain.embed.EffectiveSelector;
 import com.lilamaris.capstone.timeline.domain.event.TimelineCreated;
 import com.lilamaris.capstone.timeline.domain.exception.TimelineDomainException;
 import com.lilamaris.capstone.timeline.domain.exception.TimelineErrorCode;
-import com.lilamaris.capstone.timeline.domain.id.SnapshotSlotId;
+import com.lilamaris.capstone.timeline.domain.id.SlotId;
 import com.lilamaris.capstone.timeline.domain.id.TimelineId;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -54,14 +54,14 @@ public class Timeline implements Persistable<TimelineId>, Identifiable<TimelineI
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "timeline_id", nullable = false)
-    private List<SnapshotSlot> slotList;
+    private List<Slot> slotList;
 
     @Embedded
     private JpaDescriptionMetadata descriptionMetadata;
 
     protected Timeline(
             TimelineId id,
-            List<SnapshotSlot> slotList,
+            List<Slot> slotList,
             JpaDescriptionMetadata descriptionMetadata
     ) {
         this.id = requireField(id, "id");
@@ -71,7 +71,7 @@ public class Timeline implements Persistable<TimelineId>, Identifiable<TimelineI
 
     public static Timeline create(
             Supplier<TimelineId> idSupplier,
-            Supplier<SnapshotSlotId> snapshotSlotIdSupplier,
+            Supplier<SlotId> snapshotSlotIdSupplier,
             String title,
             String details,
             Instant txAt,
@@ -125,28 +125,28 @@ public class Timeline implements Persistable<TimelineId>, Identifiable<TimelineI
     }
 
     private void createInitialSlot(
-            Supplier<SnapshotSlotId> snapshotSlotIdSupplier,
+            Supplier<SlotId> snapshotSlotIdSupplier,
             Instant txAt,
             Instant validAt
     ) {
         var tx = Effective.create(txAt, Effective.MAX);
         var valid = Effective.create(validAt, Effective.MAX);
-        var snapshotSlot = SnapshotSlot.create(snapshotSlotIdSupplier, id, tx, valid);
+        var snapshotSlot = Slot.create(snapshotSlotIdSupplier, id, tx, valid);
         var events = snapshotSlot.pullEvent();
         this.slotList.add(snapshotSlot);
         eventList.addAll(events);
     }
 
     public void migrate(
-            Supplier<SnapshotSlotId> snapshotSlotIdSupplier,
+            Supplier<SlotId> snapshotSlotIdSupplier,
             Instant txAt,
             Instant validAt
     ) {
         checkAnySlotExists();
 
         var maybeExactSlot = slotList.stream()
-                .filter(SnapshotSlot.ifEffectiveOpenEqualTo(EffectiveSelector.TX, true))
-                .filter(SnapshotSlot.ifEffectiveContains(EffectiveSelector.VALID, validAt))
+                .filter(Slot.ifEffectiveOpenEqualTo(EffectiveSelector.TX, true))
+                .filter(Slot.ifEffectiveContains(EffectiveSelector.VALID, validAt))
                 .toList();
 
         if (maybeExactSlot.size() > 1) {
@@ -170,7 +170,7 @@ public class Timeline implements Persistable<TimelineId>, Identifiable<TimelineI
         var newValidLeft = newValidSplit.left();
         var newValidRight = newValidSplit.right();
 
-        var slotLeft = SnapshotSlot.create(
+        var slotLeft = Slot.create(
                 snapshotSlotIdSupplier,
                 id,
                 parentSlot.id(),
@@ -180,7 +180,7 @@ public class Timeline implements Persistable<TimelineId>, Identifiable<TimelineI
         slotList.add(slotLeft);
         eventList.addAll(slotLeft.pullEvent());
 
-        var slotRight = SnapshotSlot.create(
+        var slotRight = Slot.create(
                 snapshotSlotIdSupplier,
                 id,
                 slotLeft.id(),
@@ -192,7 +192,7 @@ public class Timeline implements Persistable<TimelineId>, Identifiable<TimelineI
     }
 
     public void merge(
-            Supplier<SnapshotSlotId> snapshotSlotIdSupplier,
+            Supplier<SlotId> snapshotSlotIdSupplier,
             Instant txAt,
             Instant validFrom,
             Instant validTo
@@ -202,9 +202,9 @@ public class Timeline implements Persistable<TimelineId>, Identifiable<TimelineI
         var validRange = Effective.create(validFrom, validTo);
 
         var candidateSlots = slotList.stream()
-                .filter(SnapshotSlot.ifEffectiveOpenEqualTo(EffectiveSelector.TX, true))
-                .filter(SnapshotSlot.ifEffectiveOverlap(EffectiveSelector.VALID, validRange))
-                .sorted(SnapshotSlot.sortAsc(EffectiveSelector.VALID))
+                .filter(Slot.ifEffectiveOpenEqualTo(EffectiveSelector.TX, true))
+                .filter(Slot.ifEffectiveOverlap(EffectiveSelector.VALID, validRange))
+                .sorted(Slot.sortAsc(EffectiveSelector.VALID))
                 .toList();
 
         if (candidateSlots.isEmpty()) {
@@ -224,7 +224,7 @@ public class Timeline implements Persistable<TimelineId>, Identifiable<TimelineI
                 earliestSlot.getValid().getFrom(),
                 latestSlot.getValid().getTo()
         );
-        var mergedSlot = SnapshotSlot.create(
+        var mergedSlot = Slot.create(
                 snapshotSlotIdSupplier,
                 id,
                 mergedTx,
