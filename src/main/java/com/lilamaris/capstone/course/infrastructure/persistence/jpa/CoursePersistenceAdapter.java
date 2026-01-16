@@ -1,10 +1,9 @@
 package com.lilamaris.capstone.course.infrastructure.persistence.jpa;
 
-import com.lilamaris.capstone.course.application.port.out.CoursePort;
+import com.lilamaris.capstone.course.application.port.out.CourseStore;
 import com.lilamaris.capstone.course.domain.Course;
 import com.lilamaris.capstone.course.domain.id.CourseId;
 import com.lilamaris.capstone.course.infrastructure.persistence.jpa.repository.CourseRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -13,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class CoursePersistenceAdapter implements CoursePort {
+public class CoursePersistenceAdapter implements CourseStore {
     private final CourseRepository repository;
 
     @Override
@@ -22,13 +21,22 @@ public class CoursePersistenceAdapter implements CoursePort {
     }
 
     @Override
+    public List<Course> getAll() {
+        return repository.findAll();
+    }
+
+    @Override
     public List<Course> getByIds(List<CourseId> ids) {
         return repository.findAllById(ids);
     }
 
     @Override
-    @Transactional
     public Course save(Course domain) {
         return repository.save(domain);
+    }
+
+    @Override
+    public void deleteById(CourseId id) {
+        repository.deleteById(id);
     }
 }

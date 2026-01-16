@@ -6,10 +6,14 @@ import com.lilamaris.capstone.course.domain.id.CourseId;
 import java.util.List;
 import java.util.Optional;
 
-public interface CoursePort {
+public interface CourseStore {
     Optional<Course> getById(CourseId id);
+
+    List<Course> getAll();
 
     List<Course> getByIds(List<CourseId> ids);
 
     Course save(Course domain);
+
+    void deleteById(CourseId id);
 }

@@ -42,7 +42,10 @@ public class Course implements Identifiable<CourseId>, Describable, Auditable {
     @Embedded
     private JpaDescriptionMetadata descriptionMetadata;
 
-    private Course(CourseId id, JpaDescriptionMetadata descriptionMetadata) {
+    private Course(
+            CourseId id,
+            JpaDescriptionMetadata descriptionMetadata
+    ) {
         this.id = requireField(id, "id");
         this.descriptionMetadata = requireField(descriptionMetadata, "metadata");
     }
