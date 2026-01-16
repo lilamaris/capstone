@@ -16,10 +16,12 @@ import com.lilamaris.capstone.snapshot.application.policy.previlege.SnapshotRole
 import com.lilamaris.capstone.snapshot.domain.id.SnapshotDeltaId;
 import com.lilamaris.capstone.snapshot.domain.id.SnapshotId;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import java.util.Set;
 import java.util.UUID;
 
+@Configuration
 public class SnapshotPolicyConfig {
     @Bean
     public IdGenerator<SnapshotId> snapshotIdIdGenerator(
