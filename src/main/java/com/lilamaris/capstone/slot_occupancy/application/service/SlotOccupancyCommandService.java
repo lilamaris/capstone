@@ -1,5 +1,6 @@
 package com.lilamaris.capstone.slot_occupancy.application.service;
 
+import com.lilamaris.capstone.scenario.slot_occupancy.application.exception.SlotOccupancyScenarioInvariantException;
 import com.lilamaris.capstone.scenario.slot_occupancy.application.port.out.SlotOccupancyCommand;
 import com.lilamaris.capstone.scenario.slot_occupancy.application.port.out.SlotOccupancyEntry;
 import com.lilamaris.capstone.shared.application.policy.domain.identity.port.in.IdGenerationDirectory;
@@ -16,11 +17,16 @@ import org.springframework.stereotype.Service;
 public class SlotOccupancyCommandService implements
         SlotOccupancyCommand {
     private final SlotOccupancyPort slotOccupancyPort;
-
     private final IdGenerationDirectory ids;
 
     @Override
     public SlotOccupancyEntry occupySlot(SnapshotSlotId slotId, SnapshotId snapshotId) {
+        if (slotOccupancyPort.existsBySlotIdOrSnapshotId(slotId, snapshotId)) {
+            throw new SlotOccupancyScenarioInvariantException(String.format(
+                    "Slot with id '%s' or Snapshot with id '%s' has already occupancy", slotId, snapshotId
+            ));
+        }
+
         var slotOccupancy = SlotOccupancy.create(
                 ids.next(SlotOccupancyId.class),
                 slotId,

@@ -24,7 +24,7 @@ public class SnapshotSlotOccupancyController {
     @GetMapping("/{id}/view/slot-occupancy")
     public ResponseEntity<?> getSlotOccupancyById(
             @PathVariable("id") UUID timelineId,
-            @RequestParam(value = "tx", required = false, defaultValue = "#{T(java.time.LocalDateTime).now()}")
+            @RequestParam(value = "tx", required = false, defaultValue = "#{T(java.time.ZonedDateTime).now()}")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             ZonedDateTime txParam
     ) {
