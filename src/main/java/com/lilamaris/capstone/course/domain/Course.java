@@ -26,7 +26,6 @@ import java.util.List;
 
 import static com.lilamaris.capstone.shared.domain.util.Validation.requireField;
 
-@Getter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -39,11 +38,11 @@ public class Course implements Identifiable<CourseId>, Describable, Auditable {
     @Transient
     private final List<DomainEvent> eventList = new ArrayList<>();
 
-    @Getter(AccessLevel.NONE)
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false, updatable = false))
     private CourseId id;
 
+    @Getter
     @Embedded
     private JpaDescriptionMetadata descriptionMetadata;
 
