@@ -55,30 +55,37 @@ public class ResourceOffer implements
     @Embedded
     @AttributeOverride(name = "id", column = @Column(name = "snapshot_id", nullable = false))
     private JpaExternalizableId snapshotId;
+
+    private String jsonPatch;
+
     @Transient
     private boolean isNew = true;
 
     protected ResourceOffer(
             ResourceOfferId id,
             JpaDomainRef resource,
-            JpaExternalizableId snapshotId
+            JpaExternalizableId snapshotId,
+            String jsonPatch
     ) {
         this.id = requireField(id, "id");
         this.resource = requireField(resource, "resource");
         this.snapshotId = requireField(snapshotId, "snapshotId");
+        this.jsonPatch = requireField(jsonPatch, "jsonPatch");
     }
 
     public static ResourceOffer create(
             Supplier<ResourceOfferId> idSupplier,
             DomainRef resourceRef,
-            ExternalizableId externalSnapshotId
+            ExternalizableId externalSnapshotId,
+            String jsonPatch
     ) {
         var resource = JpaDomainRef.from(resourceRef);
         var snapshotId = JpaExternalizableId.from(externalSnapshotId);
         var resourceOffer = new ResourceOffer(
                 idSupplier.get(),
                 resource,
-                snapshotId
+                snapshotId,
+                jsonPatch
         );
         resourceOffer.registerCreated();
         return resourceOffer;

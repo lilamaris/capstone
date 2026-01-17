@@ -3,6 +3,7 @@ package com.lilamaris.capstone.course.application.resolver;
 import com.lilamaris.capstone.course.application.port.out.CourseStore;
 import com.lilamaris.capstone.course.domain.Course;
 import com.lilamaris.capstone.course.domain.id.CourseId;
+import com.lilamaris.capstone.shared.application.exception.ResourceNotFoundException;
 import com.lilamaris.capstone.shared.application.jsonPatch.JsonPatchEngine;
 import com.lilamaris.capstone.shared.application.jsonPatch.JsonPatchResolver;
 import com.lilamaris.capstone.shared.application.policy.domain.identity.port.in.DomainRefResolverDirectory;
@@ -32,7 +33,10 @@ public class CourseJsonPatchResolver implements JsonPatchResolver<Course> {
     @Override
     public String resolve(DomainRef ref) {
         var id = refs.resolve(ref, CourseId.class);
-        var course = courseStore.getById(id);
+        var course = courseStore.getById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(
+                        "Course with id '%s' not found", id
+                )));
         return jsonPatchEngine.createPatch(course);
     }
 }
