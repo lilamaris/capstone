@@ -1,5 +1,6 @@
 package com.lilamaris.capstone.course.application.service;
 
+import com.lilamaris.capstone.course.application.policy.privilege.CourseAction;
 import com.lilamaris.capstone.course.application.port.in.CreateCourseUseCase;
 import com.lilamaris.capstone.course.application.port.in.DeleteCourseUseCase;
 import com.lilamaris.capstone.course.application.port.in.UpdateCourseUseCase;
@@ -7,7 +8,9 @@ import com.lilamaris.capstone.course.application.port.out.CourseStore;
 import com.lilamaris.capstone.course.application.result.CourseResult;
 import com.lilamaris.capstone.course.domain.Course;
 import com.lilamaris.capstone.course.domain.id.CourseId;
+import com.lilamaris.capstone.shared.application.context.ActorContext;
 import com.lilamaris.capstone.shared.application.exception.ResourceNotFoundException;
+import com.lilamaris.capstone.shared.application.policy.resource.access_control.port.in.ResourceAuthorizer;
 import com.lilamaris.capstone.shared.domain.defaults.DefaultDescriptionMetadata;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,7 @@ public class CourseCommandService implements
         UpdateCourseUseCase,
         DeleteCourseUseCase {
     private final CourseStore courseStore;
+    private final ResourceAuthorizer authorizer;
 
     @Override
     public CourseResult.Command create(String title, String details) {
@@ -31,6 +35,9 @@ public class CourseCommandService implements
 
     @Override
     public CourseResult.Command update(CourseId id, String title, String details) {
+        var actor = ActorContext.get();
+        authorizer.authorize(actor, id.ref(), CourseAction.UPDATE_METADATA);
+
         var course = courseStore.getById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(
                         "Course with id '%s' not found.", id

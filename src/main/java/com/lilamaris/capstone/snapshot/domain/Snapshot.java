@@ -4,6 +4,7 @@ import com.lilamaris.capstone.shared.domain.contract.Auditable;
 import com.lilamaris.capstone.shared.domain.contract.Describable;
 import com.lilamaris.capstone.shared.domain.contract.Identifiable;
 import com.lilamaris.capstone.shared.domain.event.DomainEvent;
+import com.lilamaris.capstone.shared.domain.event.aggregate.CollectedDomainEvent;
 import com.lilamaris.capstone.shared.domain.metadata.AuditMetadata;
 import com.lilamaris.capstone.shared.domain.metadata.DescriptionMetadata;
 import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaAuditMetadata;
@@ -15,6 +16,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.data.domain.AfterDomainEventPublication;
+import org.springframework.data.domain.DomainEvents;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -73,6 +76,16 @@ public class Snapshot implements Persistable<SnapshotId>, Identifiable<SnapshotI
         );
         snapshot.registerCreated();
         return snapshot;
+    }
+
+    @DomainEvents
+    CollectedDomainEvent domainEvents() {
+        return new CollectedDomainEvent(List.copyOf(eventList));
+    }
+
+    @AfterDomainEventPublication
+    void clearDomainEvents() {
+        eventList.clear();
     }
 
     @Override

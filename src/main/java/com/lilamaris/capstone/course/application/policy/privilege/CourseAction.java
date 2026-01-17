@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.course.application.policy.access_control.privilege;
+package com.lilamaris.capstone.course.application.policy.privilege;
 
 import com.lilamaris.capstone.shared.application.policy.resource.access_control.port.in.ResourceAction;
 import com.lilamaris.capstone.shared.application.policy.resource.access_control.port.in.ResourceAuthorityManageable;

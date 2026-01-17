@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.course.application.policy;
 
-import com.lilamaris.capstone.course.application.policy.access_control.privilege.CourseAction;
-import com.lilamaris.capstone.course.application.policy.access_control.privilege.CourseRole;
+import com.lilamaris.capstone.course.application.policy.privilege.CourseAction;
+import com.lilamaris.capstone.course.application.policy.privilege.CourseRole;
 import com.lilamaris.capstone.course.domain.id.CourseId;
 import com.lilamaris.capstone.shared.application.policy.domain.identity.defaults.DefaultDomainRefResolver;
 import com.lilamaris.capstone.shared.application.policy.domain.identity.defaults.RawBasedIdGenerator;
@@ -40,6 +40,7 @@ public class CoursePolicyConfig {
     public DomainRoleGraphDefinition<CourseRole> courseRoleDomainRoleGraphDefinition() {
         var definition = new DefaultDomainRoleGraphDefinition<>(AggregateDomainType.COURSE, CourseRole.class);
         definition.extend(CourseRole.MAINTAINER, CourseRole.VIEWER);
+        definition.setOwner(CourseRole.MAINTAINER);
         return definition;
     }
 

@@ -1,10 +1,12 @@
 package com.lilamaris.capstone.course.domain;
 
+import com.lilamaris.capstone.course.domain.event.CourseCreated;
 import com.lilamaris.capstone.course.domain.id.CourseId;
 import com.lilamaris.capstone.shared.domain.contract.Auditable;
 import com.lilamaris.capstone.shared.domain.contract.Describable;
 import com.lilamaris.capstone.shared.domain.contract.Identifiable;
 import com.lilamaris.capstone.shared.domain.event.DomainEvent;
+import com.lilamaris.capstone.shared.domain.event.aggregate.CollectedDomainEvent;
 import com.lilamaris.capstone.shared.domain.metadata.AuditMetadata;
 import com.lilamaris.capstone.shared.domain.metadata.DescriptionMetadata;
 import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaAuditMetadata;
@@ -14,8 +16,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.data.domain.AfterDomainEventPublication;
+import org.springframework.data.domain.DomainEvents;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +57,24 @@ public class Course implements Identifiable<CourseId>, Describable, Auditable {
 
     public static Course create(String title, String details) {
         var descriptionMetadata = JpaDescriptionMetadata.create(title, details);
-        return new Course(CourseId.newId(), descriptionMetadata);
+        var course = new Course(CourseId.newId(), descriptionMetadata);
+        course.registerCreated();
+        return course;
+    }
+
+    @DomainEvents
+    CollectedDomainEvent domainEvents() {
+        return new CollectedDomainEvent(List.copyOf(eventList));
+    }
+
+    @AfterDomainEventPublication
+    void clearDomainEvents() {
+        eventList.clear();
+    }
+
+    private void registerCreated() {
+        var event = new CourseCreated(id, Instant.now());
+        eventList.add(event);
     }
 
     @Override
