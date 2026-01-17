@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.shared.application.support;
+package com.lilamaris.capstone.shared.application.jsonPatch;
 
 public interface JsonPatchEngine {
     <T> T fromPatch(String patch, Class<T> clazz);

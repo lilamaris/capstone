@@ -1,7 +1,8 @@
-package com.lilamaris.capstone.shared.application.support;
+package com.lilamaris.capstone.shared.application.jsonPatch.defaults;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
+import com.lilamaris.capstone.shared.application.jsonPatch.JsonPatchEngine;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
