@@ -33,6 +33,15 @@ public class ResourceOfferPersistenceAdapter implements ResourceOfferStore {
     }
 
     @Override
+    public Optional<ResourceOffer> get(DomainType resourceType, ExternalizableId resourceId, ExternalizableId snapshotId) {
+        return repository.find(
+                resourceType.name(),
+                resourceId.asString(),
+                JpaExternalizableId.from(snapshotId)
+        );
+    }
+
+    @Override
     public List<ResourceOffer> getAll() {
         return repository.findAll();
     }
@@ -45,5 +54,14 @@ public class ResourceOfferPersistenceAdapter implements ResourceOfferStore {
     @Override
     public void deleteById(ResourceOfferId id) {
         repository.deleteById(id);
+    }
+
+    @Override
+    public void delete(DomainType resourceType, ExternalizableId resourceId, ExternalizableId snapshotId) {
+        repository.deleteOffer(
+                resourceType.name(),
+                resourceId.asString(),
+                JpaExternalizableId.from(snapshotId)
+        );
     }
 }

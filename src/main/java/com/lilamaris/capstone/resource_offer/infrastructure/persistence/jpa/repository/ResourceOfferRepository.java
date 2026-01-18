@@ -7,6 +7,8 @@ import com.lilamaris.capstone.shared.domain.type.DomainType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Optional;
+
 public interface ResourceOfferRepository extends JpaRepository<ResourceOffer, ResourceOfferId> {
     @Query("""
             SELECT CASE
@@ -20,6 +22,31 @@ public interface ResourceOfferRepository extends JpaRepository<ResourceOffer, Re
                 AND ro.snapshotId = :snapshotId
             """)
     boolean existsOffer(
+            String resourceType,
+            String resourceId,
+            JpaExternalizableId snapshotId
+    );
+
+    @Query("""
+            SELECT ro
+            FROM ResourceOffer ro
+            WHERE ro.resource.type.name = :resourceType
+                AND ro.resource.id = :resourceId
+                AND ro.snapshotId = :snapshotId
+            """)
+    Optional<ResourceOffer> find(
+            String resourceType,
+            String resourceId,
+            JpaExternalizableId snapshotId
+    );
+
+    @Query("""
+            DELETE FROM ResourceOffer ro
+            WHERE ro.resource.type.name = :resourceType
+                AND ro.resource.id = :resourceId
+                AND ro.snapshotId = :snapshotId
+            """)
+    void deleteOffer(
             String resourceType,
             String resourceId,
             JpaExternalizableId snapshotId

@@ -13,9 +13,13 @@ public interface ResourceOfferStore {
 
     Optional<ResourceOffer> getById(ResourceOfferId id);
 
+    Optional<ResourceOffer> get(DomainType resourceType, ExternalizableId resourceId, ExternalizableId snapshotId);
+
     List<ResourceOffer> getAll();
 
     ResourceOffer save(ResourceOffer resourceOffer);
 
     void deleteById(ResourceOfferId id);
+
+    void delete(DomainType resourceType, ExternalizableId resourceId, ExternalizableId snapshotId);
 }
