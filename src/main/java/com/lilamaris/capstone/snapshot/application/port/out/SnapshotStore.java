@@ -6,7 +6,7 @@ import com.lilamaris.capstone.snapshot.domain.id.SnapshotId;
 import java.util.List;
 import java.util.Optional;
 
-public interface SnapshotPort {
+public interface SnapshotStore {
     Optional<Snapshot> getById(SnapshotId id);
 
     List<Snapshot> getByIds(List<SnapshotId> ids);

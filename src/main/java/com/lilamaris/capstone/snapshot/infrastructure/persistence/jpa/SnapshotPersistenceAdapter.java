@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.snapshot.infrastructure.persistence.jpa;
 
-import com.lilamaris.capstone.snapshot.application.port.out.SnapshotPort;
+import com.lilamaris.capstone.snapshot.application.port.out.SnapshotStore;
 import com.lilamaris.capstone.snapshot.domain.Snapshot;
 import com.lilamaris.capstone.snapshot.domain.id.SnapshotId;
 import com.lilamaris.capstone.snapshot.infrastructure.persistence.jpa.repository.SnapshotRepository;
@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class SnapshotPersistenceAdapter implements SnapshotPort {
+public class SnapshotPersistenceAdapter implements SnapshotStore {
     private final SnapshotRepository repository;
 
     @Override

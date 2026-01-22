@@ -27,7 +27,7 @@ public class SnapshotController {
         return ResponseEntity.ok(result);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{ref}")
     public ResponseEntity<?> updateSnapshot(
             @PathVariable("id") UUID id,
             @RequestBody SnapshotRequest.Update body
