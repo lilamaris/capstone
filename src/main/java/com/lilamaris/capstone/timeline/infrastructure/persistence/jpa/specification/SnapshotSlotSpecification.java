@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.timeline.infrastructure.persistence.jpa.specification;
 
 import com.lilamaris.capstone.timeline.domain.Slot;
-import com.lilamaris.capstone.timeline.domain.embed.Effective;
+import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaEffectiveMetadata;
 import com.lilamaris.capstone.timeline.domain.id.TimelineId;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -21,7 +21,7 @@ public class SnapshotSlotSpecification {
 
     public static Specification<Slot> isOpenTx() {
         return (root, query, builder) -> builder.and(
-                builder.equal(root.get("tx").get("to"), Effective.MAX)
+                builder.equal(root.get("tx").get("to"), JpaEffectiveMetadata.MAX)
         );
     }
 

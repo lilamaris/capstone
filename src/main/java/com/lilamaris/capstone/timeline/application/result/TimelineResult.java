@@ -24,15 +24,15 @@ public class TimelineResult {
 
     public record Command(
             TimelineId id,
-            List<SnapshotSlotResult> snapshotSlotList,
+            List<SlotResult> slotList,
             DescriptionResult description,
             AuditResult audit
     ) {
         public static Command from(Timeline domain) {
-            var snapshotSlotList = domain.getSlotList().stream().map(SnapshotSlotResult::from).toList();
+            var slotList = domain.getSlotList().stream().map(SlotResult::from).toList();
             return new Command(
                     domain.id(),
-                    snapshotSlotList,
+                    slotList,
                     DescriptionResult.from(domain),
                     AuditResult.from(domain)
             );

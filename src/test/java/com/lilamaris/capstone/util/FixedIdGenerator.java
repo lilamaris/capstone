@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.util;
 
-import com.lilamaris.capstone.application.policy.identity.IdGenerator;
-import com.lilamaris.capstone.domain.model.common.domain.id.DomainId;
+import com.lilamaris.capstone.shared.application.policy.domain.identity.port.in.IdGenerator;
+import com.lilamaris.capstone.shared.domain.id.DomainId;
 
 public class FixedIdGenerator<T extends DomainId<?>> implements IdGenerator<T> {
     private final Class<T> type;

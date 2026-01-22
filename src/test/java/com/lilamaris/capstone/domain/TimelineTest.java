@@ -1,14 +1,13 @@
 package com.lilamaris.capstone.domain;
 
-import com.lilamaris.capstone.application.policy.identity.IdGenerationContext;
-import com.lilamaris.capstone.application.policy.identity.defaults.DefaultIdGenerationContext;
-import com.lilamaris.capstone.application.policy.identity.defaults.RawBasedIdGenerator;
-import com.lilamaris.capstone.domain.model.capstone.snapshot.id.SnapshotId;
-import com.lilamaris.capstone.domain.model.capstone.timeline.Timeline;
-import com.lilamaris.capstone.domain.model.capstone.timeline.event.SnapshotSlotCreated;
-import com.lilamaris.capstone.domain.model.capstone.timeline.event.TimelineCreated;
-import com.lilamaris.capstone.domain.model.capstone.timeline.id.SnapshotSlotId;
-import com.lilamaris.capstone.domain.model.capstone.timeline.id.TimelineId;
+import com.lilamaris.capstone.shared.application.policy.domain.identity.defaults.DefaultIdGenerationDirectory;
+import com.lilamaris.capstone.shared.application.policy.domain.identity.defaults.RawBasedIdGenerator;
+import com.lilamaris.capstone.shared.application.policy.domain.identity.port.in.IdGenerationDirectory;
+import com.lilamaris.capstone.timeline.domain.Timeline;
+import com.lilamaris.capstone.timeline.domain.event.SlotCreated;
+import com.lilamaris.capstone.timeline.domain.event.TimelineCreated;
+import com.lilamaris.capstone.timeline.domain.id.SlotId;
+import com.lilamaris.capstone.timeline.domain.id.TimelineId;
 import com.lilamaris.capstone.util.SequentialUuidGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,23 +25,27 @@ public class TimelineTest {
     private Instant initialTxAt;
     private Instant initialValidAt;
 
-    private IdGenerationContext ids;
+    private IdGenerationDirectory ids;
 
     @BeforeEach
     void run() {
         var timelineIdGen = new RawBasedIdGenerator<>(TimelineId.class, TimelineId::new, new SequentialUuidGenerator());
-        var snapshotSlotIdGen = new RawBasedIdGenerator<>(SnapshotSlotId.class, SnapshotSlotId::new, new SequentialUuidGenerator());
-
-        var snapshotIdGen = new RawBasedIdGenerator<>(SnapshotId.class, SnapshotId::new, new SequentialUuidGenerator());
-        ids = new DefaultIdGenerationContext(List.of(timelineIdGen, snapshotSlotIdGen, snapshotIdGen));
+        var slotIdGen = new RawBasedIdGenerator<>(SlotId.class, SlotId::new, new SequentialUuidGenerator());
+        ids = new DefaultIdGenerationDirectory(List.of(timelineIdGen, slotIdGen));
 
         initialTxAt = Instant.parse("2025-01-01T00:00:00Z");
         initialValidAt = Instant.parse("2025-01-01T00:00:00Z");
     }
 
     private Timeline getTimelineInitialMigrated() {
-        var timeline = Timeline.create(ids.next(TimelineId.class), ids.next(SnapshotSlotId.class), "Test Timeline", "Test Timeline Details", initialTxAt, initialValidAt);
-        return timeline;
+        return Timeline.create(
+                ids.next(TimelineId.class),
+                ids.next(SlotId.class),
+                "Test Timeline",
+                "Test Timeline Details",
+                initialTxAt,
+                initialValidAt
+        );
     }
 
     @Test
@@ -65,8 +68,8 @@ public class TimelineTest {
                     assertThat(timelineCreated.id()).isEqualTo(timeline.id());
                 },
                 e -> {
-                    assertThat(e).isInstanceOf(SnapshotSlotCreated.class);
-                    var snapshotSlotCreated = (SnapshotSlotCreated) e;
+                    assertThat(e).isInstanceOf(SlotCreated.class);
+                    var snapshotSlotCreated = (SlotCreated) e;
                     assertThat(snapshotSlotCreated.id()).isEqualTo(slot.id());
                 }
         );
@@ -78,7 +81,7 @@ public class TimelineTest {
 
         var operateTxAt = initialTxAt.plus(1, ChronoUnit.DAYS);
         var operateValidAt = initialValidAt.plus(3, ChronoUnit.DAYS);
-        timeline.migrate(ids.next(SnapshotSlotId.class), operateTxAt, operateValidAt);
+        timeline.migrate(ids.next(SlotId.class), operateTxAt, operateValidAt);
 
         var slots = timeline.getSlotList();
         assertThat(slots).hasSize(3);

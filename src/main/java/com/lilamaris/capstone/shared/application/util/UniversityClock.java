@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.shared.application.util;
 
 import com.lilamaris.capstone.shared.application.context.ApplicationContext;
-import com.lilamaris.capstone.timeline.domain.embed.Effective;
+import com.lilamaris.capstone.shared.domain.metadata.EffectiveMetadata;
 import org.springframework.stereotype.Component;
 
 import java.time.*;
@@ -18,7 +18,7 @@ public class UniversityClock {
     }
 
     public static OffsetDateTime toZoneAware(Instant instant) {
-        if (instant.equals(Effective.MAX)) {
+        if (instant.equals(EffectiveMetadata.MAX)) {
             return instant.atOffset(ZoneOffset.UTC);
         }
         var systemZoneId = ApplicationContext.getSystemZone();

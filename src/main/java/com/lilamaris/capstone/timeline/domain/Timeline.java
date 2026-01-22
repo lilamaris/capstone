@@ -10,8 +10,7 @@ import com.lilamaris.capstone.shared.domain.metadata.AuditMetadata;
 import com.lilamaris.capstone.shared.domain.metadata.DescriptionMetadata;
 import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaAuditMetadata;
 import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaDescriptionMetadata;
-import com.lilamaris.capstone.timeline.domain.embed.Effective;
-import com.lilamaris.capstone.timeline.domain.embed.EffectiveSelector;
+import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaEffectiveMetadata;
 import com.lilamaris.capstone.timeline.domain.event.TimelineCreated;
 import com.lilamaris.capstone.timeline.domain.exception.TimelineDomainException;
 import com.lilamaris.capstone.timeline.domain.exception.TimelineErrorCode;
@@ -71,7 +70,7 @@ public class Timeline implements Persistable<TimelineId>, Identifiable<TimelineI
 
     public static Timeline create(
             Supplier<TimelineId> idSupplier,
-            Supplier<SlotId> snapshotSlotIdSupplier,
+            Supplier<SlotId> slotIdSupplier,
             String title,
             String details,
             Instant txAt,
@@ -84,7 +83,7 @@ public class Timeline implements Persistable<TimelineId>, Identifiable<TimelineI
                 new ArrayList<>(),
                 descriptionMetadata
         );
-        timeline.createInitialSlot(snapshotSlotIdSupplier, txAt, initialValidAt);
+        timeline.createInitialSlot(slotIdSupplier, txAt, initialValidAt);
         timeline.registerCreated();
         return timeline;
     }
@@ -125,20 +124,20 @@ public class Timeline implements Persistable<TimelineId>, Identifiable<TimelineI
     }
 
     private void createInitialSlot(
-            Supplier<SlotId> snapshotSlotIdSupplier,
+            Supplier<SlotId> slotIdSupplier,
             Instant txAt,
             Instant validAt
     ) {
-        var tx = Effective.create(txAt, Effective.MAX);
-        var valid = Effective.create(validAt, Effective.MAX);
-        var snapshotSlot = Slot.create(snapshotSlotIdSupplier, id, tx, valid);
+        var tx = JpaEffectiveMetadata.create(txAt);
+        var valid = JpaEffectiveMetadata.create(validAt);
+        var snapshotSlot = Slot.create(slotIdSupplier, id, tx, valid);
         var events = snapshotSlot.pullEvent();
         this.slotList.add(snapshotSlot);
         eventList.addAll(events);
     }
 
     public void migrate(
-            Supplier<SlotId> snapshotSlotIdSupplier,
+            Supplier<SlotId> slotIdSupplier,
             Instant txAt,
             Instant validAt
     ) {
@@ -165,13 +164,13 @@ public class Timeline implements Persistable<TimelineId>, Identifiable<TimelineI
         parentSlot.close(EffectiveSelector.TX, txAt);
         eventList.addAll(parentSlot.pullEvent());
 
-        var newTx = Effective.create(txAt, Effective.MAX);
+        var newTx = JpaEffectiveMetadata.create(txAt, JpaEffectiveMetadata.MAX);
         var newValidSplit = parentSlot.getValid().splitAt(validAt);
-        var newValidLeft = newValidSplit.left();
-        var newValidRight = newValidSplit.right();
+        var newValidLeft = JpaEffectiveMetadata.from(newValidSplit.left());
+        var newValidRight = JpaEffectiveMetadata.from(newValidSplit.right());
 
         var slotLeft = Slot.create(
-                snapshotSlotIdSupplier,
+                slotIdSupplier,
                 id,
                 parentSlot.id(),
                 newTx,
@@ -181,7 +180,7 @@ public class Timeline implements Persistable<TimelineId>, Identifiable<TimelineI
         eventList.addAll(slotLeft.pullEvent());
 
         var slotRight = Slot.create(
-                snapshotSlotIdSupplier,
+                slotIdSupplier,
                 id,
                 slotLeft.id(),
                 newTx,
@@ -192,14 +191,14 @@ public class Timeline implements Persistable<TimelineId>, Identifiable<TimelineI
     }
 
     public void merge(
-            Supplier<SlotId> snapshotSlotIdSupplier,
+            Supplier<SlotId> slotIdSupplier,
             Instant txAt,
             Instant validFrom,
             Instant validTo
     ) {
         checkAnySlotExists();
 
-        var validRange = Effective.create(validFrom, validTo);
+        var validRange = JpaEffectiveMetadata.create(validFrom, validTo);
 
         var candidateSlots = slotList.stream()
                 .filter(Slot.ifEffectiveOpenEqualTo(EffectiveSelector.TX, true))
@@ -219,13 +218,13 @@ public class Timeline implements Persistable<TimelineId>, Identifiable<TimelineI
         var earliestSlot = candidateSlots.getFirst();
         var latestSlot = candidateSlots.getLast();
 
-        var mergedTx = Effective.create(txAt, Effective.MAX);
-        var mergedValid = Effective.create(
+        var mergedTx = JpaEffectiveMetadata.create(txAt, JpaEffectiveMetadata.MAX);
+        var mergedValid = JpaEffectiveMetadata.create(
                 earliestSlot.getValid().getFrom(),
                 latestSlot.getValid().getTo()
         );
         var mergedSlot = Slot.create(
-                snapshotSlotIdSupplier,
+                slotIdSupplier,
                 id,
                 mergedTx,
                 mergedValid

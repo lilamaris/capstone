@@ -1,6 +1,7 @@
 package com.lilamaris.capstone.util;
 
-import com.lilamaris.capstone.application.policy.identity.RawGenerator;
+
+import com.lilamaris.capstone.shared.application.policy.domain.identity.port.in.RawGenerator;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;

@@ -6,8 +6,7 @@ import com.lilamaris.capstone.shared.domain.event.DomainEvent;
 import com.lilamaris.capstone.shared.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.shared.domain.metadata.AuditMetadata;
 import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaAuditMetadata;
-import com.lilamaris.capstone.timeline.domain.embed.Effective;
-import com.lilamaris.capstone.timeline.domain.embed.EffectiveSelector;
+import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaEffectiveMetadata;
 import com.lilamaris.capstone.timeline.domain.event.SlotCreated;
 import com.lilamaris.capstone.timeline.domain.event.SlotEffectiveUpdated;
 import com.lilamaris.capstone.timeline.domain.id.SlotId;
@@ -60,20 +59,20 @@ public class Slot implements Persistable<SlotId>, Identifiable<SlotId>, Auditabl
             @AttributeOverride(name = "from", column = @Column(name = "tx_from")),
             @AttributeOverride(name = "to", column = @Column(name = "tx_to")),
     })
-    private Effective tx;
+    private JpaEffectiveMetadata tx;
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "from", column = @Column(name = "valid_from")),
             @AttributeOverride(name = "to", column = @Column(name = "valid_to")),
     })
-    private Effective valid;
+    private JpaEffectiveMetadata valid;
 
     protected Slot(
             SlotId id,
             TimelineId timelineId,
             SlotId parentSlotId,
-            Effective tx,
-            Effective valid
+            JpaEffectiveMetadata tx,
+            JpaEffectiveMetadata valid
     ) {
         this.id = requireField(id, "id");
         this.timelineId = requireField(timelineId, "timelineId");
@@ -86,8 +85,8 @@ public class Slot implements Persistable<SlotId>, Identifiable<SlotId>, Auditabl
             Supplier<SlotId> idSupplier,
             TimelineId timelineId,
             SlotId parentSlotId,
-            Effective tx,
-            Effective valid
+            JpaEffectiveMetadata tx,
+            JpaEffectiveMetadata valid
     ) {
         var id = idSupplier.get();
         var snapshotSlot = new Slot(id, timelineId, parentSlotId, tx, valid);
@@ -98,8 +97,8 @@ public class Slot implements Persistable<SlotId>, Identifiable<SlotId>, Auditabl
     protected static Slot create(
             Supplier<SlotId> idSupplier,
             TimelineId timelineId,
-            Effective tx,
-            Effective valid
+            JpaEffectiveMetadata tx,
+            JpaEffectiveMetadata valid
     ) {
         var id = idSupplier.get();
         var snapshotSlot = new Slot(id, timelineId, null, tx, valid);
@@ -137,7 +136,7 @@ public class Slot implements Persistable<SlotId>, Identifiable<SlotId>, Auditabl
         }
     }
 
-    protected static Predicate<Slot> ifEffectiveOverlap(EffectiveSelector selector, Effective range) {
+    protected static Predicate<Slot> ifEffectiveOverlap(EffectiveSelector selector, JpaEffectiveMetadata range) {
         if (selector == EffectiveSelector.TX) {
             return s -> s.getTx().isOverlap(range);
         } else if (selector == EffectiveSelector.VALID) {
