@@ -1,5 +1,6 @@
 package com.lilamaris.capstone.timeline.application.result;
 
+import com.lilamaris.capstone.shared.application.result.EffectiveResult;
 import com.lilamaris.capstone.timeline.domain.Slot;
 import com.lilamaris.capstone.timeline.domain.id.SlotId;
 import com.lilamaris.capstone.timeline.domain.id.TimelineId;

@@ -5,5 +5,5 @@ import com.lilamaris.capstone.timeline.domain.id.SlotId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface SnapshotSlotRepository extends JpaRepository<Slot, SlotId>, JpaSpecificationExecutor<Slot> {
+public interface SlotRepository extends JpaRepository<Slot, SlotId>, JpaSpecificationExecutor<Slot> {
 }

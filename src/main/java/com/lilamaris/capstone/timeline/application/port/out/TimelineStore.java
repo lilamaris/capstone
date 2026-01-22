@@ -9,16 +9,20 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-public interface TimelinePort {
+public interface TimelineStore {
     List<Timeline> getAll();
 
-    List<Timeline> getAllByIds(List<TimelineId> ids);
+    List<Timeline> getByIds(List<TimelineId> ids);
 
     Optional<Timeline> getById(TimelineId id);
 
     List<Slot> getSlotsByTxTime(TimelineId id, Instant txAt);
 
-    Optional<Slot> getSlot(SlotId slotId);
+    List<Slot> getSlotsByValidTime(TimelineId id, Instant validAt);
+
+    Optional<Slot> getSlotById(SlotId slotId);
+
+    List<Slot> getSlotByIds(List<SlotId> slotIds);
 
     Timeline save(Timeline domain);
 }

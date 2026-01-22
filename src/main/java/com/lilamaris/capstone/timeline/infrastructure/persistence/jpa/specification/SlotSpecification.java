@@ -1,13 +1,13 @@
 package com.lilamaris.capstone.timeline.infrastructure.persistence.jpa.specification;
 
-import com.lilamaris.capstone.timeline.domain.Slot;
 import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaEffectiveMetadata;
+import com.lilamaris.capstone.timeline.domain.Slot;
 import com.lilamaris.capstone.timeline.domain.id.TimelineId;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.Instant;
 
-public class SnapshotSlotSpecification {
+public class SlotSpecification {
     public static Specification<Slot> timelineEqual(TimelineId timelineId) {
         return (root, query, builder) -> builder.equal(root.get("timelineId"), timelineId);
     }
