@@ -14,6 +14,7 @@ import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaEffectiveMetadata
 import com.lilamaris.capstone.timeline.domain.event.TimelineCreated;
 import com.lilamaris.capstone.timeline.domain.exception.TimelineDomainException;
 import com.lilamaris.capstone.timeline.domain.exception.TimelineErrorCode;
+import com.lilamaris.capstone.timeline.domain.id.SlotClosureId;
 import com.lilamaris.capstone.timeline.domain.id.SlotId;
 import com.lilamaris.capstone.timeline.domain.id.TimelineId;
 import jakarta.persistence.*;
@@ -28,8 +29,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static com.lilamaris.capstone.shared.domain.util.Validation.requireField;
 
@@ -55,22 +58,29 @@ public class Timeline implements Persistable<TimelineId>, Identifiable<TimelineI
     @JoinColumn(name = "timeline_id", nullable = false)
     private List<Slot> slotList;
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "timeline_id", nullable = false)
+    private List<SlotClosure> slotClosureList;
+
     @Embedded
     private JpaDescriptionMetadata descriptionMetadata;
 
     protected Timeline(
             TimelineId id,
             List<Slot> slotList,
+            List<SlotClosure> slotClosureList,
             JpaDescriptionMetadata descriptionMetadata
     ) {
         this.id = requireField(id, "id");
         this.slotList = requireField(slotList, "slotList");
+        this.slotClosureList = requireField(slotClosureList, "slotClosureList");
         this.descriptionMetadata = requireField(descriptionMetadata, "descriptionMetadata");
     }
 
     public static Timeline create(
             Supplier<TimelineId> idSupplier,
             Supplier<SlotId> slotIdSupplier,
+            Supplier<SlotClosureId> slotClosureIdSupplier,
             String title,
             String details,
             Instant txAt,
@@ -81,9 +91,10 @@ public class Timeline implements Persistable<TimelineId>, Identifiable<TimelineI
         var timeline = new Timeline(
                 id,
                 new ArrayList<>(),
+                new ArrayList<>(),
                 descriptionMetadata
         );
-        timeline.createInitialSlot(slotIdSupplier, txAt, initialValidAt);
+        timeline.createInitialSlot(slotIdSupplier, slotClosureIdSupplier, txAt, initialValidAt);
         timeline.registerCreated();
         return timeline;
     }
@@ -125,19 +136,22 @@ public class Timeline implements Persistable<TimelineId>, Identifiable<TimelineI
 
     private void createInitialSlot(
             Supplier<SlotId> slotIdSupplier,
+            Supplier<SlotClosureId> slotClosureIdSupplier,
             Instant txAt,
             Instant validAt
     ) {
         var tx = JpaEffectiveMetadata.create(txAt);
         var valid = JpaEffectiveMetadata.create(validAt);
-        var snapshotSlot = Slot.create(slotIdSupplier, id, tx, valid);
-        var events = snapshotSlot.pullEvent();
-        this.slotList.add(snapshotSlot);
-        eventList.addAll(events);
+        var slot = Slot.create(slotIdSupplier, id, tx, valid);
+        var slotClosure = SlotClosure.create(slotClosureIdSupplier, id, slot.id(), slot.id(), 0);
+        slotList.add(slot);
+        slotClosureList.add(slotClosure);
+        eventList.addAll(Stream.concat(slot.pullEvent().stream(), slotClosure.pullEvent().stream()).toList());
     }
 
     public void migrate(
             Supplier<SlotId> slotIdSupplier,
+            Supplier<SlotClosureId> slotClosureIdSupplier,
             Instant txAt,
             Instant validAt
     ) {
@@ -169,29 +183,26 @@ public class Timeline implements Persistable<TimelineId>, Identifiable<TimelineI
         var newValidLeft = JpaEffectiveMetadata.from(newValidSplit.left());
         var newValidRight = JpaEffectiveMetadata.from(newValidSplit.right());
 
-        var slotLeft = Slot.create(
+        createSlot(
                 slotIdSupplier,
-                id,
-                parentSlot.id(),
+                slotClosureIdSupplier,
                 newTx,
-                newValidLeft
+                newValidLeft,
+                parentSlot.id()
         );
-        slotList.add(slotLeft);
-        eventList.addAll(slotLeft.pullEvent());
 
-        var slotRight = Slot.create(
+        createSlot(
                 slotIdSupplier,
-                id,
-                slotLeft.id(),
+                slotClosureIdSupplier,
                 newTx,
-                newValidRight
+                newValidRight,
+                parentSlot.id()
         );
-        slotList.add(slotRight);
-        eventList.addAll(slotRight.pullEvent());
     }
 
     public void merge(
             Supplier<SlotId> slotIdSupplier,
+            Supplier<SlotClosureId> slotClosureIdSupplier,
             Instant txAt,
             Instant validFrom,
             Instant validTo
@@ -223,14 +234,55 @@ public class Timeline implements Persistable<TimelineId>, Identifiable<TimelineI
                 earliestSlot.getValid().getFrom(),
                 latestSlot.getValid().getTo()
         );
-        var mergedSlot = Slot.create(
+        createSlot(
+                slotIdSupplier,
+                slotClosureIdSupplier,
+                mergedTx,
+                mergedValid,
+                latestSlot.id()
+        );
+    }
+
+    private void createSlot(
+            Supplier<SlotId> slotIdSupplier,
+            Supplier<SlotClosureId> slotClosureIdSupplier,
+            JpaEffectiveMetadata tx,
+            JpaEffectiveMetadata valid,
+            SlotId ancestorSlotId
+    ) {
+        var slot = Slot.create(
                 slotIdSupplier,
                 id,
-                mergedTx,
-                mergedValid
+                tx,
+                valid
         );
-        slotList.add(mergedSlot);
-        eventList.addAll(mergedSlot.pullEvent());
+        var reflectClosures = slotClosureList.stream()
+                .filter(c -> c.getDescendantSlotId().equals(ancestorSlotId))
+                .map(c -> SlotClosure.create(
+                        slotClosureIdSupplier,
+                        id,
+                        c.getAncestorSlotId(),
+                        slot.id(),
+                        c.getDepth()
+                ))
+                .toList();
+        slotClosureList.addAll(reflectClosures);
+
+        var maxDepth = reflectClosures.stream()
+                .max(Comparator.comparing(SlotClosure::getDepth))
+                .map(SlotClosure::getDepth)
+                .orElse(0);
+
+        var closure = SlotClosure.create(
+                slotClosureIdSupplier,
+                id,
+                slot.id(),
+                slot.id(),
+                maxDepth + 1
+        );
+        slotClosureList.add(closure);
+        slotList.add(slot);
+        eventList.addAll(slot.pullEvent());
     }
 
     private void checkAnySlotExists() {

@@ -14,6 +14,7 @@ import com.lilamaris.capstone.shared.domain.type.AggregateDomainType;
 import com.lilamaris.capstone.shared.domain.type.InternalAggregateDomainType;
 import com.lilamaris.capstone.timeline.application.policy.privilege.TimelineAction;
 import com.lilamaris.capstone.timeline.application.policy.privilege.TimelineRole;
+import com.lilamaris.capstone.timeline.domain.id.SlotClosureId;
 import com.lilamaris.capstone.timeline.domain.id.SlotId;
 import com.lilamaris.capstone.timeline.domain.id.TimelineId;
 import org.springframework.context.annotation.Bean;
@@ -36,6 +37,13 @@ public class TimelinePolicyConfig {
             RawGenerator<UUID> uuidRawGenerator
     ) {
         return new RawBasedIdGenerator<>(SlotId.class, SlotId::new, uuidRawGenerator);
+    }
+
+    @Bean
+    public IdGenerator<SlotClosureId> slotClosureIdIdGenerator(
+            RawGenerator<UUID> uuidRawGenerator
+    ) {
+        return new RawBasedIdGenerator<>(SlotClosureId.class, SlotClosureId::new, uuidRawGenerator);
     }
 
     @Bean

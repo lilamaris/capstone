@@ -6,6 +6,7 @@ import com.lilamaris.capstone.shared.application.policy.domain.identity.port.in.
 import com.lilamaris.capstone.timeline.domain.Timeline;
 import com.lilamaris.capstone.timeline.domain.event.SlotCreated;
 import com.lilamaris.capstone.timeline.domain.event.TimelineCreated;
+import com.lilamaris.capstone.timeline.domain.id.SlotClosureId;
 import com.lilamaris.capstone.timeline.domain.id.SlotId;
 import com.lilamaris.capstone.timeline.domain.id.TimelineId;
 import com.lilamaris.capstone.util.SequentialUuidGenerator;
@@ -31,6 +32,7 @@ public class TimelineTest {
     void run() {
         var timelineIdGen = new RawBasedIdGenerator<>(TimelineId.class, TimelineId::new, new SequentialUuidGenerator());
         var slotIdGen = new RawBasedIdGenerator<>(SlotId.class, SlotId::new, new SequentialUuidGenerator());
+        var slotClosureIdGen = new RawBasedIdGenerator<>(SlotClosureId.class, SlotClosureId::new, new SequentialUuidGenerator());
         ids = new DefaultIdGenerationDirectory(List.of(timelineIdGen, slotIdGen));
 
         initialTxAt = Instant.parse("2025-01-01T00:00:00Z");
@@ -41,11 +43,11 @@ public class TimelineTest {
         return Timeline.create(
                 ids.next(TimelineId.class),
                 ids.next(SlotId.class),
+                ids.next(SlotClosureId.class),
                 "Test Timeline",
                 "Test Timeline Details",
                 initialTxAt,
-                initialValidAt
-        );
+                initialValidAt);
     }
 
     @Test
@@ -81,7 +83,7 @@ public class TimelineTest {
 
         var operateTxAt = initialTxAt.plus(1, ChronoUnit.DAYS);
         var operateValidAt = initialValidAt.plus(3, ChronoUnit.DAYS);
-        timeline.migrate(ids.next(SlotId.class), operateTxAt, operateValidAt);
+        timeline.migrate(ids.next(SlotId.class), ids.next(SlotClosureId.class), operateTxAt, operateValidAt);
 
         var slots = timeline.getSlotList();
         assertThat(slots).hasSize(3);

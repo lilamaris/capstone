@@ -8,7 +8,6 @@ import com.lilamaris.capstone.timeline.domain.id.TimelineId;
 public record SlotResult(
         SlotId id,
         TimelineId timelineId,
-        SlotId parentSlotId,
         EffectiveResult tx,
         EffectiveResult valid
 ) {
@@ -18,7 +17,6 @@ public record SlotResult(
         return new SlotResult(
                 domain.id(),
                 domain.getTimelineId(),
-                domain.getParentSlotId(),
                 txResult,
                 validResult
         );

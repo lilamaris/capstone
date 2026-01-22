@@ -51,15 +51,12 @@ public class Slot implements Persistable<SlotId>, Identifiable<SlotId>, Auditabl
     private TimelineId timelineId;
 
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "parent_slot_id"))
-    private SlotId parentSlotId;
-
-    @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "from", column = @Column(name = "tx_from")),
             @AttributeOverride(name = "to", column = @Column(name = "tx_to")),
     })
     private JpaEffectiveMetadata tx;
+
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "from", column = @Column(name = "valid_from")),
@@ -70,13 +67,11 @@ public class Slot implements Persistable<SlotId>, Identifiable<SlotId>, Auditabl
     protected Slot(
             SlotId id,
             TimelineId timelineId,
-            SlotId parentSlotId,
             JpaEffectiveMetadata tx,
             JpaEffectiveMetadata valid
     ) {
         this.id = requireField(id, "id");
         this.timelineId = requireField(timelineId, "timelineId");
-        this.parentSlotId = parentSlotId;
         this.tx = requireField(tx, "tx");
         this.valid = requireField(valid, "valid");
     }
@@ -84,24 +79,11 @@ public class Slot implements Persistable<SlotId>, Identifiable<SlotId>, Auditabl
     protected static Slot create(
             Supplier<SlotId> idSupplier,
             TimelineId timelineId,
-            SlotId parentSlotId,
             JpaEffectiveMetadata tx,
             JpaEffectiveMetadata valid
     ) {
         var id = idSupplier.get();
-        var snapshotSlot = new Slot(id, timelineId, parentSlotId, tx, valid);
-        snapshotSlot.registerCreated();
-        return snapshotSlot;
-    }
-
-    protected static Slot create(
-            Supplier<SlotId> idSupplier,
-            TimelineId timelineId,
-            JpaEffectiveMetadata tx,
-            JpaEffectiveMetadata valid
-    ) {
-        var id = idSupplier.get();
-        var snapshotSlot = new Slot(id, timelineId, null, tx, valid);
+        var snapshotSlot = new Slot(id, timelineId, tx, valid);
         snapshotSlot.registerCreated();
         return snapshotSlot;
     }
@@ -154,10 +136,6 @@ public class Slot implements Persistable<SlotId>, Identifiable<SlotId>, Auditabl
     @Override
     public AuditMetadata auditMetadata() {
         return audit;
-    }
-
-    public boolean isRoot() {
-        return this.parentSlotId == null;
     }
 
     protected void open(EffectiveSelector selector, Instant at) {
