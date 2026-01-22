@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.slot_occupancy.infrastructure.persistence.jpa;
 
-import com.lilamaris.capstone.slot_occupancy.application.port.out.SlotOccupancyPort;
+import com.lilamaris.capstone.slot_occupancy.application.port.out.SlotOccupancyStore;
 import com.lilamaris.capstone.slot_occupancy.domain.SlotOccupancy;
 import com.lilamaris.capstone.slot_occupancy.domain.id.SlotOccupancyId;
 import com.lilamaris.capstone.slot_occupancy.infrastructure.persistence.jpa.repository.SlotOccupancyRepository;
@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class SlotOccupancyPersistenceAdapter implements SlotOccupancyPort {
+public class SlotOccupancyPersistenceAdapter implements SlotOccupancyStore {
     private final SlotOccupancyRepository repository;
 
     @Override

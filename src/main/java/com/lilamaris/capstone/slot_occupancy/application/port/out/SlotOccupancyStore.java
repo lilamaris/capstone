@@ -8,7 +8,7 @@ import com.lilamaris.capstone.timeline.domain.id.SlotId;
 import java.util.List;
 import java.util.Optional;
 
-public interface SlotOccupancyPort {
+public interface SlotOccupancyStore {
     boolean existsBySlotIdOrSnapshotId(SlotId slotId, SnapshotId snapshotId);
 
     Optional<SlotOccupancy> getById(SlotOccupancyId id);
