@@ -31,6 +31,11 @@ public class DefaultDomainRefResolverDirectory implements DomainRefResolverDirec
     }
 
     @Override
+    public <T extends DomainId<?>> List<T> resolve(List<DomainRef> refs, Class<T> expect) {
+        return refs.stream().map(ref -> resolve(ref, expect)).toList();
+    }
+
+    @Override
     public <T extends DomainId<?>> T resolve(ExternalizableId externalId, DomainType type, Class<T> expect) {
         var resolver = resolverOf(type);
         var ref = new DefaultDomainRef(type, externalId);
