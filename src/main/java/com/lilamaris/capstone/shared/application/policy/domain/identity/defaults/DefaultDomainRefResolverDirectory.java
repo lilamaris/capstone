@@ -7,6 +7,7 @@ import com.lilamaris.capstone.shared.domain.id.DomainId;
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
 import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
 import com.lilamaris.capstone.shared.domain.type.DomainType;
+import com.sun.source.doctree.TextTree;
 
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,11 @@ public class DefaultDomainRefResolverDirectory implements DomainRefResolverDirec
         var resolver = resolverOf(type);
         var ref = new DefaultDomainRef(type, externalId);
         return resolveId(resolver, ref, expect);
+    }
+
+    @Override
+    public <T extends DomainId<?>> List<T> resolve(List<ExternalizableId> externalIds, DomainType type, Class<T> expect) {
+        return externalIds.stream().map(externalId -> resolve(externalId, type, expect)).toList();
     }
 
     private <T extends DomainId<?>> DomainRefResolver<T> resolverOf(DomainType type) {

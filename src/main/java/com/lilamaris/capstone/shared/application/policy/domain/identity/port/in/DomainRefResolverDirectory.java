@@ -13,4 +13,6 @@ public interface DomainRefResolverDirectory {
     <T extends DomainId<?>> List<T> resolve(List<DomainRef> refs, Class<T> expect);
 
     <T extends DomainId<?>> T resolve(ExternalizableId externalId, DomainType type, Class<T> expect);
+
+    <T extends DomainId<?>> List<T> resolve(List<ExternalizableId> externalIds, DomainType type, Class<T> expect);
 }

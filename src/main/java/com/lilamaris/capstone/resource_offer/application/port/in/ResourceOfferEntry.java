@@ -5,14 +5,14 @@ import com.lilamaris.capstone.shared.domain.id.DomainRef;
 import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
 
 public record ResourceOfferEntry(
-        ExternalizableId resourceOfferId,
+        DomainRef ref,
         DomainRef resource,
         ExternalizableId snapshotId,
         String jsonPatch
 ) {
     public static ResourceOfferEntry from(ResourceOffer resourceOffer) {
         return new ResourceOfferEntry(
-                resourceOffer.id(),
+                resourceOffer.id().ref(),
                 resourceOffer.getResource(),
                 resourceOffer.getSnapshotId(),
                 resourceOffer.getJsonPatch()

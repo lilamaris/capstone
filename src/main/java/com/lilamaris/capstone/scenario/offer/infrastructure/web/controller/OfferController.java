@@ -1,8 +1,9 @@
 package com.lilamaris.capstone.scenario.offer.infrastructure.web.controller;
 
-import com.lilamaris.capstone.scenario.offer.application.port.in.OfferIssueUseCase;
-import com.lilamaris.capstone.scenario.offer.application.port.in.OfferRevokeUseCase;
+import com.lilamaris.capstone.scenario.offer.application.port.in.OfferIssuer;
+import com.lilamaris.capstone.scenario.offer.application.port.in.OfferRevoker;
 import com.lilamaris.capstone.scenario.offer.infrastructure.web.request.OfferRequest;
+import com.lilamaris.capstone.scenario.offer.infrastructure.web.response.OfferResponse;
 import com.lilamaris.capstone.shared.domain.defaults.DefaultDomainRef;
 import com.lilamaris.capstone.shared.domain.defaults.DefaultExternalizableId;
 import lombok.RequiredArgsConstructor;
@@ -13,42 +14,34 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/offer")
 @RequiredArgsConstructor
 public class OfferController {
-    private final OfferIssueUseCase offerIssueUseCase;
-    private final OfferRevokeUseCase offerRevokeUseCase;
+    private final OfferIssuer offerIssuer;
+    private final OfferRevoker offerRevoker;
 
     @PostMapping
     public ResponseEntity<?> createOffer(
             @RequestBody OfferRequest.Offer body
     ) {
-        var ref = DefaultDomainRef.from(
+        var result = offerIssuer.offer(
                 body.resourceType(),
-                DefaultExternalizableId.from(body.resourceId())
-        );
-
-        var result = offerIssueUseCase.offer(
-                ref,
+                DefaultExternalizableId.from(body.resourceId()),
                 DefaultExternalizableId.from(body.snapshotId())
         );
 
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(
+                OfferResponse.from(result)
+        );
     }
 
     @DeleteMapping
     public ResponseEntity<?> revokeOffer(
             @RequestBody OfferRequest.Offer body
     ) {
-        var resourceId = DefaultExternalizableId.from(body.resourceId());
-        var snapshotId = DefaultExternalizableId.from(body.snapshotId());
-        var ref = DefaultDomainRef.from(
+        offerRevoker.revoke(
                 body.resourceType(),
-                resourceId
+                DefaultExternalizableId.from(body.resourceId()),
+                DefaultExternalizableId.from(body.snapshotId())
         );
 
-        var result = offerRevokeUseCase.revoke(
-                ref,
-                snapshotId
-        );
-
-        return ResponseEntity.ok(result);
+        return ResponseEntity.noContent().build();
     }
 }
