@@ -3,7 +3,9 @@ package com.lilamaris.capstone.scenario.auth.infrastructure.security.authz.jwt;
 import com.lilamaris.capstone.scenario.auth.application.port.in.TokenAuthUseCase;
 import com.lilamaris.capstone.shared.application.context.ActorContext;
 import com.lilamaris.capstone.shared.application.exception.ApplicationInvariantException;
+import com.lilamaris.capstone.shared.domain.defaults.DefaultExternalizableId;
 import com.lilamaris.capstone.shared.domain.event.actor.UserActor;
+import com.lilamaris.capstone.user.application.port.in.UserExistenceChecker;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,6 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String AUTH_HEADER = "Authorization";
     private static final String AUTH_HEADER_PREFIX = "Bearer ";
 
+    private final UserExistenceChecker userExistenceChecker;
     private final TokenAuthUseCase tokenAuthUseCase;
 
     @Override
@@ -39,11 +42,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (StringUtils.hasText(token)) {
                 var claims = tokenAuthUseCase.parseToken(token);
-                var actor = UserActor.of(claims.getSubject());
-                var authorities = Collections.singletonList(new SimpleGrantedAuthority(actor.type().name()));
-                var authentication = new UsernamePasswordAuthenticationToken(actor, token, authorities);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-                ActorContext.set(actor);
+                var userId = DefaultExternalizableId.from(claims.getSubject());
+
+                if (userExistenceChecker.isExist(userId)) {
+                    var actor = UserActor.of(claims.getSubject());
+                    var authorities = Collections.singletonList(new SimpleGrantedAuthority(actor.type().name()));
+                    var authentication = new UsernamePasswordAuthenticationToken(actor, token, authorities);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    ActorContext.set(actor);
+                }
             }
         } catch (ApplicationInvariantException e) {
             request.setAttribute("jwtException", e);

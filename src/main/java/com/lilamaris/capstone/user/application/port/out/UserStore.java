@@ -5,8 +5,10 @@ import com.lilamaris.capstone.user.domain.id.UserId;
 
 import java.util.Optional;
 
-public interface UserPort {
+public interface UserStore {
     Optional<User> getById(UserId id);
+
+    boolean isExists(UserId id);
 
     User save(User domain);
 }
