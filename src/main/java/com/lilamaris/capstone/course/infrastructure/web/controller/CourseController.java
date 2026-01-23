@@ -1,11 +1,12 @@
 package com.lilamaris.capstone.course.infrastructure.web.controller;
 
-import com.lilamaris.capstone.course.application.port.in.CreateCourseUseCase;
-import com.lilamaris.capstone.course.application.port.in.DeleteCourseUseCase;
-import com.lilamaris.capstone.course.application.port.in.FindCourseUseCase;
-import com.lilamaris.capstone.course.application.port.in.UpdateCourseUseCase;
+import com.lilamaris.capstone.course.application.port.in.CourseCreator;
+import com.lilamaris.capstone.course.application.port.in.CourseReader;
+import com.lilamaris.capstone.course.application.port.in.CourseRemover;
+import com.lilamaris.capstone.course.application.port.in.CourseUpdater;
 import com.lilamaris.capstone.course.domain.id.CourseId;
 import com.lilamaris.capstone.course.infrastructure.web.request.CourseRequest;
+import com.lilamaris.capstone.course.infrastructure.web.response.CourseResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,22 +17,24 @@ import java.util.UUID;
 @RequestMapping("/api/v1/course")
 @RequiredArgsConstructor
 public class CourseController {
-    private final CreateCourseUseCase createCourseUseCase;
-    private final UpdateCourseUseCase updateCourseUseCase;
-    private final DeleteCourseUseCase deleteCourseUseCase;
+    private final CourseCreator courseCreator;
+    private final CourseUpdater courseUpdater;
+    private final CourseRemover courseRemover;
 
-    private final FindCourseUseCase findCourseUseCase;
+    private final CourseReader courseReader;
 
     @PostMapping
     public ResponseEntity<?> createCourse(
             @RequestBody CourseRequest.Create body
     ) {
-        var result = createCourseUseCase.create(
+        var result = courseCreator.create(
                 body.title(),
                 body.details()
         );
 
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(
+                CourseResponse.from(result)
+        );
     }
 
     @PutMapping("/{id}")
@@ -40,13 +43,15 @@ public class CourseController {
             @RequestBody CourseRequest.Update body
     ) {
         var courseId = new CourseId(id);
-        var result = updateCourseUseCase.update(
+        var result = courseUpdater.update(
                 courseId,
                 body.title(),
                 body.details()
         );
 
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(
+                CourseResponse.from(result)
+        );
     }
 
     @DeleteMapping("/{id}")
@@ -54,14 +59,16 @@ public class CourseController {
             @PathVariable("id") UUID id
     ) {
         var courseId = new CourseId(id);
-        deleteCourseUseCase.delete(courseId);
+        courseRemover.delete(courseId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping
     public ResponseEntity<?> getAllCourse() {
-        var result = findCourseUseCase.getAll();
-        return ResponseEntity.ok(result);
+        var result = courseReader.getAll();
+        return ResponseEntity.ok(
+                result.stream().map(CourseResponse::from).toList()
+        );
     }
 
     @GetMapping("/{id}")
@@ -69,7 +76,9 @@ public class CourseController {
             @PathVariable("id") UUID id
     ) {
         var courseId = new CourseId(id);
-        var course = findCourseUseCase.getById(courseId);
-        return ResponseEntity.ok(course);
+        var result = courseReader.getById(courseId);
+        return ResponseEntity.ok(
+                CourseResponse.from(result)
+        );
     }
 }

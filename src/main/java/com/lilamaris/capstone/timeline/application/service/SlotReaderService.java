@@ -4,9 +4,10 @@ import com.lilamaris.capstone.shared.application.exception.ResourceNotFoundExcep
 import com.lilamaris.capstone.shared.application.policy.domain.identity.port.in.DomainRefResolverDirectory;
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
 import com.lilamaris.capstone.timeline.application.port.in.SlotEntry;
+import com.lilamaris.capstone.timeline.application.port.in.SlotPathEntry;
+import com.lilamaris.capstone.timeline.application.port.in.SlotPathResolver;
 import com.lilamaris.capstone.timeline.application.port.in.SlotReader;
 import com.lilamaris.capstone.timeline.application.port.out.SlotQuery;
-import com.lilamaris.capstone.timeline.application.port.out.TimelineStore;
 import com.lilamaris.capstone.timeline.domain.id.SlotId;
 import com.lilamaris.capstone.timeline.domain.id.TimelineId;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,9 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class SlotReaderService implements SlotReader {
+public class SlotReaderService implements
+        SlotReader,
+        SlotPathResolver {
     private final SlotQuery slotQuery;
     private final DomainRefResolverDirectory refDir;
 
@@ -47,7 +50,14 @@ public class SlotReaderService implements SlotReader {
         return slotQuery.getSlotById(id)
                 .map(SlotEntry::from)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(
-                        "Slot with ref '%s' not found.", id
+                        "Slot with snapshotRef '%s' not found.", id
                 )));
+    }
+
+    @Override
+    public List<SlotPathEntry> getPathOf(SlotId slotId) {
+        return slotQuery.getClosureOf(slotId).stream()
+                .map(SlotPathEntry::from)
+                .toList();
     }
 }

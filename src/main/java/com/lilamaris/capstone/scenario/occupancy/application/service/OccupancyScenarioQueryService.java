@@ -34,7 +34,7 @@ public class OccupancyScenarioQueryService implements OccupancyQueryUseCase {
 
         var snapshotRefs = occupancy.stream().map(SlotOccupancyEntry::snapshotRef).toList();
         var snapshots = snapshotReader.resolveRefs(snapshotRefs).stream()
-                .collect(Collectors.toMap(SnapshotEntry::ref, Function.identity()));
+                .collect(Collectors.toMap(SnapshotEntry::snapshotRef, Function.identity()));
 
         var occupancies = occupancy.stream().collect(Collectors.toMap(
                 SlotOccupancyEntry::slotRef,
@@ -44,7 +44,7 @@ public class OccupancyScenarioQueryService implements OccupancyQueryUseCase {
         return slots.values().stream()
                 .map(slot -> {
                     var snapshotId = Optional.ofNullable(occupancies.get(slot.ref()))
-                            .map(e -> e.ref().id())
+                            .map(e -> e.snapshotRef().id())
                             .orElse(null);
                     return OccupancyResult.Query.from(slot.tx(), slot.valid(), snapshotId);
                 })

@@ -27,7 +27,7 @@ public class OccupancyScenarioCommandService implements OccupancyCommandUseCase 
         return OccupancyResult.Command.from(
                 slot.tx(),
                 slot.valid(),
-                snapshot.ref().id()
+                snapshot.snapshotRef().id()
         );
     }
 }

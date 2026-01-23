@@ -8,9 +8,8 @@ import com.lilamaris.capstone.shared.application.util.UniversityClock;
 import com.lilamaris.capstone.shared.domain.defaults.DefaultDescriptionMetadata;
 import com.lilamaris.capstone.shared.domain.event.actor.CanonicalActor;
 import com.lilamaris.capstone.timeline.application.policy.privilege.TimelineAction;
-import com.lilamaris.capstone.timeline.application.port.in.TimelineCommandUseCase;
+import com.lilamaris.capstone.timeline.application.port.in.*;
 import com.lilamaris.capstone.timeline.application.port.out.TimelineStore;
-import com.lilamaris.capstone.timeline.application.result.TimelineResult;
 import com.lilamaris.capstone.timeline.domain.Timeline;
 import com.lilamaris.capstone.timeline.domain.id.SlotClosureId;
 import com.lilamaris.capstone.timeline.domain.id.SlotId;
@@ -18,18 +17,36 @@ import com.lilamaris.capstone.timeline.domain.id.TimelineId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class TimelineCommandService implements TimelineCommandUseCase {
+public class TimelineService implements
+        TimelineCreator,
+        TimelineUpdater,
+        TimelineMigration,
+        TimelineMerge,
+        TimelineReader {
     private final TimelineStore timelineStore;
-
     private final IdGenerationDirectory ids;
     private final ResourceAuthorizer authorizer;
 
     @Override
-    public TimelineResult.CommandCompressed create(String title, String details, LocalDateTime initialValidAt) {
+    public List<TimelineEntry> getAll() {
+        return timelineStore.getAll().stream().map(TimelineEntry::from).toList();
+    }
+
+    @Override
+    public TimelineEntry getById(TimelineId id) {
+        var timeline = timelineStore.getById(id).orElseThrow(() -> new ResourceNotFoundException(
+                String.format("Timeline with snapshotRef '%s' not found.", id)
+        ));
+        return TimelineEntry.from(timeline);
+    }
+
+    @Override
+    public TimelineEntry create(String title, String details, Instant validAt) {
         var domain = Timeline.create(
                 ids.next(TimelineId.class),
                 ids.next(SlotId.class),
@@ -37,63 +54,68 @@ public class TimelineCommandService implements TimelineCommandUseCase {
                 title,
                 details,
                 UniversityClock.now(),
-                UniversityClock.at(initialValidAt));
-        var created = timelineStore.save(domain);
+                validAt
+        );
 
-        return TimelineResult.CommandCompressed.from(created);
+        var saved = timelineStore.save(domain);
+
+        return TimelineEntry.from(saved);
     }
 
     @Override
-    public TimelineResult.CommandCompressed update(TimelineId id, String title, String details) {
+    public TimelineEntry update(TimelineId id, String title, String details) {
         CanonicalActor actor = ActorContext.get();
         authorizer.authorize(actor, id.ref(), TimelineAction.UPDATE_METADATA);
 
         var timeline = timelineStore.getById(id).orElseThrow(() -> new ResourceNotFoundException(
-                String.format("Timeline with ref '%s' not found.", id)
+                String.format("Timeline with snapshotRef '%s' not found.", id)
         ));
 
         timeline.updateDescription(new DefaultDescriptionMetadata(title, details));
 
-        return TimelineResult.CommandCompressed.from(timeline);
+        return TimelineEntry.from(timeline);
     }
 
     @Override
-    public TimelineResult.Command migrate(TimelineId id, LocalDateTime validAt) {
+    public TimelineEntry migrate(TimelineId id, Instant migrateAt) {
         CanonicalActor actor = ActorContext.get();
         authorizer.authorize(actor, id.ref(), TimelineAction.MIGRATE);
 
         var timeline = timelineStore.getById(id).orElseThrow(() -> new ResourceNotFoundException(
-                String.format("Timeline with ref '%s' not found.", id)
+                String.format("Timeline with snapshotRef '%s' not found.", id)
         ));
 
         timeline.migrate(
                 ids.next(SlotId.class),
                 ids.next(SlotClosureId.class),
                 UniversityClock.now(),
-                UniversityClock.at(validAt));
+                migrateAt
+        );
+
         var saved = timelineStore.save(timeline);
 
-        return TimelineResult.Command.from(saved);
+        return TimelineEntry.from(saved);
     }
 
     @Override
-    public TimelineResult.Command merge(TimelineId id, LocalDateTime validFrom, LocalDateTime validTo) {
+    public TimelineEntry merge(TimelineId id, Instant mergeFrom, Instant mergeTo) {
         CanonicalActor actor = ActorContext.get();
         authorizer.authorize(actor, id.ref(), TimelineAction.MERGE);
 
         var timeline = timelineStore.getById(id).orElseThrow(() -> new ResourceNotFoundException(
-                String.format("Timeline with ref '%s' not found.", id)
+                String.format("Timeline with snapshotRef '%s' not found.", id)
         ));
 
         timeline.merge(
                 ids.next(SlotId.class),
                 ids.next(SlotClosureId.class),
                 UniversityClock.now(),
-                UniversityClock.at(validFrom),
-                UniversityClock.at(validTo));
+                mergeFrom,
+                mergeTo
+        );
 
         var saved = timelineStore.save(timeline);
 
-        return TimelineResult.Command.from(saved);
+        return TimelineEntry.from(saved);
     }
 }

@@ -1,11 +1,8 @@
 package com.lilamaris.capstone.course.application.service;
 
 import com.lilamaris.capstone.course.application.policy.privilege.CourseAction;
-import com.lilamaris.capstone.course.application.port.in.CreateCourseUseCase;
-import com.lilamaris.capstone.course.application.port.in.DeleteCourseUseCase;
-import com.lilamaris.capstone.course.application.port.in.UpdateCourseUseCase;
+import com.lilamaris.capstone.course.application.port.in.*;
 import com.lilamaris.capstone.course.application.port.out.CourseStore;
-import com.lilamaris.capstone.course.application.result.CourseResult;
 import com.lilamaris.capstone.course.domain.Course;
 import com.lilamaris.capstone.course.domain.id.CourseId;
 import com.lilamaris.capstone.shared.application.context.ActorContext;
@@ -16,25 +13,42 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class CourseCommandService implements
-        CreateCourseUseCase,
-        UpdateCourseUseCase,
-        DeleteCourseUseCase {
+public class CourseService implements
+        CourseReader,
+        CourseCreator,
+        CourseUpdater,
+        CourseRemover {
     private final CourseStore courseStore;
     private final ResourceAuthorizer authorizer;
 
     @Override
-    public CourseResult.Command create(String title, String details) {
-        var created = Course.create(title, details);
-        var saved = courseStore.save(created);
-        return CourseResult.Command.from(saved);
+    public List<CourseEntry> getAll() {
+        return courseStore.getAll().stream().map(CourseEntry::from).toList();
     }
 
     @Override
-    public CourseResult.Command update(CourseId id, String title, String details) {
+    public CourseEntry getById(CourseId id) {
+        var course = courseStore.getById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(
+                        "Course with id '%s' not found.", id
+                )));
+        return CourseEntry.from(course);
+    }
+
+    @Override
+    public CourseEntry create(String title, String details) {
+        var created = Course.create(title, details);
+        var saved = courseStore.save(created);
+        return CourseEntry.from(saved);
+    }
+
+    @Override
+    public CourseEntry update(CourseId id, String title, String details) {
         var actor = ActorContext.get();
         authorizer.authorize(actor, id.ref(), CourseAction.UPDATE_METADATA);
 
@@ -44,7 +58,7 @@ public class CourseCommandService implements
                 )));
         course.updateDescription(new DefaultDescriptionMetadata(title, details));
         var saved = courseStore.save(course);
-        return CourseResult.Command.from(saved);
+        return CourseEntry.from(saved);
     }
 
     @Override
