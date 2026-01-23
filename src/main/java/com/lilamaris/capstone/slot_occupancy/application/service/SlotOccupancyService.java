@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +30,14 @@ public class SlotOccupancyService implements
     private final IdGenerationDirectory ids;
     private final DomainRefResolverDirectory refDir;
 
+    private Supplier<ResourceNotFoundException> resourceNotFoundExceptionSupplier(DomainRef ref) {
+        return () -> new ResourceNotFoundException(String.format(
+                "Slot occupancy not found with reference type '%s' and reference id '%s'",
+                ref.type().name(),
+                ref.id().asString()
+        ));
+    }
+
     @Override
     public List<SlotOccupancyEntry> resolveByRefs(List<DomainRef> refs) {
         var ids = refDir.resolve(refs, SlotOccupancyId.class);
@@ -38,10 +47,9 @@ public class SlotOccupancyService implements
     @Override
     public SlotOccupancyEntry resolveByRef(DomainRef ref) {
         var id = refDir.resolve(ref, SlotOccupancyId.class);
-        return slotOccupancyStore.getById(id).map(SlotOccupancyEntry::from)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(
-                        "SlotOccupancy with ref '%s' not found.", id
-                )));
+        return slotOccupancyStore.getById(id)
+                .map(SlotOccupancyEntry::from)
+                .orElseThrow(resourceNotFoundExceptionSupplier(ref));
     }
 
     @Override
@@ -51,9 +59,25 @@ public class SlotOccupancyService implements
     }
 
     @Override
+    public SlotOccupancyEntry getBySlotRef(DomainRef ref) {
+        var id = refDir.resolve(ref, SlotId.class);
+        return slotOccupancyStore.getBySlotId(id)
+                .map(SlotOccupancyEntry::from)
+                .orElseThrow(resourceNotFoundExceptionSupplier(ref));
+    }
+
+    @Override
     public List<SlotOccupancyEntry> getBySnapshotRefs(List<DomainRef> refs) {
         var ids = refDir.resolve(refs, SnapshotId.class);
         return slotOccupancyStore.getBySnapshotIds(ids).stream().map(SlotOccupancyEntry::from).toList();
+    }
+
+    @Override
+    public SlotOccupancyEntry getBySnapshotRef(DomainRef ref) {
+        var id = refDir.resolve(ref, SnapshotId.class);
+        return slotOccupancyStore.getBySnapshotId(id)
+                .map(SlotOccupancyEntry::from)
+                .orElseThrow(resourceNotFoundExceptionSupplier(ref));
     }
 
     @Override

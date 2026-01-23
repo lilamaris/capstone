@@ -11,5 +11,9 @@ public interface SlotOccupancyReader {
 
     List<SlotOccupancyEntry> getBySlotRefs(List<DomainRef> refs);
 
+    SlotOccupancyEntry getBySlotRef(DomainRef ref);
+
     List<SlotOccupancyEntry> getBySnapshotRefs(List<DomainRef> refs);
+
+    SlotOccupancyEntry getBySnapshotRef(DomainRef ref);
 }
