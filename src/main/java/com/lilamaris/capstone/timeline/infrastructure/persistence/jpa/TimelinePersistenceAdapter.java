@@ -21,7 +21,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TimelinePersistenceAdapter implements TimelineStore {
     private final TimelineRepository timelineRepository;
-    private final SlotRepository slotRepository;
 
     @Override
     public List<Timeline> getAll() {
@@ -31,32 +30,6 @@ public class TimelinePersistenceAdapter implements TimelineStore {
     @Override
     public List<Timeline> getByIds(List<TimelineId> ids) {
         return timelineRepository.findAllById(ids);
-    }
-
-    @Override
-    public List<Slot> getSlotsByTxTime(TimelineId id, Instant txAt) {
-        Specification<Slot> spec = Specification.unrestricted();
-        spec = spec.and(SlotSpecification.timelineEqual(id));
-        spec = spec.and(SlotSpecification.betweenTx(txAt));
-        return slotRepository.findAll(spec);
-    }
-
-    @Override
-    public List<Slot> getSlotsByValidTime(TimelineId id, Instant validAt) {
-        Specification<Slot> spec = Specification.unrestricted();
-        spec = spec.and(SlotSpecification.timelineEqual(id));
-        spec = spec.and(SlotSpecification.betweenValid(validAt));
-        return slotRepository.findAll(spec);
-    }
-
-    @Override
-    public Optional<Slot> getSlotById(SlotId slotId) {
-        return slotRepository.findById(slotId);
-    }
-
-    @Override
-    public List<Slot> getSlotByIds(List<SlotId> slotIds) {
-        return slotRepository.findAllById(slotIds);
     }
 
     @Override
