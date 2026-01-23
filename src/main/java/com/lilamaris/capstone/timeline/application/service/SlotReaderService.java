@@ -3,6 +3,8 @@ package com.lilamaris.capstone.timeline.application.service;
 import com.lilamaris.capstone.shared.application.exception.ResourceNotFoundException;
 import com.lilamaris.capstone.shared.application.policy.domain.identity.port.in.DomainRefResolverDirectory;
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
+import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
+import com.lilamaris.capstone.shared.domain.type.InternalAggregateDomainType;
 import com.lilamaris.capstone.timeline.application.port.in.SlotEntry;
 import com.lilamaris.capstone.timeline.application.port.in.SlotPathEntry;
 import com.lilamaris.capstone.timeline.application.port.in.SlotPathResolver;
@@ -51,6 +53,16 @@ public class SlotReaderService implements
                 .map(SlotEntry::from)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(
                         "Slot with snapshotRef '%s' not found.", id
+                )));
+    }
+
+    @Override
+    public SlotEntry getById(ExternalizableId id) {
+        var slotId = refDir.resolve(id, InternalAggregateDomainType.SLOT, SlotId.class);
+        return slotQuery.getSlotById(slotId)
+                .map(SlotEntry::from)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(
+                        "Slot with id '%s' not found.", id
                 )));
     }
 

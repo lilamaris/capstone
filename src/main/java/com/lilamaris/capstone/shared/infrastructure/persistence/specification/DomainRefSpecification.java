@@ -1,0 +1,27 @@
+package com.lilamaris.capstone.shared.infrastructure.persistence.specification;
+
+import com.lilamaris.capstone.shared.domain.id.DomainRef;
+import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaDomainRef;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Root;
+import org.springframework.data.jpa.domain.Specification;
+
+import java.util.function.BiFunction;
+
+public class DomainRefSpecification {
+    public static <T> Specification<T> eqDomainRef(
+            DomainRef ref,
+            BiFunction<Root<T>, CriteriaBuilder, Path<JpaDomainRef>> pathBiFunction
+    ) {
+        return (root, query, cb) -> {
+            var path = pathBiFunction.apply(root, cb);
+
+            return cb.and(
+                    cb.equal(path.get("type").get("name"), ref.type().name()),
+                    cb.equal(path.get("id"), ref.id().asString())
+            );
+        };
+    }
+
+}

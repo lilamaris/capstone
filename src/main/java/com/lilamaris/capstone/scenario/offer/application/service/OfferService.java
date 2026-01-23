@@ -1,18 +1,15 @@
 package com.lilamaris.capstone.scenario.offer.application.service;
 
-import com.lilamaris.capstone.resource_offer.application.port.in.ResourceOfferCreator;
-import com.lilamaris.capstone.resource_offer.application.port.in.ResourceOfferRemover;
+import com.lilamaris.capstone.delta.application.port.in.DeltaIssuer;
+import com.lilamaris.capstone.delta.application.port.in.DeltaRevoker;
 import com.lilamaris.capstone.scenario.offer.application.port.in.OfferEntry;
 import com.lilamaris.capstone.scenario.offer.application.port.in.OfferIssuer;
 import com.lilamaris.capstone.scenario.offer.application.port.in.OfferRevoker;
-import com.lilamaris.capstone.scenario.offer.application.port.in.SlotOfferAggregator;
 import com.lilamaris.capstone.shared.application.jsonPatch.JsonPatchResolverDirectory;
-import com.lilamaris.capstone.shared.domain.defaults.DefaultDomainRef;
+import com.lilamaris.capstone.shared.domain.id.DomainRef;
 import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
-import com.lilamaris.capstone.shared.domain.type.DomainType;
-import com.lilamaris.capstone.snapshot.application.port.in.SnapshotReader;
-import com.lilamaris.capstone.snapshot.domain.id.SnapshotId;
-import com.lilamaris.capstone.timeline.domain.id.SlotId;
+import com.lilamaris.capstone.timeline.application.port.in.SlotPathResolver;
+import com.lilamaris.capstone.timeline.application.port.in.SlotReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,32 +18,38 @@ import org.springframework.stereotype.Service;
 public class OfferService implements
         OfferIssuer,
         OfferRevoker {
-    private final SnapshotReader snapshotReader;
-    private final ResourceOfferCreator resourceOfferCreator;
-    private final ResourceOfferRemover resourceOfferRemover;
+    private final SlotReader slotReader;
+    private final SlotPathResolver slotPathResolver;
+
+    private final DeltaIssuer deltaIssuer;
+    private final DeltaRevoker deltaRevoker;
     private final JsonPatchResolverDirectory patchResolvers;
 
     @Override
     public OfferEntry offer(
-            DomainType resourceType,
-            ExternalizableId resourceId,
-            SnapshotId snapshotId
+            DomainRef resource,
+            ExternalizableId slotId
     ) {
-        var resource = DefaultDomainRef.from(resourceType, resourceId);
-        var snapshot = snapshotReader.getById(snapshotId);
+        var slot = slotReader.getById(slotId);
+
         var patchResolver = patchResolvers.resolverOf(resource.type());
+
         var jsonPatch = patchResolver.resolve(resource);
-        var resourceOfferEntry = resourceOfferCreator.issue(resource, snapshotId, jsonPatch);
-        return OfferEntry.from(snapshot, resourceOfferEntry.resource());
+
+        var delta = deltaIssuer.issue(
+                resource,
+                slotId,
+                jsonPatch
+        );
+
+        return OfferEntry.from(slot, delta.resource());
     }
 
     @Override
     public void revoke(
-            DomainType resourceType,
-            ExternalizableId resourceId,
-            SnapshotId snapshotId
+            DomainRef resource,
+            ExternalizableId slotId
     ) {
-        var resource = DefaultDomainRef.from(resourceType, resourceId);
-        resourceOfferRemover.revoke(resource, snapshotId);
+        deltaRevoker.revoke(resource, slotId);
     }
 }

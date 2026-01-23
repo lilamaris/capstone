@@ -8,7 +8,7 @@ public record OfferResponse(
         DomainRefResponse resource
 ) {
     public static OfferResponse from(OfferEntry offerEntry) {
-        var snapshot = DomainRefResponse.from(offerEntry.snapshotEntry().snapshotRef());
+        var snapshot = DomainRefResponse.from(offerEntry.slotEntry().ref());
         var resource = DomainRefResponse.from(offerEntry.offeredResource());
         return new OfferResponse(
                 snapshot,

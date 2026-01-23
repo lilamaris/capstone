@@ -6,7 +6,13 @@ public class OfferRequest {
     public record Offer(
             AggregateDomainType resourceType,
             String resourceId,
-            String snapshotId
+            String slotId
+    ) {
+    }
+
+    public record Aggregate(
+            AggregateDomainType resourceType,
+            String slotId
     ) {
     }
 }

@@ -1,15 +1,15 @@
 package com.lilamaris.capstone.scenario.offer.application.port.in;
 
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
-import com.lilamaris.capstone.snapshot.application.port.in.SnapshotEntry;
+import com.lilamaris.capstone.timeline.application.port.in.SlotEntry;
 
 public record OfferEntry(
-        SnapshotEntry snapshotEntry,
+        SlotEntry slotEntry,
         DomainRef offeredResource
 ) {
-    public static OfferEntry from(SnapshotEntry snapshotEntry, DomainRef resourceRef) {
+    public static OfferEntry from(SlotEntry slotEntry, DomainRef resourceRef) {
         return new OfferEntry(
-                snapshotEntry,
+                slotEntry,
                 resourceRef
         );
     }

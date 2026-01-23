@@ -2,7 +2,7 @@ package com.lilamaris.capstone.shared.domain.type;
 
 public enum AggregateDomainType implements DomainType {
     TIMELINE,
-    SNAPSHOT,
+    DELTA,
     USER,
     COURSE
 }

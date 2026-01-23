@@ -1,9 +1,9 @@
-package com.lilamaris.capstone.scenario.offer.application.port.in;
+package com.lilamaris.capstone.delta.application.port.in;
 
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
 import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
 
-public interface OfferRevoker {
+public interface DeltaRevoker {
     void revoke(
             DomainRef resource,
             ExternalizableId slotId

@@ -15,4 +15,11 @@ public record DefaultDomainRef(
     public static DefaultDomainRef from(DomainType type, ExternalizableId id) {
         return new DefaultDomainRef(type, id);
     }
+
+    public static DefaultDomainRef from(DomainType type, String id) {
+        return new DefaultDomainRef(
+                type,
+                DefaultExternalizableId.from(id)
+        );
+    }
 }
