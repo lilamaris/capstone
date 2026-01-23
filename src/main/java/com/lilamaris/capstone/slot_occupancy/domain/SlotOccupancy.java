@@ -49,7 +49,7 @@ public class SlotOccupancy implements Persistable<SlotOccupancyId>, Identifiable
     private SnapshotId snapshotId;
 
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "snapshot_slot_id", nullable = false, updatable = false))
+    @AttributeOverride(name = "value", column = @Column(name = "slot_id", nullable = false, updatable = false))
     private SlotId slotId;
     @Transient
     private boolean isNew = true;
