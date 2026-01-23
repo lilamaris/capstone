@@ -55,8 +55,9 @@ public class SlotReaderService implements
     }
 
     @Override
-    public List<SlotPathEntry> getPathOf(SlotId slotId) {
-        return slotQuery.getClosureOf(slotId).stream()
+    public List<SlotPathEntry> getPathOf(DomainRef ref) {
+        var id = refDir.resolve(ref, SlotId.class);
+        return slotQuery.getClosureOf(id).stream()
                 .map(SlotPathEntry::from)
                 .toList();
     }
