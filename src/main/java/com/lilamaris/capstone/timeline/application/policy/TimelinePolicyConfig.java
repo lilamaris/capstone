@@ -57,7 +57,7 @@ public class TimelinePolicyConfig {
     public DomainRefResolver<SlotId> snapshotSlotIdDomainRefResolver(
             RawParser<UUID> uuidRawParser
     ) {
-        return new DefaultDomainRefResolver<>(InternalAggregateDomainType.SNAPSHOT_SLOT, uuidRawParser, SlotId::new);
+        return new DefaultDomainRefResolver<>(InternalAggregateDomainType.SLOT, uuidRawParser, SlotId::new);
     }
 
     @Bean

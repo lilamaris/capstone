@@ -39,7 +39,7 @@ public class SlotOccupancyPersistenceAdapter implements SlotOccupancyStore {
 
     @Override
     public List<SlotOccupancy> getBySlotIds(List<SlotId> slotIds) {
-        return List.of();
+        return repository.findAllBySlotIdIn(slotIds);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class SlotOccupancyPersistenceAdapter implements SlotOccupancyStore {
 
     @Override
     public List<SlotOccupancy> getBySnapshotIds(List<SnapshotId> snapshotIds) {
-        return List.of();
+        return repository.findAllBySnapshotIdIn(snapshotIds);
     }
 
     @Override

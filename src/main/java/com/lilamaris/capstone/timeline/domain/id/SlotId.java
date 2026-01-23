@@ -35,7 +35,7 @@ public class SlotId extends DefaultUuidDomainId implements Referenceable, Extern
 
     @Override
     public DomainRef ref() {
-        return DefaultDomainRef.from(InternalAggregateDomainType.SNAPSHOT_SLOT, this);
+        return DefaultDomainRef.from(InternalAggregateDomainType.SLOT, this);
     }
 
     @Override
