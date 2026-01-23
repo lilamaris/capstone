@@ -7,6 +7,8 @@ import com.lilamaris.capstone.shared.application.policy.domain.identity.port.in.
 import com.lilamaris.capstone.shared.application.policy.resource.access_control.port.in.ResourceAuthorizer;
 import com.lilamaris.capstone.shared.domain.defaults.DefaultDescriptionMetadata;
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
+import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
+import com.lilamaris.capstone.shared.domain.type.AggregateDomainType;
 import com.lilamaris.capstone.snapshot.application.policy.previlege.SnapshotAction;
 import com.lilamaris.capstone.snapshot.application.port.in.SnapshotCreator;
 import com.lilamaris.capstone.snapshot.application.port.in.SnapshotEntry;
@@ -19,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +35,12 @@ public class SnapshotService implements
     private final IdGenerationDirectory ids;
     private final ResourceAuthorizer authorizer;
 
+    private Supplier<ResourceNotFoundException> resourceNotFound(SnapshotId id) {
+        return () -> new ResourceNotFoundException(String.format(
+                "Snapshot with id '%s' not found", id
+        ));
+    }
+
     @Override
     public List<SnapshotEntry> resolveRefs(List<DomainRef> refs) {
         var ids = refDir.resolve(refs, SnapshotId.class);
@@ -39,12 +48,34 @@ public class SnapshotService implements
     }
 
     @Override
+    public List<SnapshotEntry> resolveExternals(List<ExternalizableId> externalizableIds) {
+        var ids = refDir.resolve(externalizableIds, AggregateDomainType.SNAPSHOT, SnapshotId.class);
+        return getByIds(ids);
+    }
+
+    @Override
     public SnapshotEntry resolveRef(DomainRef ref) {
         var id = refDir.resolve(ref, SnapshotId.class);
         return snapshotStore.getById(id).map(SnapshotEntry::from)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(
-                        "Snapshot with snapshotRef '%s' not found", id
-                )));
+                .orElseThrow(resourceNotFound(id));
+    }
+
+    @Override
+    public SnapshotEntry resolveExternal(ExternalizableId externalizableId) {
+        var id = refDir.resolve(externalizableId, AggregateDomainType.SNAPSHOT, SnapshotId.class);
+        return getById(id);
+    }
+
+    @Override
+    public SnapshotEntry getById(SnapshotId id) {
+        return snapshotStore.getById(id)
+                .map(SnapshotEntry::from)
+                .orElseThrow(resourceNotFound(id));
+    }
+
+    @Override
+    public List<SnapshotEntry> getByIds(List<SnapshotId> ids) {
+        return snapshotStore.getByIds(ids).stream().map(SnapshotEntry::from).toList();
     }
 
     @Override
@@ -63,9 +94,7 @@ public class SnapshotService implements
         var actor = ActorContext.get();
         authorizer.authorize(actor, id.ref(), SnapshotAction.UPDATE_METADATA);
 
-        var snapshot = snapshotStore.getById(id).orElseThrow(() -> new ResourceNotFoundException(
-                String.format("Snapshot with snapshotRef '%s' not found.", id))
-        );
+        var snapshot = snapshotStore.getById(id).orElseThrow(resourceNotFound(id));
         snapshot.updateDescription(new DefaultDescriptionMetadata(title, details));
 
         return SnapshotEntry.from(snapshot);
