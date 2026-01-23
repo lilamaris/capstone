@@ -53,6 +53,8 @@ public class SnapshotDelta implements Persistable<SnapshotDeltaId>, Identifiable
     private JpaDomainRef resourceRef;
 
     private String jsonPatch;
+    @Transient
+    private boolean isNew = true;
 
     protected SnapshotDelta(SnapshotDeltaId id, SnapshotId snapshotId, JpaDomainRef resourceRef, String jsonPatch) {
         this.id = requireField(id, "id");
@@ -81,9 +83,6 @@ public class SnapshotDelta implements Persistable<SnapshotDeltaId>, Identifiable
     public AuditMetadata auditMetadata() {
         return audit;
     }
-
-    @Transient
-    private boolean isNew = true;
 
     @Override
     public SnapshotDeltaId getId() {

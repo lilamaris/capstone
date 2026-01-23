@@ -52,6 +52,8 @@ public class Snapshot implements Persistable<SnapshotId>, Identifiable<SnapshotI
 
     @Embedded
     private JpaDescriptionMetadata descriptionMetadata;
+    @Transient
+    private boolean isNew = true;
 
     protected Snapshot(
             SnapshotId id,
@@ -118,9 +120,6 @@ public class Snapshot implements Persistable<SnapshotId>, Identifiable<SnapshotI
         var event = new SnapshotCreated(id, Instant.now());
         eventList.add(event);
     }
-
-    @Transient
-    private boolean isNew = true;
 
     @Override
     public SnapshotId getId() {

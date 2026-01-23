@@ -1,19 +1,13 @@
 package com.lilamaris.capstone.timeline.infrastructure.persistence.jpa;
 
 import com.lilamaris.capstone.timeline.application.port.out.TimelineStore;
-import com.lilamaris.capstone.timeline.domain.Slot;
 import com.lilamaris.capstone.timeline.domain.Timeline;
-import com.lilamaris.capstone.timeline.domain.id.SlotId;
 import com.lilamaris.capstone.timeline.domain.id.TimelineId;
-import com.lilamaris.capstone.timeline.infrastructure.persistence.jpa.repository.SlotRepository;
 import com.lilamaris.capstone.timeline.infrastructure.persistence.jpa.repository.TimelineRepository;
-import com.lilamaris.capstone.timeline.infrastructure.persistence.jpa.specification.SlotSpecification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 

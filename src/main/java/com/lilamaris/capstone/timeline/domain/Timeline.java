@@ -64,6 +64,8 @@ public class Timeline implements Persistable<TimelineId>, Identifiable<TimelineI
 
     @Embedded
     private JpaDescriptionMetadata descriptionMetadata;
+    @Transient
+    private boolean isNew = true;
 
     protected Timeline(
             TimelineId id,
@@ -290,9 +292,6 @@ public class Timeline implements Persistable<TimelineId>, Identifiable<TimelineI
             throw new TimelineDomainException(TimelineErrorCode.EMPTY_SLOT, "No slot exists on this timeline.");
         }
     }
-
-    @Transient
-    private boolean isNew = true;
 
     @Override
     public TimelineId getId() {

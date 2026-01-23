@@ -19,8 +19,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AccountRegisterService implements
-        AuthAccountRegistrar
-{
+        AuthAccountRegistrar {
     private final AccountPort accountPort;
     private final AuthProviderTranslator translator;
     private final IdGenerationDirectory ids;

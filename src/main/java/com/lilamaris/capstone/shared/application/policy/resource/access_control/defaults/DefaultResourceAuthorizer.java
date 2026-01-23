@@ -1,11 +1,11 @@
 package com.lilamaris.capstone.shared.application.policy.resource.access_control.defaults;
 
 import com.lilamaris.capstone.shared.application.exception.ResourceForbiddenException;
+import com.lilamaris.capstone.shared.application.policy.domain.role.port.in.DomainRoleResolver;
 import com.lilamaris.capstone.shared.application.policy.resource.access_control.port.in.ResourceAccessPolicyDirectory;
 import com.lilamaris.capstone.shared.application.policy.resource.access_control.port.in.ResourceAction;
 import com.lilamaris.capstone.shared.application.policy.resource.access_control.port.in.ResourceAuthorizer;
 import com.lilamaris.capstone.shared.application.policy.resource.access_control.port.out.ResourceAuthorityQuery;
-import com.lilamaris.capstone.shared.application.policy.domain.role.port.in.DomainRoleResolver;
 import com.lilamaris.capstone.shared.domain.event.actor.CanonicalActor;
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
 import lombok.RequiredArgsConstructor;

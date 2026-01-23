@@ -1,8 +1,8 @@
 package com.lilamaris.capstone.shared.application.policy.resource.access_control.defaults;
 
+import com.lilamaris.capstone.shared.application.policy.domain.role.port.in.DomainRole;
 import com.lilamaris.capstone.shared.application.policy.resource.access_control.port.in.ResourceAccessPolicy;
 import com.lilamaris.capstone.shared.application.policy.resource.access_control.port.in.ResourceAction;
-import com.lilamaris.capstone.shared.application.policy.domain.role.port.in.DomainRole;
 import com.lilamaris.capstone.shared.domain.type.DomainType;
 import lombok.RequiredArgsConstructor;
 

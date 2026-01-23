@@ -53,6 +53,8 @@ public class AccessControl implements Persistable<AccessControlId>, Identifiable
     private JpaDomainRef resource;
 
     private String scopedRole;
+    @Transient
+    private boolean isNew = true;
 
     protected AccessControl(
             AccessControlId id,
@@ -92,9 +94,6 @@ public class AccessControl implements Persistable<AccessControlId>, Identifiable
     public AuditMetadata auditMetadata() {
         return audit;
     }
-
-    @Transient
-    private boolean isNew = true;
 
     @Override
     public AccessControlId getId() {

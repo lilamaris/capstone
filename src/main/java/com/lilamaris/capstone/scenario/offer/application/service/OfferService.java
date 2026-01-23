@@ -17,8 +17,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class OfferService implements
         OfferIssuer,
-        OfferRevoker
-{
+        OfferRevoker {
     private final SnapshotReader snapshotReader;
     private final ResourceOfferCreator resourceOfferCreator;
     private final ResourceOfferRemover resourceOfferRemover;

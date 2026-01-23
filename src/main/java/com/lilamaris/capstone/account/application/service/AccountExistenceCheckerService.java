@@ -11,8 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AccountExistenceCheckerService implements
-        AuthAccountExistenceChecker
-{
+        AuthAccountExistenceChecker {
     private final AccountPort accountPort;
     private final AuthProviderTranslator translator;
 

@@ -3,10 +3,8 @@ package com.lilamaris.capstone.access_control.infrastructure.persistence.jpa.rep
 import com.lilamaris.capstone.access_control.domain.AccessControl;
 import com.lilamaris.capstone.access_control.domain.id.AccessControlId;
 import com.lilamaris.capstone.shared.domain.event.actor.ActorType;
-import com.lilamaris.capstone.shared.domain.type.DomainType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface AccessControlRepository extends JpaRepository<AccessControl, AccessControlId> {

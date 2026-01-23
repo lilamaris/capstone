@@ -1,9 +1,9 @@
 package com.lilamaris.capstone.shared.domain.persistence.jpa;
 
 import com.lilamaris.capstone.shared.domain.defaults.DefaultEffectiveMetadata;
+import com.lilamaris.capstone.shared.domain.defaults.DefaultEffectiveSplitEntry;
 import com.lilamaris.capstone.shared.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.shared.domain.metadata.EffectiveMetadata;
-import com.lilamaris.capstone.shared.domain.defaults.DefaultEffectiveSplitEntry;
 import com.lilamaris.capstone.shared.domain.persistence.ToPojo;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;

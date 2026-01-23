@@ -14,8 +14,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class AccountResolverService implements
-        AuthAccountResolver
-{
+        AuthAccountResolver {
     private final AccountPort accountPort;
     private final AuthProviderTranslator translator;
 

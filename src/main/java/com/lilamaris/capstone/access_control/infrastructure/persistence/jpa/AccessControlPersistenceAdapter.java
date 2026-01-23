@@ -19,8 +19,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AccessControlPersistenceAdapter implements
         AccessControlPort,
-        ResourceAuthorityQuery
-{
+        ResourceAuthorityQuery {
     private final AccessControlRepository repository;
 
     @Override

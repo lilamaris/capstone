@@ -37,12 +37,12 @@ public class DefaultDomainRoleResolver implements DomainRoleResolver {
         Deque<String> stack = new ArrayDeque<>();
         stack.push(role.name());
 
-        while(!stack.isEmpty()) {
+        while (!stack.isEmpty()) {
             var current = stack.pop();
             if (!visited.add(current)) continue;
 
             var parents = hierarchy.getOrDefault(current, Set.of());
-            for (var parent: parents) {
+            for (var parent : parents) {
                 if (parent.equals(target.name())) {
                     return true;
                 }

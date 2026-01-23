@@ -45,6 +45,8 @@ public class Account implements Persistable<AccountId>, Identifiable<AccountId>,
     private String principalId;
 
     private String passwordHash;
+    @Transient
+    private boolean isNew = true;
 
     protected Account(
             AccountId id,
@@ -106,9 +108,6 @@ public class Account implements Persistable<AccountId>, Identifiable<AccountId>,
     public AuditMetadata auditMetadata() {
         return audit;
     }
-
-    @Transient
-    private boolean isNew = true;
 
     @Override
     public AccountId getId() {

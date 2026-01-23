@@ -33,6 +33,8 @@ public class User implements Persistable<UserId>, Identifiable<UserId>, Auditabl
     private UserId id;
 
     private String displayName;
+    @Transient
+    private boolean isNew = true;
 
     protected User(UserId id, String displayName) {
         this.id = requireField(id, "id");
@@ -61,9 +63,6 @@ public class User implements Persistable<UserId>, Identifiable<UserId>, Auditabl
     public AuditMetadata auditMetadata() {
         return audit;
     }
-
-    @Transient
-    private boolean isNew = true;
 
     @Override
     public UserId getId() {

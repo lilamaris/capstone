@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.scenario.occupancy.infrastructure.web.controller;
 
-import com.lilamaris.capstone.scenario.occupancy.application.port.in.SlotOccupier;
 import com.lilamaris.capstone.scenario.occupancy.application.port.in.OccupancyReader;
+import com.lilamaris.capstone.scenario.occupancy.application.port.in.SlotOccupier;
 import com.lilamaris.capstone.scenario.occupancy.infrastructure.web.request.OccupancyRequest;
 import com.lilamaris.capstone.scenario.occupancy.infrastructure.web.response.OccupancyResponse;
 import com.lilamaris.capstone.snapshot.domain.id.SnapshotId;

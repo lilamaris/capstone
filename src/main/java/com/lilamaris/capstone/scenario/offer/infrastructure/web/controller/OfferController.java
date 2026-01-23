@@ -4,7 +4,6 @@ import com.lilamaris.capstone.scenario.offer.application.port.in.OfferIssuer;
 import com.lilamaris.capstone.scenario.offer.application.port.in.OfferRevoker;
 import com.lilamaris.capstone.scenario.offer.infrastructure.web.request.OfferRequest;
 import com.lilamaris.capstone.scenario.offer.infrastructure.web.response.OfferResponse;
-import com.lilamaris.capstone.shared.domain.defaults.DefaultDomainRef;
 import com.lilamaris.capstone.shared.domain.defaults.DefaultExternalizableId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -24,8 +24,7 @@ import java.util.List;
 public class SlotOccupancyService implements
         SlotOccupancyReader,
         SlotOccupancyCreator,
-        SlotOccupancyRemover
-{
+        SlotOccupancyRemover {
     private final SlotOccupancyStore slotOccupancyStore;
     private final IdGenerationDirectory ids;
     private final DomainRefResolverDirectory refDir;

@@ -63,6 +63,8 @@ public class Slot implements Persistable<SlotId>, Identifiable<SlotId>, Auditabl
             @AttributeOverride(name = "to", column = @Column(name = "valid_to")),
     })
     private JpaEffectiveMetadata valid;
+    @Transient
+    private boolean isNew = true;
 
     protected Slot(
             SlotId id,
@@ -175,9 +177,6 @@ public class Slot implements Persistable<SlotId>, Identifiable<SlotId>, Auditabl
         var event = new SlotEffectiveUpdated(id, tx, valid, Instant.now());
         eventList.add(event);
     }
-
-    @Transient
-    private boolean isNew = true;
 
     @Override
     public SlotId getId() {

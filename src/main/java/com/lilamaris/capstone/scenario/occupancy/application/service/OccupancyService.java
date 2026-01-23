@@ -26,8 +26,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OccupancyService implements
         SlotOccupier,
-        OccupancyReader
-{
+        OccupancyReader {
     private final SlotOccupancyCreator slotOccupancyCreator;
     private final SlotOccupancyReader slotOccupancyReader;
     private final SlotReader slotReader;
