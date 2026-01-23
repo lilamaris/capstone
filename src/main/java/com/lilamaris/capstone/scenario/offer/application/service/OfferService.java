@@ -5,11 +5,14 @@ import com.lilamaris.capstone.resource_offer.application.port.in.ResourceOfferRe
 import com.lilamaris.capstone.scenario.offer.application.port.in.OfferEntry;
 import com.lilamaris.capstone.scenario.offer.application.port.in.OfferIssuer;
 import com.lilamaris.capstone.scenario.offer.application.port.in.OfferRevoker;
+import com.lilamaris.capstone.scenario.offer.application.port.in.SlotOfferAggregator;
 import com.lilamaris.capstone.shared.application.jsonPatch.JsonPatchResolverDirectory;
 import com.lilamaris.capstone.shared.domain.defaults.DefaultDomainRef;
 import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
 import com.lilamaris.capstone.shared.domain.type.DomainType;
 import com.lilamaris.capstone.snapshot.application.port.in.SnapshotReader;
+import com.lilamaris.capstone.snapshot.domain.id.SnapshotId;
+import com.lilamaris.capstone.timeline.domain.id.SlotId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,10 +30,10 @@ public class OfferService implements
     public OfferEntry offer(
             DomainType resourceType,
             ExternalizableId resourceId,
-            ExternalizableId snapshotId
+            SnapshotId snapshotId
     ) {
         var resource = DefaultDomainRef.from(resourceType, resourceId);
-        var snapshot = snapshotReader.resolveExternal(snapshotId);
+        var snapshot = snapshotReader.getById(snapshotId);
         var patchResolver = patchResolvers.resolverOf(resource.type());
         var jsonPatch = patchResolver.resolve(resource);
         var resourceOfferEntry = resourceOfferCreator.issue(resource, snapshotId, jsonPatch);
@@ -41,7 +44,7 @@ public class OfferService implements
     public void revoke(
             DomainType resourceType,
             ExternalizableId resourceId,
-            ExternalizableId snapshotId
+            SnapshotId snapshotId
     ) {
         var resource = DefaultDomainRef.from(resourceType, resourceId);
         resourceOfferRemover.revoke(resource, snapshotId);

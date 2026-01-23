@@ -48,22 +48,10 @@ public class SnapshotService implements
     }
 
     @Override
-    public List<SnapshotEntry> resolveExternals(List<ExternalizableId> externalizableIds) {
-        var ids = refDir.resolve(externalizableIds, AggregateDomainType.SNAPSHOT, SnapshotId.class);
-        return getByIds(ids);
-    }
-
-    @Override
     public SnapshotEntry resolveRef(DomainRef ref) {
         var id = refDir.resolve(ref, SnapshotId.class);
         return snapshotStore.getById(id).map(SnapshotEntry::from)
                 .orElseThrow(resourceNotFound(id));
-    }
-
-    @Override
-    public SnapshotEntry resolveExternal(ExternalizableId externalizableId) {
-        var id = refDir.resolve(externalizableId, AggregateDomainType.SNAPSHOT, SnapshotId.class);
-        return getById(id);
     }
 
     @Override

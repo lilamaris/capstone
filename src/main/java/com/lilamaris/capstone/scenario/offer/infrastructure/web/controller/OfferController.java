@@ -5,9 +5,12 @@ import com.lilamaris.capstone.scenario.offer.application.port.in.OfferRevoker;
 import com.lilamaris.capstone.scenario.offer.infrastructure.web.request.OfferRequest;
 import com.lilamaris.capstone.scenario.offer.infrastructure.web.response.OfferResponse;
 import com.lilamaris.capstone.shared.domain.defaults.DefaultExternalizableId;
+import com.lilamaris.capstone.snapshot.domain.id.SnapshotId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/offer")
@@ -20,10 +23,11 @@ public class OfferController {
     public ResponseEntity<?> createOffer(
             @RequestBody OfferRequest.Offer body
     ) {
+        var snapshotId = new SnapshotId(UUID.fromString(body.snapshotId()));
         var result = offerIssuer.offer(
                 body.resourceType(),
                 DefaultExternalizableId.from(body.resourceId()),
-                DefaultExternalizableId.from(body.snapshotId())
+                snapshotId
         );
 
         return ResponseEntity.ok(
@@ -35,10 +39,11 @@ public class OfferController {
     public ResponseEntity<?> revokeOffer(
             @RequestBody OfferRequest.Offer body
     ) {
+        var snapshotId = new SnapshotId(UUID.fromString(body.snapshotId()));
         offerRevoker.revoke(
                 body.resourceType(),
                 DefaultExternalizableId.from(body.resourceId()),
-                DefaultExternalizableId.from(body.snapshotId())
+                snapshotId
         );
 
         return ResponseEntity.noContent().build();
