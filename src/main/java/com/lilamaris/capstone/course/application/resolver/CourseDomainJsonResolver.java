@@ -1,11 +1,11 @@
 package com.lilamaris.capstone.course.application.resolver;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.lilamaris.capstone.course.application.port.out.CourseStore;
-import com.lilamaris.capstone.course.domain.Course;
 import com.lilamaris.capstone.course.domain.id.CourseId;
 import com.lilamaris.capstone.shared.application.exception.ResourceNotFoundException;
 import com.lilamaris.capstone.shared.application.jsonPatch.JsonPatchEngine;
-import com.lilamaris.capstone.shared.application.jsonPatch.JsonPatchResolver;
+import com.lilamaris.capstone.shared.application.jsonPatch.DomainJsonResolver;
 import com.lilamaris.capstone.shared.application.policy.domain.identity.port.in.DomainRefResolverDirectory;
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
 import com.lilamaris.capstone.shared.domain.type.AggregateDomainType;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class CourseJsonPatchResolver implements JsonPatchResolver<Course> {
+public class CourseDomainJsonResolver implements DomainJsonResolver {
     private final CourseStore courseStore;
     private final JsonPatchEngine jsonPatchEngine;
     private final DomainRefResolverDirectory refs;
@@ -26,17 +26,12 @@ public class CourseJsonPatchResolver implements JsonPatchResolver<Course> {
     }
 
     @Override
-    public String resolve(Course domain) {
-        return jsonPatchEngine.createPatch(domain);
-    }
-
-    @Override
-    public String resolve(DomainRef ref) {
+    public JsonNode resolve(DomainRef ref) {
         var id = refs.resolve(ref, CourseId.class);
         var course = courseStore.getById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(
                         "Course with id '%s' not found", id
                 )));
-        return jsonPatchEngine.createPatch(course);
+        return jsonPatchEngine.parseNode(course);
     }
 }

@@ -1,13 +1,11 @@
 package com.lilamaris.capstone.shared.application.jsonPatch;
 
-import com.lilamaris.capstone.shared.domain.contract.Identifiable;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
 import com.lilamaris.capstone.shared.domain.type.DomainType;
 
-public interface JsonPatchResolver<T extends Identifiable<?>> {
+public interface DomainJsonResolver {
     DomainType support();
 
-    String resolve(T domain);
-
-    String resolve(DomainRef ref);
+    JsonNode resolve(DomainRef ref);
 }

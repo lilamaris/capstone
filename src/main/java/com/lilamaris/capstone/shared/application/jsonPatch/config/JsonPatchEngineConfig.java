@@ -1,8 +1,8 @@
 package com.lilamaris.capstone.shared.application.jsonPatch.config;
 
-import com.lilamaris.capstone.shared.application.jsonPatch.JsonPatchResolver;
-import com.lilamaris.capstone.shared.application.jsonPatch.JsonPatchResolverDirectory;
-import com.lilamaris.capstone.shared.application.jsonPatch.defaults.DefaultJsonPatchResolverDirectory;
+import com.lilamaris.capstone.shared.application.jsonPatch.DomainJsonResolver;
+import com.lilamaris.capstone.shared.application.jsonPatch.DomainJsonResolverDirectory;
+import com.lilamaris.capstone.shared.application.jsonPatch.defaults.DefaultDomainJsonResolverDirectory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,9 +11,9 @@ import java.util.List;
 @Configuration
 public class JsonPatchEngineConfig {
     @Bean
-    JsonPatchResolverDirectory jsonPatchResolverDirectory(
-            List<JsonPatchResolver<?>> resolvers
+    DomainJsonResolverDirectory jsonPatchResolverDirectory(
+            List<DomainJsonResolver> resolvers
     ) {
-        return new DefaultJsonPatchResolverDirectory(resolvers);
+        return new DefaultDomainJsonResolverDirectory(resolvers);
     }
 }
