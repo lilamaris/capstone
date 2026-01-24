@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.scenario.offer.infrastructure.web.request;
+package com.lilamaris.capstone.scenario.register_resource_on_timeline.infrastructure.web.request;
 
 import com.lilamaris.capstone.shared.domain.type.AggregateDomainType;
 

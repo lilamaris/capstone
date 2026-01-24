@@ -1,10 +1,10 @@
-package com.lilamaris.capstone.scenario.offer.infrastructure.web.controller;
+package com.lilamaris.capstone.scenario.register_resource_on_timeline.infrastructure.web.controller;
 
-import com.lilamaris.capstone.scenario.offer.application.port.in.OfferAggregator;
-import com.lilamaris.capstone.scenario.offer.application.port.in.OfferIssuer;
-import com.lilamaris.capstone.scenario.offer.application.port.in.OfferRevoker;
-import com.lilamaris.capstone.scenario.offer.infrastructure.web.request.OfferRequest;
-import com.lilamaris.capstone.scenario.offer.infrastructure.web.response.OfferResponse;
+import com.lilamaris.capstone.scenario.register_resource_on_timeline.application.port.in.OfferAggregator;
+import com.lilamaris.capstone.scenario.register_resource_on_timeline.application.port.in.OfferIssuer;
+import com.lilamaris.capstone.scenario.register_resource_on_timeline.application.port.in.OfferRevoker;
+import com.lilamaris.capstone.scenario.register_resource_on_timeline.infrastructure.web.request.OfferRequest;
+import com.lilamaris.capstone.scenario.register_resource_on_timeline.infrastructure.web.response.OfferResponse;
 import com.lilamaris.capstone.shared.domain.defaults.DefaultDomainRef;
 import com.lilamaris.capstone.shared.domain.defaults.DefaultExternalizableId;
 import com.lilamaris.capstone.timeline.domain.id.SlotId;
@@ -29,7 +29,7 @@ public class OfferController {
         var slotId = new SlotId(UUID.fromString(body.slotId()));
         aggregator.aggregate(
                 body.resourceType(),
-                slotId
+                slotId.externalId()
         );
 
         return ResponseEntity.ok(null);
