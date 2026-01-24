@@ -1,9 +1,20 @@
 package com.lilamaris.capstone.shared.application.jsonPatch;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.github.fge.jsonpatch.JsonPatch;
+
 public interface JsonPatchEngine {
-    <T> T fromPatch(String patch, Class<T> clazz);
+    JsonNode parseNode(Object target);
 
-    <T> T apply(String patch, T target, Class<T> clazz);
+    JsonNode parseNode(String target);
 
-    <T> String createPatch(T target);
+    JsonPatch parsePatch(String target);
+
+    String stringify(Object node);
+
+    JsonNode materialize(JsonPatch jsonPatch);
+
+    JsonPatch diff(JsonNode before, JsonNode after);
+
+    JsonNode apply(JsonNode current, JsonPatch patch);
 }
