@@ -1,7 +1,10 @@
 package com.lilamaris.capstone.delta.domain;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.github.fge.jsonpatch.JsonPatch;
 import com.lilamaris.capstone.delta.domain.event.DeltaCreated;
 import com.lilamaris.capstone.delta.domain.id.DeltaId;
+import com.lilamaris.capstone.shared.application.jsonPatch.JsonPatchEngine;
 import com.lilamaris.capstone.shared.domain.contract.Auditable;
 import com.lilamaris.capstone.shared.domain.contract.Identifiable;
 import com.lilamaris.capstone.shared.domain.event.DomainEvent;
@@ -18,6 +21,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.lang.Nullable;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -55,7 +59,10 @@ public class Delta implements Persistable<DeltaId>, Identifiable<DeltaId>, Audit
     })
     private JpaDomainRef resource;
 
-    private String jsonPatch;
+    private String state;
+
+    private String patch;
+
     @Transient
     private boolean isNew = true;
 
@@ -63,28 +70,35 @@ public class Delta implements Persistable<DeltaId>, Identifiable<DeltaId>, Audit
             DeltaId id,
             JpaExternalizableId slotId,
             JpaDomainRef resource,
-            String jsonPatch
+            String state,
+            String patch
     ) {
         this.id = requireField(id, "id");
         this.slotId = requireField(slotId, "slotId");
         this.resource = requireField(resource, "resource");
-        this.jsonPatch = requireField(jsonPatch, "jsonPatch");
+        this.state = requireField(state, "state");
+        this.patch = requireField(patch, "patch");
     }
 
     public static Delta create(
+            JsonPatchEngine jsonPatchEngine,
             Supplier<DeltaId> idSupplier,
             ExternalizableId slotId,
             DomainRef resource,
-            String jsonPatch
+            @Nullable JsonNode state,
+            @Nullable JsonPatch patch
     ) {
         var id = idSupplier.get();
         var externalSlotId = JpaExternalizableId.from(slotId);
         var resourceRef = JpaDomainRef.from(resource);
+        var stringifyState = jsonPatchEngine.stringify(state);
+        var stringifyPatch = jsonPatchEngine.stringify(patch);
         var delta = new Delta(
                 id,
                 externalSlotId,
                 resourceRef,
-                jsonPatch
+                stringifyState,
+                stringifyPatch
         );
         delta.registerCreated();
         return delta;

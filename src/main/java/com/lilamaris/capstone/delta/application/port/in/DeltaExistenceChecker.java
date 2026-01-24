@@ -6,6 +6,6 @@ import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
 public interface DeltaExistenceChecker {
     boolean isExist(
             DomainRef resourceRef,
-            ExternalizableId slotRef
+            ExternalizableId slotId
     );
 }

@@ -18,6 +18,14 @@ public interface DeltaStore {
 
     List<Delta> getByIds(List<DeltaId> ids);
 
+    List<Delta> getBySlotId(ExternalizableId slotId);
+
+    Optional<Delta> getBySlotIdAndResource(ExternalizableId slotId, DomainRef resource);
+
+    List<Delta> getBySlotIds(List<ExternalizableId> slotIds);
+
+    List<Delta> getBySlotIdsAndResource(List<ExternalizableId> slotIds, DomainRef resource);
+
     Delta save(Delta delta);
 
     void delete(

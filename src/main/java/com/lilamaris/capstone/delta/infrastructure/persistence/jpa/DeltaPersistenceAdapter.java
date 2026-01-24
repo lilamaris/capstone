@@ -34,6 +34,13 @@ public class DeltaPersistenceAdapter implements DeltaStore {
         );
     }
 
+    private Specification<Delta> inExternalizableIdSpecification(List<ExternalizableId> ids) {
+        return ExternalizableIdSpecification.inExternalizableIds(
+                ids,
+                (root, cb) -> root.get("slotId")
+        );
+    }
+
     @Override
     public boolean isExists(DomainRef resource, ExternalizableId slotId) {
         Specification<Delta> spec = Specification.unrestricted();
@@ -50,6 +57,36 @@ public class DeltaPersistenceAdapter implements DeltaStore {
     @Override
     public List<Delta> getByIds(List<DeltaId> ids) {
         return repository.findAllById(ids);
+    }
+
+    @Override
+    public List<Delta> getBySlotId(ExternalizableId slotId) {
+        Specification<Delta> spec = Specification.unrestricted();
+        spec = spec.and(externalizableIdSpecification(slotId));
+        return repository.findAll(spec);
+    }
+
+    @Override
+    public Optional<Delta> getBySlotIdAndResource(ExternalizableId slotId, DomainRef resource) {
+        Specification<Delta> spec = Specification.unrestricted();
+        spec = spec.and(externalizableIdSpecification(slotId));
+        spec = spec.and(domainRefSpecification(resource));
+        return repository.findOne(spec);
+    }
+
+    @Override
+    public List<Delta> getBySlotIds(List<ExternalizableId> slotIds) {
+        Specification<Delta> spec = Specification.unrestricted();
+        spec = spec.and(inExternalizableIdSpecification(slotIds));
+        return repository.findAll(spec);
+    }
+
+    @Override
+    public List<Delta> getBySlotIdsAndResource(List<ExternalizableId> slotIds, DomainRef resource) {
+        Specification<Delta> spec = Specification.unrestricted();
+        spec = spec.and(inExternalizableIdSpecification(slotIds));
+        spec = spec.and(domainRefSpecification(resource));
+        return repository.findAll(spec);
     }
 
     @Override
