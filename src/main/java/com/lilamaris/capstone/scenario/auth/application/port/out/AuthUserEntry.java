@@ -9,7 +9,7 @@ public record AuthUserEntry(
 ) {
     public static AuthUserEntry from(User user) {
         return new AuthUserEntry(
-                user.id(),
+                user.id().externalId(),
                 user.getDisplayName()
         );
     }

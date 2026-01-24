@@ -1,8 +1,10 @@
 package com.lilamaris.capstone.user.domain.id;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.lilamaris.capstone.shared.domain.contract.CanonicalIdentity;
 import com.lilamaris.capstone.shared.domain.contract.Referenceable;
 import com.lilamaris.capstone.shared.domain.defaults.DefaultDomainRef;
+import com.lilamaris.capstone.shared.domain.defaults.DefaultExternalizableId;
 import com.lilamaris.capstone.shared.domain.defaults.DefaultUuidDomainId;
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
 import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
@@ -15,7 +17,7 @@ import java.util.UUID;
 
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserId extends DefaultUuidDomainId implements Referenceable, ExternalizableId {
+public class UserId extends DefaultUuidDomainId implements Referenceable, CanonicalIdentity {
     @JsonValue
     protected UUID value;
 
@@ -35,11 +37,11 @@ public class UserId extends DefaultUuidDomainId implements Referenceable, Extern
 
     @Override
     public DomainRef ref() {
-        return DefaultDomainRef.from(AggregateDomainType.USER, this);
+        return DefaultDomainRef.from(AggregateDomainType.USER, externalId());
     }
 
     @Override
-    public String asString() {
-        return value.toString();
+    public ExternalizableId externalId() {
+        return DefaultExternalizableId.from(value.toString());
     }
 }

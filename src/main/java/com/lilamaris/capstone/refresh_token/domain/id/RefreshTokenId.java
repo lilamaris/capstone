@@ -1,6 +1,8 @@
 package com.lilamaris.capstone.refresh_token.domain.id;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.lilamaris.capstone.shared.domain.contract.CanonicalIdentity;
+import com.lilamaris.capstone.shared.domain.defaults.DefaultExternalizableId;
 import com.lilamaris.capstone.shared.domain.defaults.DefaultStringDomainId;
 import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
 import jakarta.persistence.Embeddable;
@@ -9,7 +11,7 @@ import lombok.NoArgsConstructor;
 
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RefreshTokenId extends DefaultStringDomainId implements ExternalizableId {
+public class RefreshTokenId extends DefaultStringDomainId implements CanonicalIdentity {
     @JsonValue
     protected String value;
 
@@ -28,7 +30,7 @@ public class RefreshTokenId extends DefaultStringDomainId implements Externaliza
     }
 
     @Override
-    public String asString() {
-        return value;
+    public ExternalizableId externalId() {
+        return DefaultExternalizableId.from(value);
     }
 }

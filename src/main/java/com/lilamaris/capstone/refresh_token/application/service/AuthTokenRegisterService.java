@@ -28,7 +28,7 @@ public class AuthTokenRegisterService implements
         refreshTokenPort.save(id, token, refreshTokenExpiration);
 
         return new AuthRefreshTokenRegisterEntry(
-                id,
+                id.externalId(),
                 subject,
                 refreshTokenExpiration
         );

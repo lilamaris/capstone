@@ -1,6 +1,8 @@
 package com.lilamaris.capstone.account.domain.id;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.lilamaris.capstone.shared.domain.contract.CanonicalIdentity;
+import com.lilamaris.capstone.shared.domain.defaults.DefaultExternalizableId;
 import com.lilamaris.capstone.shared.domain.defaults.DefaultUuidDomainId;
 import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
 import jakarta.persistence.Embeddable;
@@ -11,7 +13,7 @@ import java.util.UUID;
 
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class AccountId extends DefaultUuidDomainId implements ExternalizableId {
+public class AccountId extends DefaultUuidDomainId implements CanonicalIdentity {
     @JsonValue
     protected UUID value;
 
@@ -30,7 +32,7 @@ public class AccountId extends DefaultUuidDomainId implements ExternalizableId {
     }
 
     @Override
-    public String asString() {
-        return value.toString();
+    public ExternalizableId externalId() {
+        return DefaultExternalizableId.from(value.toString());
     }
 }

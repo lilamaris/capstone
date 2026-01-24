@@ -26,7 +26,7 @@ public class RefreshTokenStore implements RefreshTokenPort {
 
     @Override
     public void save(RefreshTokenId id, RefreshToken domain, Duration ttl) {
-        save(id.asString(), domain, ttl);
+        save(id.externalId().asString(), domain, ttl);
     }
 
     public void save(String token, RefreshToken entry, Duration ttl) {

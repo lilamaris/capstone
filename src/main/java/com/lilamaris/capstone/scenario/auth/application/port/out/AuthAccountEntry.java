@@ -9,8 +9,8 @@ public record AuthAccountEntry(
 ) {
     public static AuthAccountEntry from(Account account) {
         return new AuthAccountEntry(
-                account.id(),
-                account.getUserId()
+                account.id().externalId(),
+                account.getUserId().externalId()
         );
     }
 }
