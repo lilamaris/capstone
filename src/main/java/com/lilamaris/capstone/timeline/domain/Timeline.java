@@ -265,24 +265,19 @@ public class Timeline implements Persistable<TimelineId>, Identifiable<TimelineI
                         id,
                         c.getAncestorSlotId(),
                         slot.id(),
-                        c.getDepth()
+                        c.getDepth() + 1
                 ))
                 .toList();
         slotClosureList.addAll(reflectClosures);
 
-        var maxDepth = reflectClosures.stream()
-                .max(Comparator.comparing(SlotClosure::getDepth))
-                .map(SlotClosure::getDepth)
-                .orElse(0);
-
-        var closure = SlotClosure.create(
+        var selfClosure = SlotClosure.create(
                 slotClosureIdSupplier,
                 id,
                 slot.id(),
                 slot.id(),
-                maxDepth + 1
+                0
         );
-        slotClosureList.add(closure);
+        slotClosureList.add(selfClosure);
         slotList.add(slot);
         eventList.addAll(slot.pullEvent());
     }
