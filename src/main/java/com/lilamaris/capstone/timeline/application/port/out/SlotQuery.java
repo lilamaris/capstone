@@ -19,4 +19,6 @@ public interface SlotQuery {
     List<Slot> getSlotsByValidTime(TimelineId id, Instant validAt);
 
     List<SlotClosure> getClosureOf(SlotId descendantSlotId);
+
+    Optional<SlotClosure> getParentOf(SlotId slotId);
 }

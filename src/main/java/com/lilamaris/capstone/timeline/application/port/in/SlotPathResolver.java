@@ -1,10 +1,12 @@
 package com.lilamaris.capstone.timeline.application.port.in;
 
-import com.lilamaris.capstone.shared.domain.id.DomainRef;
-import com.lilamaris.capstone.timeline.domain.id.SlotId;
+import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface SlotPathResolver {
-    List<SlotPathEntry> getPathOf(DomainRef ref);
+    List<SlotPathEntry> getHierarchy(ExternalizableId slotId);
+
+    Optional<SlotPathEntry> getParent(ExternalizableId slotId);
 }

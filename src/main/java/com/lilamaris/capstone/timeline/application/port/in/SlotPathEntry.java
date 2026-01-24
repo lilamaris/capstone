@@ -1,18 +1,17 @@
 package com.lilamaris.capstone.timeline.application.port.in;
 
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
+import com.lilamaris.capstone.timeline.domain.Slot;
 import com.lilamaris.capstone.timeline.domain.SlotClosure;
 
 public record SlotPathEntry(
-        DomainRef ancestorSlotRef,
-        DomainRef descendantSlotRef,
+        DomainRef ref,
         Integer depth
 ) {
-    public static SlotPathEntry from(SlotClosure slotClosure) {
+    public static SlotPathEntry from(Slot slot, SlotClosure closure) {
         return new SlotPathEntry(
-                slotClosure.getAncestorSlotId().ref(),
-                slotClosure.getDescendantSlotId().ref(),
-                slotClosure.getDepth()
+                slot.id().ref(),
+                closure.getDepth()
         );
     }
 }

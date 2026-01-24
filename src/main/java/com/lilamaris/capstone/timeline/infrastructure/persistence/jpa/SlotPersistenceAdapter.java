@@ -52,4 +52,9 @@ public class SlotPersistenceAdapter implements SlotQuery {
     public List<SlotClosure> getClosureOf(SlotId descendantSlotId) {
         return slotClosureRepository.findClosure(descendantSlotId);
     }
+
+    @Override
+    public Optional<SlotClosure> getParentOf(SlotId slotId) {
+        return slotClosureRepository.findParent(slotId);
+    }
 }

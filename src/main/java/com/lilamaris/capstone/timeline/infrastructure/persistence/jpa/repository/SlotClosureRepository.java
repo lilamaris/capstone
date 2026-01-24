@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface SlotClosureRepository extends JpaRepository<SlotClosure, SlotClosureId> {
     @Query("""
@@ -15,4 +16,11 @@ public interface SlotClosureRepository extends JpaRepository<SlotClosure, SlotCl
             WHERE sc.descendantSlotId = :descendantSlotId
             ORDER BY depth""")
     List<SlotClosure> findClosure(SlotId descendantSlotId);
+
+    @Query("""
+            SELECT sc
+            FROM SlotClosure sc
+            WHERE sc.descendantSlotId = :descendantSlotId
+                and sc.depth = 1""")
+    Optional<SlotClosure> findParent(SlotId descendantSlotId);
 }
