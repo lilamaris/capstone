@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -71,37 +70,13 @@ public class DeltaService implements
     }
 
     @Override
-    public List<DeltaEntry> getDeltaOfSlot(ExternalizableId slotId) {
-        return deltaStore.getBySlotId(slotId).stream()
-                .map(d -> DeltaEntry.from(d, jsonPatchEngine))
-                .toList();
-    }
-
-    @Override
-    public Optional<DeltaEntry> getDeltaOfSlot(ExternalizableId slotId, DomainRef resource) {
-        return deltaStore.getBySlotIdAndResource(slotId, resource)
-                .map(d -> DeltaEntry.from(d, jsonPatchEngine));
-    }
-
-    @Override
-    public Map<CanonicalExternalId, DeltaEntry> getDeltaOfSlots(List<ExternalizableId> slotIds, DomainRef resource) {
-        return deltaStore.getBySlotIdsAndResource(slotIds, resource).stream().collect(
-                Collectors.toUnmodifiableMap(
-                        delta -> CanonicalExternalId.from(delta.getSlotId()),
-                        delta -> DeltaEntry.from(delta, jsonPatchEngine)
+    public Map<CanonicalExternalId, List<DeltaEntry>> getDelta(DeltaReadOption option) {
+        return deltaStore.getDelta(option).stream().collect(Collectors.groupingBy(
+                delta -> CanonicalExternalId.from(delta.getSlotId()),
+                Collectors.mapping(
+                        delta -> DeltaEntry.from(delta, jsonPatchEngine),
+                        Collectors.toList()
                 )
-        );
-    }
-
-    @Override
-    public Map<CanonicalExternalId, List<DeltaEntry>> getDeltaOfSlots(List<ExternalizableId> slotIds) {
-        return deltaStore.getBySlotIds(slotIds).stream().collect(
-                Collectors.groupingBy(
-                        delta -> CanonicalExternalId.from(delta.getSlotId()),
-                        Collectors.mapping(
-                                delta -> DeltaEntry.from(delta, jsonPatchEngine),
-                                Collectors.toList()
-                        )
-                ));
+        ));
     }
 }

@@ -1,5 +1,6 @@
 package com.lilamaris.capstone.delta.application.port.out;
 
+import com.lilamaris.capstone.delta.application.port.in.DeltaReadOption;
 import com.lilamaris.capstone.delta.domain.Delta;
 import com.lilamaris.capstone.delta.domain.id.DeltaId;
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
@@ -16,22 +17,11 @@ public interface DeltaStore {
 
     Optional<Delta> getById(DeltaId id);
 
-    List<Delta> getByIds(List<DeltaId> ids);
-
-    List<Delta> getBySlotId(ExternalizableId slotId);
-
-    Optional<Delta> getBySlotIdAndResource(ExternalizableId slotId, DomainRef resource);
-
-    List<Delta> getBySlotIds(List<ExternalizableId> slotIds);
-
-    List<Delta> getBySlotIdsAndResource(List<ExternalizableId> slotIds, DomainRef resource);
+    List<Delta> getDelta(DeltaReadOption option);
 
     Delta save(Delta delta);
 
-    void delete(
-            DomainRef resource,
-            ExternalizableId slotId
-    );
+    void delete(DomainRef resource, ExternalizableId slotId);
 
     void deleteById(DeltaId id);
 }
