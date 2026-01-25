@@ -54,7 +54,7 @@ public class Delta implements Persistable<DeltaId>, Identifiable<DeltaId>, Audit
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "type", column = @Column(name = "resource_type")),
+            @AttributeOverride(name = "type.name", column = @Column(name = "resource_type")),
             @AttributeOverride(name = "id", column = @Column(name = "resource_id"))
     })
     private JpaDomainRef resource;
