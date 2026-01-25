@@ -8,18 +8,6 @@ public record SlotPathResolverOption(
         @Nullable Integer minDepth,
         @Nullable Integer maxDepth
 ) {
-    public boolean isSelf() {
-        return maxDepth == null && minDepth == null;
-    }
-
-    public boolean hasMinLimit() {
-        return minDepth != null;
-    }
-
-    public boolean hasMaxLimit() {
-        return maxDepth != null;
-    }
-
     public static SlotPathResolverOption between(ExternalizableId targetSlotId, Integer minDepth, Integer maxDepth) {
         return new SlotPathResolverOption(
                 targetSlotId,
@@ -55,8 +43,28 @@ public record SlotPathResolverOption(
     public static SlotPathResolverOption self(ExternalizableId targetSlotId) {
         return new SlotPathResolverOption(
                 targetSlotId,
+                0,
+                1
+        );
+    }
+
+    public static SlotPathResolverOption all(ExternalizableId targetSlotId) {
+        return new SlotPathResolverOption(
+                targetSlotId,
                 null,
                 null
         );
+    }
+
+    public boolean isSelf() {
+        return maxDepth == null && minDepth == null;
+    }
+
+    public boolean hasMinLimit() {
+        return minDepth != null;
+    }
+
+    public boolean hasMaxLimit() {
+        return maxDepth != null;
     }
 }
