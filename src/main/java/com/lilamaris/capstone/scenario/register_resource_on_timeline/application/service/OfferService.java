@@ -3,10 +3,7 @@ package com.lilamaris.capstone.scenario.register_resource_on_timeline.applicatio
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.lilamaris.capstone.delta.application.port.in.*;
-import com.lilamaris.capstone.scenario.register_resource_on_timeline.application.port.in.OfferAggregator;
-import com.lilamaris.capstone.scenario.register_resource_on_timeline.application.port.in.OfferEntry;
-import com.lilamaris.capstone.scenario.register_resource_on_timeline.application.port.in.OfferIssuer;
-import com.lilamaris.capstone.scenario.register_resource_on_timeline.application.port.in.OfferRevoker;
+import com.lilamaris.capstone.scenario.register_resource_on_timeline.application.port.in.*;
 import com.lilamaris.capstone.shared.application.jsonPatch.DomainJsonResolverDirectory;
 import com.lilamaris.capstone.shared.application.jsonPatch.JsonPatchEngine;
 import com.lilamaris.capstone.shared.domain.id.CanonicalExternalId;
@@ -18,7 +15,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -93,41 +92,32 @@ public class OfferService implements
     }
 
     @Override
-    public void aggregate(DomainType resourceType, ExternalizableId targetSlotId) {
+    public List<OfferAggregateEntry> aggregate(DomainType resourceType, ExternalizableId targetSlotId) {
+        var pathOption = SlotPathResolverOption.all(targetSlotId);
+        List<SlotPathEntry> hierarchy = slotPathResolver.getHierarchy(pathOption);
+        var slotIds = hierarchy.stream().map(e -> e.ref().id()).toList();
+
+        var deltaOption = DeltaReadOption.typeOnly(slotIds, resourceType);
+        Map<CanonicalExternalId, List<DeltaEntry>> deltaMap = deltaReader.getDelta(deltaOption);
+
+        Map<CanonicalExternalId, JsonNode> resourceStateMap = new HashMap<>();
+
+        for (SlotPathEntry slot : hierarchy) {
+            var key = CanonicalExternalId.from(slot.ref().id());
+            var slotDeltas = deltaMap.get(key);
+            if (slotDeltas == null) continue;
+
+            for (DeltaEntry delta : slotDeltas) {
+                var resourceId = CanonicalExternalId.from(delta.resource().id());
+                resourceStateMap.put(resourceId, delta.state());
+            }
+        }
+
+        return resourceStateMap.entrySet().stream()
+                .map(entry -> new OfferAggregateEntry(
+                        entry.getKey().toExternalizableId(),
+                        entry.getValue()
+                ))
+                .toList();
     }
-//
-//    private Optional<JsonNode> findAggregateResource(
-//            DomainRef resource,
-//            ExternalizableId targetSlotId
-//    ) {
-//        List<ExternalizableId> ancestorSlotIds = slotPathResolver.getHierarchy(targetSlotId).stream()
-//                .sorted(Comparator.comparing(SlotPathEntry::depth))
-//                .map(e -> e.ancestorSlotRef().id())
-//                .toList();
-//
-//        Map<CanonicalExternalId, DeltaEntry> candidateDelta = deltaReader.getDeltaOfSlots(
-//                ancestorSlotIds,
-//                resource
-//        );
-//
-//        JsonNode aggregate = null;
-//        boolean found = false;
-//
-//        for (var id : ancestorSlotIds) {
-//            var canonicalSlotId = CanonicalExternalId.from(id);
-//            var d = candidateDelta.get(canonicalSlotId);
-//            if (d == null) continue;
-//
-//            JsonPatch patch = jsonPatchEngine.parsePatch(d.patch());
-//
-//            if (!found) {
-//                aggregate = jsonPatchEngine.materialize(patch);
-//                found = true;
-//            } else {
-//                aggregate = jsonPatchEngine.apply(aggregate, patch);
-//            }
-//        }
-//
-//        return Optional.ofNullable(aggregate);
-//    }
 }

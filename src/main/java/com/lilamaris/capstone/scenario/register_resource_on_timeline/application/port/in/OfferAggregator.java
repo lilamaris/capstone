@@ -3,8 +3,10 @@ package com.lilamaris.capstone.scenario.register_resource_on_timeline.applicatio
 import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
 import com.lilamaris.capstone.shared.domain.type.DomainType;
 
+import java.util.List;
+
 public interface OfferAggregator {
-    void aggregate(
+    List<OfferAggregateEntry> aggregate(
             DomainType resourceType,
             ExternalizableId targetSlotId
     );

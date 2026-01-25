@@ -4,6 +4,7 @@ import com.lilamaris.capstone.scenario.register_resource_on_timeline.application
 import com.lilamaris.capstone.scenario.register_resource_on_timeline.application.port.in.OfferIssuer;
 import com.lilamaris.capstone.scenario.register_resource_on_timeline.application.port.in.OfferRevoker;
 import com.lilamaris.capstone.scenario.register_resource_on_timeline.infrastructure.web.request.OfferRequest;
+import com.lilamaris.capstone.scenario.register_resource_on_timeline.infrastructure.web.response.OfferAggregateResponse;
 import com.lilamaris.capstone.scenario.register_resource_on_timeline.infrastructure.web.response.OfferResponse;
 import com.lilamaris.capstone.shared.domain.defaults.DefaultDomainRef;
 import com.lilamaris.capstone.shared.domain.defaults.DefaultExternalizableId;
@@ -27,12 +28,14 @@ public class OfferController {
             @RequestBody OfferRequest.Aggregate body
     ) {
         var slotId = new SlotId(UUID.fromString(body.slotId()));
-        aggregator.aggregate(
+        var result = aggregator.aggregate(
                 body.resourceType(),
                 slotId.externalId()
         );
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(
+                result.stream().map(OfferAggregateResponse::from).toList()
+        );
     }
 
     @PostMapping
