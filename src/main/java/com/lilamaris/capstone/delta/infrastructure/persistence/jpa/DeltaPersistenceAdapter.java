@@ -69,11 +69,11 @@ public class DeltaPersistenceAdapter implements DeltaStore {
         spec = spec.and(slotIdInSpecification(option.slotIds()));
 
         if (option.hasResourceType()) {
-            spec = spec.and(resourceIdSpecification(option.resourceId()));
+            spec = spec.and(resourceTypeSpecification(option.resourceType()));
         }
 
         if (option.hasResourceId()) {
-            spec = spec.and(resourceTypeSpecification(option.resourceType()));
+            spec = spec.and(resourceIdSpecification(option.resourceId()));
         }
 
         return repository.findAll(spec);
