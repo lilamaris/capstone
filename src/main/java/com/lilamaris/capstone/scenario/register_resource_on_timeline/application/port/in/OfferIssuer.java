@@ -6,6 +6,6 @@ import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
 public interface OfferIssuer {
     OfferEntry offer(
             DomainRef resource,
-            ExternalizableId slotId
+            ExternalizableId targetSlotId
     );
 }

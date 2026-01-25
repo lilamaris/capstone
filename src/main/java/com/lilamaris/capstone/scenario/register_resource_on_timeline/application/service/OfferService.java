@@ -1,31 +1,24 @@
 package com.lilamaris.capstone.scenario.register_resource_on_timeline.application.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
-import com.lilamaris.capstone.delta.application.port.in.DeltaEntry;
-import com.lilamaris.capstone.delta.application.port.in.DeltaIssuer;
-import com.lilamaris.capstone.delta.application.port.in.DeltaReader;
-import com.lilamaris.capstone.delta.application.port.in.DeltaRevoker;
+import com.lilamaris.capstone.delta.application.port.in.*;
 import com.lilamaris.capstone.scenario.register_resource_on_timeline.application.port.in.OfferAggregator;
 import com.lilamaris.capstone.scenario.register_resource_on_timeline.application.port.in.OfferEntry;
 import com.lilamaris.capstone.scenario.register_resource_on_timeline.application.port.in.OfferIssuer;
 import com.lilamaris.capstone.scenario.register_resource_on_timeline.application.port.in.OfferRevoker;
-import com.lilamaris.capstone.shared.application.jsonPatch.JsonPatchEngine;
 import com.lilamaris.capstone.shared.application.jsonPatch.DomainJsonResolverDirectory;
+import com.lilamaris.capstone.shared.application.jsonPatch.JsonPatchEngine;
 import com.lilamaris.capstone.shared.domain.id.CanonicalExternalId;
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
 import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
 import com.lilamaris.capstone.shared.domain.type.DomainType;
-import com.lilamaris.capstone.timeline.application.port.in.SlotEntry;
-import com.lilamaris.capstone.timeline.application.port.in.SlotPathResolver;
-import com.lilamaris.capstone.timeline.application.port.in.SlotReader;
+import com.lilamaris.capstone.timeline.application.port.in.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -43,32 +36,47 @@ public class OfferService implements
 
     private final DomainJsonResolverDirectory jsonDirs;
     private final JsonPatchEngine jsonPatchEngine;
-    private final ObjectMapper objectMapper;
 
     @Override
     public OfferEntry offer(
             DomainRef resource,
-            ExternalizableId slotId
+            ExternalizableId targetSlotId
     ) {
+        SlotEntry slot = slotReader.getById(targetSlotId);
         JsonNode currentState = jsonDirs.resolve(resource);
 
-        SlotEntry slot = slotReader.getById(slotId);
+        var pathOption = SlotPathResolverOption.max(targetSlotId, 1);
+        var hierarchy = slotPathResolver.getHierarchy(pathOption);
+        var slotIds = hierarchy.stream().map(e -> e.ref().id()).toList();
 
-        Optional<JsonNode> previousState = slotPathResolver.getParent(slotId)
-                .flatMap(parent -> deltaReader.getDeltaOfSlot(parent.ref().id(), resource))
-                .map(DeltaEntry::state);
+        var deltaOption = DeltaReadOption.idAndType(slotIds, resource.type(), resource.id());
+        var deltas = deltaReader.getDelta(deltaOption);
 
-        JsonPatch patch = previousState
-                .map(prev -> jsonPatchEngine.diff(prev, currentState))
-                .orElse(null);
+        JsonNode previousState = null;
 
-        JsonNode finalState = previousState
-                .map(prev -> jsonPatchEngine.apply(prev, patch))
-                .orElse(currentState);
+        for (SlotPathEntry entry : hierarchy) {
+            var key = CanonicalExternalId.from(entry.ref().id());
+
+            List<DeltaEntry> slotDeltas = deltas.get(key);
+            if (slotDeltas == null || slotDeltas.isEmpty()) continue;
+
+            previousState = slotDeltas.getFirst().state();
+            break;
+        }
+
+        // calculate diff between previous and current if previousState provided.
+        JsonPatch patch = previousState != null
+                ? jsonPatchEngine.diff(previousState, currentState)
+                : null;
+
+        // determine the current final state based on whether the previous state exists.
+        JsonNode finalState = previousState != null
+                ? jsonPatchEngine.apply(previousState, patch)
+                : currentState;
 
         var delta = deltaIssuer.issue(
                 resource,
-                slotId,
+                targetSlotId,
                 finalState,
                 patch
         );
