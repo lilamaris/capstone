@@ -5,10 +5,8 @@ import com.lilamaris.capstone.shared.application.policy.domain.identity.port.in.
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
 import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
 import com.lilamaris.capstone.shared.domain.type.InternalAggregateDomainType;
-import com.lilamaris.capstone.timeline.application.port.in.SlotEntry;
-import com.lilamaris.capstone.timeline.application.port.in.SlotPathEntry;
-import com.lilamaris.capstone.timeline.application.port.in.SlotPathResolver;
-import com.lilamaris.capstone.timeline.application.port.in.SlotReader;
+import com.lilamaris.capstone.timeline.application.exception.SlotReaderInvariantException;
+import com.lilamaris.capstone.timeline.application.port.in.*;
 import com.lilamaris.capstone.timeline.application.port.out.SlotQuery;
 import com.lilamaris.capstone.timeline.domain.Slot;
 import com.lilamaris.capstone.timeline.domain.SlotClosure;
@@ -18,8 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -72,32 +70,32 @@ public class SlotReaderService implements
     }
 
     @Override
-    public List<SlotPathEntry> getHierarchy(ExternalizableId slotId) {
-        var id = refDir.resolve(slotId, InternalAggregateDomainType.SLOT, SlotId.class);
+    public List<SlotPathEntry> getHierarchy(SlotPathResolverOption option) {
+        var id = refDir.resolve(option.targetSlotId(), InternalAggregateDomainType.SLOT, SlotId.class);
 
-        var closures = slotQuery.getClosureOf(id);
+        var closures = slotQuery.getHierarchy(id, option);
         var ancestorSlotIds = closures.stream().map(SlotClosure::getAncestorSlotId).toList();
 
-        var slots = slotQuery.getSlotByIds(ancestorSlotIds).stream()
+        var ancestorSlots = slotQuery.getSlotByIds(ancestorSlotIds).stream()
                 .collect(Collectors.toUnmodifiableMap(
                         Slot::id,
                         Function.identity()
                 ));
 
+        if (ancestorSlotIds.size() != ancestorSlots.size()) {
+            throw new SlotReaderInvariantException(String.format(
+                    "Slot closure and Slot size mismatch. Closure size: '%s', Available slot size: '%s'.",
+                    closures.size(),
+                    ancestorSlots.size()
+            ));
+        }
+
         return closures.stream()
                 .map(closure -> SlotPathEntry.from(
-                        slots.get(closure.getAncestorSlotId()),
+                        ancestorSlots.get(closure.getAncestorSlotId()),
                         closure
                 ))
+                .sorted(Comparator.comparing(SlotPathEntry::depth))
                 .toList();
-    }
-
-    @Override
-    public Optional<SlotPathEntry> getParent(ExternalizableId slotId) {
-        var id = refDir.resolve(slotId, InternalAggregateDomainType.SLOT, SlotId.class);
-        var closure = slotQuery.getParentOf(id).orElse(null);
-        if (closure == null) return Optional.empty();
-        return slotQuery.getSlotById(closure.getAncestorSlotId())
-                .map(s -> SlotPathEntry.from(s, closure));
     }
 }

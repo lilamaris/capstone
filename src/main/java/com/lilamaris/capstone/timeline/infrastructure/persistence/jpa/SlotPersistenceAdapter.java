@@ -1,5 +1,6 @@
 package com.lilamaris.capstone.timeline.infrastructure.persistence.jpa;
 
+import com.lilamaris.capstone.timeline.application.port.in.SlotPathResolverOption;
 import com.lilamaris.capstone.timeline.application.port.out.SlotQuery;
 import com.lilamaris.capstone.timeline.domain.Slot;
 import com.lilamaris.capstone.timeline.domain.SlotClosure;
@@ -7,6 +8,7 @@ import com.lilamaris.capstone.timeline.domain.id.SlotId;
 import com.lilamaris.capstone.timeline.domain.id.TimelineId;
 import com.lilamaris.capstone.timeline.infrastructure.persistence.jpa.repository.SlotClosureRepository;
 import com.lilamaris.capstone.timeline.infrastructure.persistence.jpa.repository.SlotRepository;
+import com.lilamaris.capstone.timeline.infrastructure.persistence.jpa.specification.SlotClosureSpecification;
 import com.lilamaris.capstone.timeline.infrastructure.persistence.jpa.specification.SlotSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -49,12 +51,18 @@ public class SlotPersistenceAdapter implements SlotQuery {
     }
 
     @Override
-    public List<SlotClosure> getClosureOf(SlotId descendantSlotId) {
-        return slotClosureRepository.findClosure(descendantSlotId);
-    }
+    public List<SlotClosure> getHierarchy(SlotId descendantSlotId, SlotPathResolverOption option) {
+        Specification<SlotClosure> spec = Specification.unrestricted();
+        spec = spec.and(SlotClosureSpecification.eqDescendantSlotId(descendantSlotId));
 
-    @Override
-    public Optional<SlotClosure> getParentOf(SlotId slotId) {
-        return slotClosureRepository.findParent(slotId);
+        if (option.hasMaxLimit()) {
+            spec = spec.and(SlotClosureSpecification.maxDepth(option.maxDepth()));
+        }
+
+        if (option.hasMinLimit()) {
+            spec = spec.and(SlotClosureSpecification.minDepth(option.minDepth()));
+        }
+
+        return slotClosureRepository.findAll(spec);
     }
 }

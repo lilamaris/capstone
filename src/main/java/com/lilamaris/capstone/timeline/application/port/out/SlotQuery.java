@@ -1,5 +1,6 @@
 package com.lilamaris.capstone.timeline.application.port.out;
 
+import com.lilamaris.capstone.timeline.application.port.in.SlotPathResolverOption;
 import com.lilamaris.capstone.timeline.domain.Slot;
 import com.lilamaris.capstone.timeline.domain.SlotClosure;
 import com.lilamaris.capstone.timeline.domain.id.SlotId;
@@ -18,7 +19,5 @@ public interface SlotQuery {
 
     List<Slot> getSlotsByValidTime(TimelineId id, Instant validAt);
 
-    List<SlotClosure> getClosureOf(SlotId descendantSlotId);
-
-    Optional<SlotClosure> getParentOf(SlotId slotId);
+    List<SlotClosure> getHierarchy(SlotId descendantSlotId, SlotPathResolverOption option);
 }
