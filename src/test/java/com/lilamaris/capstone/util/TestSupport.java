@@ -1,10 +1,10 @@
 package com.lilamaris.capstone.util;
 
+import com.lilamaris.capstone.bitemporal.timeline.domain.id.SlotClosureId;
+import com.lilamaris.capstone.bitemporal.timeline.domain.id.SlotId;
+import com.lilamaris.capstone.bitemporal.timeline.domain.id.TimelineId;
 import com.lilamaris.capstone.shared.application.policy.domain.identity.defaults.RawBasedIdGenerator;
 import com.lilamaris.capstone.shared.application.policy.domain.identity.port.in.IdGenerator;
-import com.lilamaris.capstone.timeline.domain.id.SlotClosureId;
-import com.lilamaris.capstone.timeline.domain.id.SlotId;
-import com.lilamaris.capstone.timeline.domain.id.TimelineId;
 
 import java.time.Instant;
 import java.util.function.Supplier;

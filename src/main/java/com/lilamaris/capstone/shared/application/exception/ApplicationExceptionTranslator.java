@@ -1,9 +1,9 @@
 package com.lilamaris.capstone.shared.application.exception;
 
+import com.lilamaris.capstone.bitemporal.timeline.domain.exception.TimelineDomainException;
 import com.lilamaris.capstone.shared.domain.exception.DomainIllegalArgumentException;
 import com.lilamaris.capstone.shared.domain.exception.DomainIllegalStateException;
 import com.lilamaris.capstone.shared.domain.exception.DomainInvariantException;
-import com.lilamaris.capstone.timeline.domain.exception.TimelineDomainException;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

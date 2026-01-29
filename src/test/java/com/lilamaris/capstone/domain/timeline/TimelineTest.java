@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.domain.timeline;
 
-import com.lilamaris.capstone.timeline.domain.Timeline;
-import com.lilamaris.capstone.timeline.domain.event.TimelineCreated;
+import com.lilamaris.capstone.bitemporal.timeline.domain.Timeline;
+import com.lilamaris.capstone.bitemporal.timeline.domain.event.TimelineCreated;
 import com.lilamaris.capstone.util.TestSupport;
 import org.junit.jupiter.api.Test;
 

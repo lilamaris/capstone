@@ -1,7 +1,6 @@
 package com.lilamaris.capstone.shared.infrastructure.persistence.specification;
 
 import com.lilamaris.capstone.shared.domain.id.DomainRef;
-import com.lilamaris.capstone.shared.domain.id.ExternalizableId;
 import com.lilamaris.capstone.shared.domain.persistence.jpa.JpaDomainRef;
 import com.lilamaris.capstone.shared.domain.type.DomainType;
 import jakarta.persistence.criteria.CriteriaBuilder;

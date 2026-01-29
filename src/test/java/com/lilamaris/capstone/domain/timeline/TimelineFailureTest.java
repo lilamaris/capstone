@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.domain.timeline;
 
-import com.lilamaris.capstone.timeline.domain.exception.TimelineDomainException;
-import com.lilamaris.capstone.timeline.domain.exception.TimelineErrorCode;
+import com.lilamaris.capstone.bitemporal.timeline.domain.exception.TimelineDomainException;
+import com.lilamaris.capstone.bitemporal.timeline.domain.exception.TimelineErrorCode;
 import com.lilamaris.capstone.util.TestSupport;
 import org.junit.jupiter.api.Test;
 
