@@ -19,7 +19,7 @@ rootProject.name = "capstone"
 
 include("kernel")
 include("kernel:kernel-core")
-include("kernel:kernel-test")
+include("kernel:kernel-test-support")
 
 include("timeline")
 include("timeline:timeline-domain")
