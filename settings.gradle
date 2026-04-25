@@ -16,3 +16,7 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = 'capstone'
+
+include 'kernel'
+include 'kernel:kernel-core'
+include 'kernel:kernel-test'
