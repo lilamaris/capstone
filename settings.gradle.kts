@@ -15,14 +15,14 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = 'capstone'
+rootProject.name = "capstone"
 
-include 'kernel'
-include 'kernel:kernel-core'
-include 'kernel:kernel-test'
+include("kernel")
+include("kernel:kernel-core")
+include("kernel:kernel-test")
 
-include 'timeline'
-include 'timeline:timeline-domain'
-include 'timeline:timeline-application'
-include 'timeline:timeline-web-mvc'
-include 'timeline:timeline-persistence'
+include("timeline")
+include("timeline:timeline-domain")
+include("timeline:timeline-application")
+include("timeline:timeline-web-mvc")
+include("timeline:timeline-persistence")
