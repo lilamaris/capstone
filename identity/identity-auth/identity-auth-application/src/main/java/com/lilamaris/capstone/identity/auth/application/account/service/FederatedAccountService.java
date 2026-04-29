@@ -1,0 +1,109 @@
+package com.lilamaris.capstone.identity.auth.application.account.service;
+
+import com.lilamaris.capstone.identity.auth.application.account.model.UserAccountProvisioner;
+import com.lilamaris.capstone.identity.auth.application.account.port.in.AuthenticateFederatedAccountUseCase;
+import com.lilamaris.capstone.identity.auth.application.account.port.in.LinkFederatedAccountUseCase;
+import com.lilamaris.capstone.identity.auth.application.account.port.in.ListFederatedAccountUseCase;
+import com.lilamaris.capstone.identity.auth.application.account.port.in.UnlinkFederatedAccountUseCase;
+import com.lilamaris.capstone.identity.auth.application.account.port.in.command.AuthenticateFederatedAccountCommand;
+import com.lilamaris.capstone.identity.auth.application.account.port.in.command.LinkFederatedAccountCommand;
+import com.lilamaris.capstone.identity.auth.application.account.port.in.command.ListFederatedAccountCommand;
+import com.lilamaris.capstone.identity.auth.application.account.port.in.command.UnlinkFederatedAccountCommand;
+import com.lilamaris.capstone.identity.auth.application.account.port.in.result.FederatedAccountResult;
+import com.lilamaris.capstone.identity.auth.application.account.port.in.result.UserResult;
+import com.lilamaris.capstone.identity.auth.application.account.port.out.FederatedAccountReader;
+import com.lilamaris.capstone.identity.auth.application.account.port.out.FederatedAccountStore;
+import com.lilamaris.capstone.identity.auth.application.account.port.out.UserReader;
+import com.lilamaris.capstone.identity.auth.application.account.port.out.UserStore;
+import com.lilamaris.capstone.identity.auth.application.account.port.out.criteria.FederatedProviderLookupCriteria;
+import com.lilamaris.capstone.identity.auth.application.account.port.out.criteria.FederatedUserLookupCriteria;
+import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationErrorCode;
+import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Clock;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class FederatedAccountService implements
+        AuthenticateFederatedAccountUseCase,
+        LinkFederatedAccountUseCase,
+        UnlinkFederatedAccountUseCase,
+        ListFederatedAccountUseCase {
+
+    private final FederatedAccountReader reader;
+    private final FederatedAccountStore store;
+    private final UserReader userReader;
+    private final UserStore userStore;
+
+    private final UserAccountProvisioner provisioner;
+    private final Clock clock;
+
+    @Override
+    @Transactional
+    public UserResult authenticate(AuthenticateFederatedAccountCommand command) {
+        ensureNotExistsAccount(command.registrationId(), command.providerUserId());
+
+        var now = clock.instant();
+        var provisioned = provisioner.createFederatedUser(
+                command.providerUserNickname(),
+                command.registrationId(),
+                command.providerUserId(),
+                now
+        );
+
+        var user = provisioned.user();
+        var account = provisioned.account();
+
+        userStore.save(user);
+        store.save(account);
+
+        return UserResult.from(user);
+    }
+
+    @Override
+    @Transactional
+    public UserResult link(LinkFederatedAccountCommand command) {
+        ensureNotExistsAccount(command.registrationId(), command.providerUserId());
+
+        var user = userReader.findById(command.userId())
+                .orElseThrow(() -> new IdentityAuthApplicationException(IdentityAuthApplicationErrorCode.USER_NOT_FOUND));
+
+        var now = clock.instant();
+        var provisioned = provisioner.linkFederated(user, command.registrationId(), command.providerUserId(), now);
+
+        store.save(provisioned.account());
+
+        return UserResult.from(user);
+    }
+
+    @Override
+    @Transactional
+    public void unlink(UnlinkFederatedAccountCommand command) {
+        var criteria = FederatedUserLookupCriteria.of(command.userId(), command.registrationId());
+        var account = reader.findByCriteria(criteria)
+                .orElseThrow(() -> new IdentityAuthApplicationException(IdentityAuthApplicationErrorCode.ACCOUNT_NOT_FOUND));
+
+        store.delete(account);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<FederatedAccountResult> list(ListFederatedAccountCommand command) {
+        var exists = userReader.existsById(command.userId());
+        if (!exists) throw new IdentityAuthApplicationException(IdentityAuthApplicationErrorCode.USER_NOT_FOUND);
+
+        return reader.findByUserId(command.userId()).stream()
+                .map(FederatedAccountResult::from)
+                .toList();
+    }
+
+    private void ensureNotExistsAccount(String registrationId, String providerUserId) {
+        var criteria = FederatedProviderLookupCriteria.of(registrationId, providerUserId);
+        var exists = reader.existsByCriteria(criteria);
+        if (exists) throw new IdentityAuthApplicationException(IdentityAuthApplicationErrorCode.ACCOUNT_ALREADY_EXISTS);
+    }
+}
