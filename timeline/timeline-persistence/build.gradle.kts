@@ -1,5 +1,5 @@
 plugins {
-    id("capstone.persistence-base")
+    id("capstone.layer.persistence")
 }
 
 group = "com.lilamaris.capstone"
