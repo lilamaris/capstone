@@ -1,5 +1,5 @@
 plugins {
-    id("capstone.spring.module")
+    id("capstone.spring.platform")
 }
 
 val libs = extensions

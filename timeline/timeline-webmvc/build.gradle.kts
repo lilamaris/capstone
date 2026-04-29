@@ -1,5 +1,5 @@
 plugins {
-    id("capstone.web-mvc-base")
+    id("capstone.layer.webmvc")
 }
 
 group = "com.lilamaris.capstone"
