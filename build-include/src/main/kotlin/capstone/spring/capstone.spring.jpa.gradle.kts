@@ -1,5 +1,6 @@
 plugins {
     id("capstone.spring.platform")
+    id("java-library")
 }
 
 val libs = extensions
@@ -7,6 +8,11 @@ val libs = extensions
     .named("libs")
 
 dependencies {
-    add("implementation", libs.findLibrary("jakarta-persistence-api").get())
+    add("compileOnlyApi", libs.findLibrary("jakarta-persistence-api").get())
     add("testImplementation", libs.findLibrary("jakarta-persistence-api").get())
+
+    plugins.withId("java-test-fixtures") {
+        add("testFixturesCompileOnlyApi", platform(libs.findLibrary("spring-boot-dependencies").get()))
+        add("testFixturesCompileOnlyApi", libs.findLibrary("jakarta-persistence-api").get())
+    }
 }
