@@ -1,10 +1,10 @@
 plugins {
-    id("capstone.domain-base")
+    id("capstone.layer.domain")
 }
 
 group = "com.lilamaris.capstone"
 version = "0.0.1-SNAPSHOT"
 
 dependencies {
-    implementation(libs.jakarta.persistence.api)
+    testImplementation(project(":kernel:kernel-test-support"))
 }
