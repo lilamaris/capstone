@@ -100,4 +100,50 @@ public class SimpleCapabilityTest {
                     .hasMessageContaining("must not be null.");
         }
     }
+
+    @Nested
+    @DisplayName("동등성 검사")
+    class EqualityTest {
+        @Test
+        @DisplayName("scope가 같으면 동등성 검사 시 true")
+        void should_return_true_when_same_scope() {
+            var scope = "scope";
+
+            var capability = SimpleCapability.of(scope, "description");
+
+            Capability otherCapability = new Capability() {
+                @Override
+                public String scope() {
+                    return scope;
+                }
+
+                @Override
+                public String description() {
+                    return "other_capability";
+                }
+            };
+
+            assertThat(capability.isSame(otherCapability)).isTrue();
+        }
+
+        @Test
+        @DisplayName("scope가 다르면 동등성 검사 시 false")
+        void should_return_false_when_same_scope() {
+            var capability = SimpleCapability.of("scope", "description");
+
+            Capability otherCapability = new Capability() {
+                @Override
+                public String scope() {
+                    return "other.scope";
+                }
+
+                @Override
+                public String description() {
+                    return "other_capability";
+                }
+            };
+
+            assertThat(capability.isSame(otherCapability)).isFalse();
+        }
+    }
 }
