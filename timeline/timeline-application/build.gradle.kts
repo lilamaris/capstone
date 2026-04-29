@@ -1,5 +1,5 @@
 plugins {
-    id("capstone.application-base")
+    id("capstone.layer.application")
 }
 
 group = "com.lilamaris.capstone"
