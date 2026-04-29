@@ -1,5 +1,5 @@
 plugins {
-    id("capstone.spring.module")
+    id("capstone.spring.jpa")
 }
 
 val libs = extensions
@@ -7,6 +7,13 @@ val libs = extensions
     .named("libs")
 
 dependencies {
-    add("implementation", libs.findLibrary("jakarta-persistence-api").get())
-    add("testImplementation", libs.findLibrary("jakarta-persistence-api").get())
+    add("runtimeOnly", libs.findLibrary("h2database").get())
+    add("implementation", libs.findLibrary("spring-boot-starter-data-jpa").get())
+
+    add("testRuntimeOnly", libs.findLibrary("h2database").get())
+    add("testImplementation", libs.findLibrary("spring-boot-starter-data-jpa-test").get())
+
+    add("testImplementation", platform(libs.findLibrary("testcontainers-bom").get()))
+    add("testImplementation", libs.findLibrary("testcontainers-postgresql").get())
+    add("testImplementation", libs.findLibrary("testcontainers-jdbc").get())
 }
