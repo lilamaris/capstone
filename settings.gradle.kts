@@ -21,6 +21,9 @@ include("kernel")
 include("kernel:kernel-core")
 include("kernel:kernel-test-support")
 
+include("identity")
+include("identity:identity-core")
+
 include("timeline")
 include("timeline:timeline-domain")
 include("timeline:timeline-application")
