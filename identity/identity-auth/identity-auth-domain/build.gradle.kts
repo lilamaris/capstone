@@ -6,6 +6,9 @@ group = "com.lilamaris.capstone"
 version = "0.0.1-SNAPSHOT"
 
 dependencies {
+    implementation(project(":identity:identity-core"))
     implementation(project(":kernel:kernel-core"))
+
+    testImplementation(testFixtures(project(":kernel:kernel-core")))
     testImplementation(project(":kernel:kernel-test-support"))
 }
