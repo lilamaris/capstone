@@ -14,13 +14,13 @@ tasks.withType<Test>().configureEach {
 
 tasks.register<Test>("unitTest") {
     group = "verification"
-    description = "Runs tests tagged with @Tag(\"unit\")"
+    description = "Runs tests tagged with @Tag(\"integration\")"
 
     testClassesDirs = sourceSets["test"].output.classesDirs
     classpath = sourceSets["test"].runtimeClasspath
 
     useJUnitPlatform {
-        includeTags("unit")
+        excludeTags("integration")
     }
 }
 
