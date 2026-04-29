@@ -23,6 +23,8 @@ include("kernel:kernel-test-support")
 
 include("identity")
 include("identity:identity-core")
+include("identity:identity-auth")
+include("identity:identity-auth:identity-auth-domain")
 
 include("timeline")
 include("timeline:timeline-domain")
