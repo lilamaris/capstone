@@ -1,5 +1,5 @@
 plugins {
-    id("capstone.spring.observability")
+    id("capstone.layer.launcher")
 }
 
 group = "com.lilamaris.capstone"

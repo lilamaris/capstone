@@ -1,14 +1,3 @@
-import gradle.kotlin.dsl.accessors._729aa7c1588b83738f7ec34c0a320432.java
-import gradle.kotlin.dsl.accessors._729aa7c1588b83738f7ec34c0a320432.sourceSets
-import org.gradle.api.artifacts.VersionCatalogsExtension
-import org.gradle.api.tasks.testing.Test
-import org.gradle.jvm.toolchain.JavaLanguageVersion
-import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.get
-import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.register
-import org.gradle.kotlin.dsl.withType
-
 plugins {
     id("java-library")
 }
