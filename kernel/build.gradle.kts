@@ -1,5 +1,5 @@
 plugins {
-    id("java")
+    id("capstone.base.aggregate")
 }
 
 group = "com.lilamaris.capstone"
