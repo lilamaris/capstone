@@ -1,8 +1,8 @@
 package com.lilamaris.capstone.identity.auth.domain.role;
 
+import com.lilamaris.capstone.identity.auth.domain.TestSupport;
 import com.lilamaris.capstone.identity.core.role.CanonicalRole;
 import com.lilamaris.capstone.kernel.core.namespace.ApplicationNamespace;
-import com.lilamaris.capstone.kernel.core.namespace.ApplicationNamespaceFixture;
 import com.lilamaris.capstone.kernel.testsupport.FixedClock;
 import com.lilamaris.capstone.kernel.testsupport.generator.SequenceCounter;
 import com.lilamaris.capstone.kernel.testsupport.generator.UuidGenerator;
@@ -27,7 +27,7 @@ public class UserGrantedRoleTest {
     Instant now = clock.instant();
 
     UUID userId = new UuidGenerator(new SequenceCounter()).generate();
-    ApplicationNamespace namespace = ApplicationNamespaceFixture.createApplicationNamespace();
+    ApplicationNamespace namespace = TestSupport.createApplicationNamespace();
 
     @Nested
     @DisplayName("생성 테스트")

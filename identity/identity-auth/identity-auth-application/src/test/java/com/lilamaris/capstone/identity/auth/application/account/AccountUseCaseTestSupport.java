@@ -4,9 +4,6 @@ import com.lilamaris.capstone.identity.auth.application.account.port.in.command.
 import com.lilamaris.capstone.identity.auth.application.account.port.in.query.ListFederatedAccountQuery;
 import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationErrorCode;
 import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationException;
-import com.lilamaris.capstone.identity.auth.domain.CredentialAccountFixture;
-import com.lilamaris.capstone.identity.auth.domain.FederatedAccountFixture;
-import com.lilamaris.capstone.identity.auth.domain.UserFixture;
 import com.lilamaris.capstone.identity.auth.domain.account.CredentialAccount;
 import com.lilamaris.capstone.identity.auth.domain.account.FederatedAccount;
 import com.lilamaris.capstone.identity.auth.domain.account.User;
@@ -26,29 +23,29 @@ public final class AccountUseCaseTestSupport {
 
     public static final UUID USER_ID = new UuidGenerator(new SequenceCounter(1)).generate();
 
-    public static final String NICKNAME = UserFixture.INITIAL_NICKNAME;
+    public static final String NICKNAME = "tester";
     public static final String UPDATED_NICKNAME = "updated-tester";
-    public static final String EMAIL = CredentialAccountFixture.INITIAL_EMAIL;
+    public static final String EMAIL = "tester@example.com";
     public static final String RAW_PASSWORD = "raw-password";
     public static final String NEW_RAW_PASSWORD = "new-raw-password";
-    public static final String PASSWORD_HASH = CredentialAccountFixture.INITIAL_PASSWORD_HASH;
+    public static final String PASSWORD_HASH = "{bcrypt}password-hash";
     public static final String NEW_PASSWORD_HASH = "{bcrypt}new-password-hash";
-    public static final String REGISTRATION_ID = FederatedAccountFixture.INITIAL_REGISTRATION_ID;
-    public static final String PROVIDER_USER_ID = FederatedAccountFixture.INITIAL_PROVIDER_USER_ID;
+    public static final String REGISTRATION_ID = "google";
+    public static final String PROVIDER_USER_ID = "google-user-1";
 
     private AccountUseCaseTestSupport() {
     }
 
     public static User user() {
-        return UserFixture.createUser(NOW);
+        return User.of(NICKNAME, NOW);
     }
 
     public static CredentialAccount credentialAccount() {
-        return CredentialAccountFixture.createCredentialAccount(NOW);
+        return CredentialAccount.of(user(), EMAIL, PASSWORD_HASH, NOW);
     }
 
     public static FederatedAccount federatedAccount() {
-        return FederatedAccountFixture.createFederatedAccount(NOW);
+        return FederatedAccount.of(user(), REGISTRATION_ID, PROVIDER_USER_ID, NOW);
     }
 
     public static RegisterCredentialAccountCommand registerCredentialAccountCommand() {
