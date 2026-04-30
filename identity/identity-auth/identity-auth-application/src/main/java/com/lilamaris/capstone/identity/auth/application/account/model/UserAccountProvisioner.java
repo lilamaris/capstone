@@ -1,8 +1,8 @@
 package com.lilamaris.capstone.identity.auth.application.account.model;
 
-import com.lilamaris.capstone.identity.auth.domain.CredentialAccount;
-import com.lilamaris.capstone.identity.auth.domain.FederatedAccount;
-import com.lilamaris.capstone.identity.auth.domain.User;
+import com.lilamaris.capstone.identity.auth.domain.account.CredentialAccount;
+import com.lilamaris.capstone.identity.auth.domain.account.FederatedAccount;
+import com.lilamaris.capstone.identity.auth.domain.account.User;
 import com.lilamaris.capstone.kernel.core.condition.Preconditions;
 import lombok.RequiredArgsConstructor;
 

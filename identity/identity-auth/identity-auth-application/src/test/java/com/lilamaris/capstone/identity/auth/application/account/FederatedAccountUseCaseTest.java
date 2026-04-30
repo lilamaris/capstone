@@ -9,8 +9,8 @@ import com.lilamaris.capstone.identity.auth.application.account.port.out.criteri
 import com.lilamaris.capstone.identity.auth.application.account.port.out.criteria.FederatedUserLookupCriteria;
 import com.lilamaris.capstone.identity.auth.application.account.service.FederatedAccountService;
 import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationErrorCode;
-import com.lilamaris.capstone.identity.auth.domain.FederatedAccount;
-import com.lilamaris.capstone.identity.auth.domain.User;
+import com.lilamaris.capstone.identity.auth.domain.account.FederatedAccount;
+import com.lilamaris.capstone.identity.auth.domain.account.User;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;

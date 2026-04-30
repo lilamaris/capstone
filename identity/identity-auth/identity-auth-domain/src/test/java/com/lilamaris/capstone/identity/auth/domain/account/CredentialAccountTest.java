@@ -1,5 +1,7 @@
-package com.lilamaris.capstone.identity.auth.domain;
+package com.lilamaris.capstone.identity.auth.domain.account;
 
+import com.lilamaris.capstone.identity.auth.domain.CredentialAccountFixture;
+import com.lilamaris.capstone.identity.auth.domain.UserFixture;
 import com.lilamaris.capstone.kernel.testsupport.FixedClock;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

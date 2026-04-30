@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.identity.auth.application.account.port.in.result;
 
-import com.lilamaris.capstone.identity.auth.domain.User;
+import com.lilamaris.capstone.identity.auth.domain.account.User;
 
 import java.time.Instant;
 import java.util.UUID;

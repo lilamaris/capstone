@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.identity.auth.domain;
+package com.lilamaris.capstone.identity.auth.domain.role;
 
 import com.lilamaris.capstone.identity.core.actor.CanonicalRole;
 import com.lilamaris.capstone.kernel.core.namespace.ApplicationNamespace;
