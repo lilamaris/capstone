@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.identity.auth.domain.role;
 
-import com.lilamaris.capstone.identity.core.actor.CanonicalRole;
+import com.lilamaris.capstone.identity.core.role.CanonicalRole;
 import com.lilamaris.capstone.kernel.core.namespace.ApplicationNamespace;
 import com.lilamaris.capstone.kernel.core.namespace.ApplicationNamespaceFixture;
 import com.lilamaris.capstone.kernel.testsupport.FixedClock;

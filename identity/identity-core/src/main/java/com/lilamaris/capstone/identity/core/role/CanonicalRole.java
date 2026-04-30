@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.identity.core.actor;
+package com.lilamaris.capstone.identity.core.role;
 
 public enum CanonicalRole {
     GUEST,
