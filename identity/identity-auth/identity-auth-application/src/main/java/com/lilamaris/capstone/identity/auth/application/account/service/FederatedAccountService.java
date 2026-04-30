@@ -7,7 +7,7 @@ import com.lilamaris.capstone.identity.auth.application.account.port.in.ListFede
 import com.lilamaris.capstone.identity.auth.application.account.port.in.UnlinkFederatedAccountUseCase;
 import com.lilamaris.capstone.identity.auth.application.account.port.in.command.AuthenticateFederatedAccountCommand;
 import com.lilamaris.capstone.identity.auth.application.account.port.in.command.LinkFederatedAccountCommand;
-import com.lilamaris.capstone.identity.auth.application.account.port.in.command.ListFederatedAccountCommand;
+import com.lilamaris.capstone.identity.auth.application.account.port.in.query.ListFederatedAccountQuery;
 import com.lilamaris.capstone.identity.auth.application.account.port.in.command.UnlinkFederatedAccountCommand;
 import com.lilamaris.capstone.identity.auth.application.account.port.in.result.FederatedAccountResult;
 import com.lilamaris.capstone.identity.auth.application.account.port.in.result.UserResult;
@@ -92,7 +92,7 @@ public class FederatedAccountService implements
 
     @Override
     @Transactional(readOnly = true)
-    public List<FederatedAccountResult> list(ListFederatedAccountCommand command) {
+    public List<FederatedAccountResult> list(ListFederatedAccountQuery command) {
         var exists = userReader.existsById(command.userId());
         if (!exists) throw new IdentityAuthApplicationException(IdentityAuthApplicationErrorCode.USER_NOT_FOUND);
 
