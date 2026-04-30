@@ -1,6 +1,7 @@
 package com.lilamaris.capstone.identity.auth.application.account;
 
 import com.lilamaris.capstone.identity.auth.application.account.port.in.command.*;
+import com.lilamaris.capstone.identity.auth.application.account.port.in.query.ListFederatedAccountQuery;
 import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationErrorCode;
 import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationException;
 import com.lilamaris.capstone.identity.auth.domain.*;
@@ -69,8 +70,8 @@ public final class AccountUseCaseTestSupport {
         return new UnlinkFederatedAccountCommand(USER_ID, REGISTRATION_ID);
     }
 
-    public static ListFederatedAccountCommand listFederatedAccountCommand() {
-        return new ListFederatedAccountCommand(USER_ID);
+    public static ListFederatedAccountQuery listFederatedAccountCommand() {
+        return new ListFederatedAccountQuery(USER_ID);
     }
 
     public static ChangeNicknameCommand changeNicknameCommand() {
