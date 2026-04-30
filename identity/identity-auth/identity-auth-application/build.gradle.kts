@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":kernel:kernel-core"))
 
     implementation(libs.spring.security.crypto)
+    implementation(libs.spring.security.jose)
 
     testImplementation(testFixtures(project(":identity:identity-auth:identity-auth-domain")))
     testImplementation(testFixtures(project(":kernel:kernel-core")))
