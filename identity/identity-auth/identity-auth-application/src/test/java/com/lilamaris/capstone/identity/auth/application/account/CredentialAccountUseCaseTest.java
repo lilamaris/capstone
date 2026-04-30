@@ -6,8 +6,8 @@ import com.lilamaris.capstone.identity.auth.application.account.port.out.Credent
 import com.lilamaris.capstone.identity.auth.application.account.port.out.UserStore;
 import com.lilamaris.capstone.identity.auth.application.account.service.CredentialAccountService;
 import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationErrorCode;
-import com.lilamaris.capstone.identity.auth.domain.CredentialAccount;
-import com.lilamaris.capstone.identity.auth.domain.User;
+import com.lilamaris.capstone.identity.auth.domain.account.CredentialAccount;
+import com.lilamaris.capstone.identity.auth.domain.account.User;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;

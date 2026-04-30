@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.identity.auth.domain;
+package com.lilamaris.capstone.identity.auth.domain.account;
 
 import com.lilamaris.capstone.kernel.core.condition.Preconditions;
 import jakarta.persistence.*;

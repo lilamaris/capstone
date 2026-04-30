@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.identity.auth.domain;
+package com.lilamaris.capstone.identity.auth.domain.role;
 
 import com.lilamaris.capstone.kernel.core.condition.Preconditions;
 import com.lilamaris.capstone.kernel.core.namespace.ApplicationNamespace;

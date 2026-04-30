@@ -1,5 +1,7 @@
 package com.lilamaris.capstone.identity.auth.domain;
 
+import com.lilamaris.capstone.identity.auth.domain.account.User;
+
 import java.time.Instant;
 
 public class UserFixture {
