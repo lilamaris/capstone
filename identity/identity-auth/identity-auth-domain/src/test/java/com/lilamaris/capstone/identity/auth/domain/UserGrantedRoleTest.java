@@ -4,6 +4,8 @@ import com.lilamaris.capstone.identity.core.actor.CanonicalRole;
 import com.lilamaris.capstone.kernel.core.namespace.ApplicationNamespace;
 import com.lilamaris.capstone.kernel.core.namespace.ApplicationNamespaceFixture;
 import com.lilamaris.capstone.kernel.testsupport.FixedClock;
+import com.lilamaris.capstone.kernel.testsupport.generator.SequenceCounter;
+import com.lilamaris.capstone.kernel.testsupport.generator.UuidGenerator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -13,6 +15,7 @@ import org.junit.jupiter.params.provider.NullSource;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.UUID;
 
 import static com.lilamaris.capstone.kernel.testsupport.assertion.DomainAssertions.assertThatDomainThrownBy;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,20 +26,20 @@ public class UserGrantedRoleTest {
 
     Instant now = clock.instant();
 
-    User user = UserFixture.createUser(now);
+    UUID userId = new UuidGenerator(new SequenceCounter()).generate();
     ApplicationNamespace namespace = ApplicationNamespaceFixture.createApplicationNamespace();
 
     @Nested
     @DisplayName("생성 테스트")
     class CreationTest {
         @Test
-        @DisplayName("user, namespace, role, createdAt으로 생성한다")
-        void create_with_user_namespace_role_and_created_at() {
+        @DisplayName("userId, namespace, role, createdAt으로 생성한다")
+        void create_with_userId_namespace_role_and_created_at() {
             var role = CanonicalRole.USER;
 
-            var grantedRole = UserGrantedRole.of(user, namespace, role, now);
+            var grantedRole = UserGrantedRole.of(userId, namespace, role, now);
 
-            assertThat(grantedRole.getUser()).isSameAs(user);
+            assertThat(grantedRole.getUserId()).isSameAs(userId);
             assertThat(grantedRole.getNamespace().name()).isEqualTo(namespace.name());
             assertThat(grantedRole.getRole()).isEqualTo(role);
             assertThat(grantedRole.getCreatedAt()).isEqualTo(now);
@@ -46,7 +49,7 @@ public class UserGrantedRoleTest {
         @EnumSource(CanonicalRole.class)
         @DisplayName("모든 CanonicalRole로 생성 가능")
         void create_with_all_canonical_roles(CanonicalRole role) {
-            var grantedRole = UserGrantedRole.of(user, namespace, role, now);
+            var grantedRole = UserGrantedRole.of(userId, namespace, role, now);
 
             assertThat(grantedRole.getRole()).isEqualTo(role);
         }
@@ -64,19 +67,19 @@ public class UserGrantedRoleTest {
                 }
             };
 
-            var grantedRole = UserGrantedRole.of(user, namespace, role, now);
+            var grantedRole = UserGrantedRole.of(userId, namespace, role, now);
 
             assertThat(grantedRole.getNamespace()).isInstanceOf(EmbeddableApplicationNamespace.class);
             assertThat(grantedRole.getNamespace().name()).isEqualTo(namespaceName);
             assertThat(grantedRole.getRole()).isEqualTo(role);
         }
 
-        @ParameterizedTest(name = "user = {0}")
+        @ParameterizedTest(name = "userId = {0}")
         @NullSource
-        @DisplayName("user가 null이면 예외")
-        void throw_exception_when_null_user(User user) {
+        @DisplayName("userId가 null이면 예외")
+        void throw_exception_when_null_userId(UUID userId) {
             assertThatDomainThrownBy(() -> UserGrantedRole.of(
-                    user,
+                    userId,
                     namespace,
                     CanonicalRole.USER,
                     now
@@ -90,7 +93,7 @@ public class UserGrantedRoleTest {
         @DisplayName("namespace가 null이면 예외")
         void throw_exception_when_null_namespace(ApplicationNamespace namespace) {
             assertThatDomainThrownBy(() -> UserGrantedRole.of(
-                    user,
+                    userId,
                     namespace,
                     CanonicalRole.USER,
                     now
@@ -110,7 +113,7 @@ public class UserGrantedRoleTest {
             };
 
             assertThatDomainThrownBy(() -> UserGrantedRole.of(
-                    user,
+                    userId,
                     namespace,
                     CanonicalRole.USER,
                     now
@@ -130,7 +133,7 @@ public class UserGrantedRoleTest {
             };
 
             assertThatDomainThrownBy(() -> UserGrantedRole.of(
-                    user,
+                    userId,
                     namespace,
                     CanonicalRole.USER,
                     now
@@ -144,7 +147,7 @@ public class UserGrantedRoleTest {
         @DisplayName("role이 null이면 예외")
         void throw_exception_when_null_role(CanonicalRole role) {
             assertThatDomainThrownBy(() -> UserGrantedRole.of(
-                    user,
+                    userId,
                     namespace,
                     role,
                     now
@@ -158,7 +161,7 @@ public class UserGrantedRoleTest {
         @DisplayName("createdAt이 null이면 예외")
         void throw_exception_when_null_created_at(Instant createdAt) {
             assertThatDomainThrownBy(() -> UserGrantedRole.of(
-                    user,
+                    userId,
                     namespace,
                     CanonicalRole.USER,
                     createdAt
