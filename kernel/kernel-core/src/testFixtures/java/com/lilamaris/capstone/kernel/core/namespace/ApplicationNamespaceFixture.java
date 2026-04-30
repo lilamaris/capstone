@@ -6,4 +6,8 @@ public class ApplicationNamespaceFixture {
     public static ApplicationNamespace createApplicationNamespace() {
         return SimpleApplicationNamespace.of(INITIAL_NAMESPACE_NAME);
     }
+
+    public static ApplicationNamespace createApplicationNamespace(String name) {
+        return SimpleApplicationNamespace.of(name);
+    }
 }

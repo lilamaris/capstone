@@ -1,7 +1,5 @@
 package com.lilamaris.capstone.identity.core.actor;
 
-import lombok.Builder;
-
 import java.util.Set;
 
 public class ActorFixture {
@@ -12,13 +10,30 @@ public class ActorFixture {
         return SimpleActor.of(INITIAL_SUBJECT, INITIAL_CAPABILITIES);
     }
 
-    @Builder(builderClassName = "ActorBuilder", builderMethodName = "createActor")
     public static Actor createActor(String subject, Set<Capability> capabilities) {
         return SimpleActor.of(subject, capabilities);
+    }
+
+    public static ActorBuilder builder() {
+        return new ActorBuilder();
     }
 
     public static class ActorBuilder {
         private String subject = INITIAL_SUBJECT;
         private Set<Capability> capabilities = INITIAL_CAPABILITIES;
+
+        public ActorBuilder subject(String subject) {
+            this.subject = subject;
+            return this;
+        }
+
+        public ActorBuilder capabilities(Set<Capability> capabilities) {
+            this.capabilities = capabilities;
+            return this;
+        }
+
+        public Actor build() {
+            return createActor(subject, capabilities);
+        }
     }
 }
