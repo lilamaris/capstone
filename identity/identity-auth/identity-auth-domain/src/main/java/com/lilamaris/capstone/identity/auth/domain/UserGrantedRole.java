@@ -28,9 +28,8 @@ public class UserGrantedRole {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "user_id", nullable = false)
+    private UUID userId;
 
     @Embedded
     @AttributeOverride(name = "name", column = @Column(name = "namespace", nullable = false))
@@ -43,16 +42,16 @@ public class UserGrantedRole {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
-    private UserGrantedRole(User user, EmbeddableApplicationNamespace namespace, CanonicalRole role, Instant createdAt) {
-        this.user = Preconditions.requireNonNull(user, "user");
+    private UserGrantedRole(UUID userId, EmbeddableApplicationNamespace namespace, CanonicalRole role, Instant createdAt) {
+        this.userId = Preconditions.requireNonNull(userId, "userId");
         this.namespace = Preconditions.requireNonNull(namespace, "namespace");
         this.role = Preconditions.requireNonNull(role, "role");
         this.createdAt = Preconditions.requireNonNull(createdAt, "createdAt");
     }
 
-    public static UserGrantedRole of(User user, ApplicationNamespace namespace, CanonicalRole role, Instant createdAt) {
+    public static UserGrantedRole of(UUID userId, ApplicationNamespace namespace, CanonicalRole role, Instant createdAt) {
         return new UserGrantedRole(
-                user,
+                userId,
                 EmbeddableApplicationNamespace.from(namespace),
                 role,
                 createdAt
