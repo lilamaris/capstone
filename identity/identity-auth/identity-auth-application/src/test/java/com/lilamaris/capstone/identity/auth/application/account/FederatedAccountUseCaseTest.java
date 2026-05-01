@@ -9,6 +9,7 @@ import com.lilamaris.capstone.identity.auth.application.account.port.out.criteri
 import com.lilamaris.capstone.identity.auth.application.account.port.out.criteria.FederatedUserLookupCriteria;
 import com.lilamaris.capstone.identity.auth.application.account.service.FederatedAccountService;
 import com.lilamaris.capstone.identity.auth.application.role.internal.InitialUserGrantedRoleProvisioner;
+import com.lilamaris.capstone.identity.auth.application.role.port.out.UserGrantedRoleReader;
 import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationErrorCode;
 import com.lilamaris.capstone.identity.auth.domain.account.FederatedAccount;
 import com.lilamaris.capstone.identity.auth.domain.account.User;
@@ -20,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,6 +43,9 @@ class FederatedAccountUseCaseTest {
     UserStore userStore;
 
     @Mock
+    UserGrantedRoleReader userGrantedRoleReader;
+
+    @Mock
     InitialUserGrantedRoleProvisioner roleProvisioner;
 
     UserAccountProvisioner provisioner = new UserAccountProvisioner();
@@ -54,6 +59,7 @@ class FederatedAccountUseCaseTest {
                 store,
                 userReader,
                 userStore,
+                userGrantedRoleReader,
                 provisioner,
                 roleProvisioner,
                 AccountUseCaseTestSupport.CLOCK
@@ -67,13 +73,18 @@ class FederatedAccountUseCaseTest {
         @DisplayName("사용자와 federated 계정을 저장한다")
         void save_user_and_federated_account() {
             when(userStore.save(any(User.class))).thenReturn(AccountUseCaseTestSupport.savedUser());
+            when(roleProvisioner.grant(AccountUseCaseTestSupport.USER_ID))
+                    .thenReturn(List.of(AccountUseCaseTestSupport.userGrantedRole()));
 
-            service.authenticate(AccountUseCaseTestSupport.authenticateFederatedAccountCommand());
+            var result = service.authenticate(AccountUseCaseTestSupport.authenticateFederatedAccountCommand());
 
             verify(reader).existsByCriteria(any(FederatedProviderLookupCriteria.class));
             verify(userStore).save(any(User.class));
             verify(store).save(any(FederatedAccount.class));
             verify(roleProvisioner).grant(AccountUseCaseTestSupport.USER_ID);
+            assertThat(result.grantedRoles())
+                    .extracting(role -> role.namespace().name())
+                    .containsExactly(AccountUseCaseTestSupport.NAMESPACE_NAME);
         }
 
         @Test
@@ -96,12 +107,18 @@ class FederatedAccountUseCaseTest {
         void find_user_and_save_federated_account() {
             when(userReader.findById(AccountUseCaseTestSupport.USER_ID))
                     .thenReturn(Optional.of(AccountUseCaseTestSupport.user()));
+            when(userGrantedRoleReader.findByUserId(AccountUseCaseTestSupport.USER_ID))
+                    .thenReturn(List.of(AccountUseCaseTestSupport.userGrantedRole()));
 
-            service.link(AccountUseCaseTestSupport.linkFederatedAccountCommand());
+            var result = service.link(AccountUseCaseTestSupport.linkFederatedAccountCommand());
 
             verify(reader).existsByCriteria(any(FederatedProviderLookupCriteria.class));
             verify(userReader).findById(AccountUseCaseTestSupport.USER_ID);
             verify(store).save(any(FederatedAccount.class));
+            verify(userGrantedRoleReader).findByUserId(AccountUseCaseTestSupport.USER_ID);
+            assertThat(result.grantedRoles())
+                    .extracting(role -> role.namespace().name())
+                    .containsExactly(AccountUseCaseTestSupport.NAMESPACE_NAME);
         }
 
         @Test

@@ -1,8 +1,8 @@
 package com.lilamaris.capstone.identity.auth.application.account.port.in;
 
 import com.lilamaris.capstone.identity.auth.application.account.port.in.command.LinkFederatedAccountCommand;
-import com.lilamaris.capstone.identity.auth.application.account.port.in.result.UserResult;
+import com.lilamaris.capstone.identity.auth.application.account.port.in.result.AuthenticationResult;
 
 public interface LinkFederatedAccountUseCase {
-    UserResult link(LinkFederatedAccountCommand command);
+    AuthenticationResult link(LinkFederatedAccountCommand command);
 }

@@ -1,8 +1,8 @@
 package com.lilamaris.capstone.identity.auth.application.account.port.in;
 
 import com.lilamaris.capstone.identity.auth.application.account.port.in.command.AuthenticateFederatedAccountCommand;
-import com.lilamaris.capstone.identity.auth.application.account.port.in.result.UserResult;
+import com.lilamaris.capstone.identity.auth.application.account.port.in.result.AuthenticationResult;
 
 public interface AuthenticateFederatedAccountUseCase {
-    UserResult authenticate(AuthenticateFederatedAccountCommand command);
+    AuthenticationResult authenticate(AuthenticateFederatedAccountCommand command);
 }
