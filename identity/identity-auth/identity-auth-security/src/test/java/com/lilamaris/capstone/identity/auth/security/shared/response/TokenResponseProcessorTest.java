@@ -2,7 +2,7 @@ package com.lilamaris.capstone.identity.auth.security.shared.response;
 
 import com.lilamaris.capstone.identity.auth.application.jwks.port.in.IssueJwtUseCase;
 import com.lilamaris.capstone.identity.auth.application.jwks.port.in.IssueOpaqueTokenUseCase;
-import com.lilamaris.capstone.identity.auth.security.shared.principal.TrustedPrincipal;
+import com.lilamaris.capstone.identity.auth.security.TestSupport;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,17 +12,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletResponse;
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.Set;
-import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("TokenResponseProcessor 테스트")
 class TokenResponseProcessorTest {
-    private static final UUID USER_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
-
     @Mock
     IssueJwtUseCase issueJwtUseCase;
 
@@ -41,9 +36,9 @@ class TokenResponseProcessorTest {
                     issueOpaqueTokenUseCase,
                     new ResponseWriter(new ObjectMapper())
             );
-            var principal = principal();
+            var principal = TestSupport.trustedPrincipal();
 
-            when(issueJwtUseCase.issue(USER_ID.toString(), Set.of("identity-auth:USER")))
+            when(issueJwtUseCase.issue(TestSupport.USER_ID.toString(), principal.scopes()))
                     .thenReturn("access-token");
             when(issueOpaqueTokenUseCase.issue()).thenReturn("refresh-token");
 
@@ -54,24 +49,5 @@ class TokenResponseProcessorTest {
             assertThat(response.getContentAsString()).contains("access-token");
             assertThat(response.getContentAsString()).contains("refresh-token");
         }
-    }
-
-    private TrustedPrincipal principal() {
-        return new TrustedPrincipal() {
-            @Override
-            public UUID userId() {
-                return USER_ID;
-            }
-
-            @Override
-            public String nickname() {
-                return "tester";
-            }
-
-            @Override
-            public Set<String> scopes() {
-                return Set.of("identity-auth:USER");
-            }
-        };
     }
 }

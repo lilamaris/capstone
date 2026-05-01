@@ -1,5 +1,6 @@
 package com.lilamaris.capstone.identity.auth.security.credential.filter;
 
+import com.lilamaris.capstone.identity.auth.security.TestSupport;
 import com.lilamaris.capstone.identity.auth.security.exception.AuthenticationProcessingException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -35,12 +36,7 @@ class JsonCredentialSignInProcessingFilterTest {
                 return authentication;
             });
 
-            var request = request("""
-                    {
-                      "email": "tester@example.com",
-                      "password": "raw-password"
-                    }
-                    """);
+            var request = request(TestSupport.credentialSignInRequestBody());
 
             var result = filter.attemptAuthentication(request, new MockHttpServletResponse());
 
@@ -48,8 +44,8 @@ class JsonCredentialSignInProcessingFilterTest {
             assertThat(captured.get()).isInstanceOf(CredentialSignInAuthentication.class);
 
             var authentication = (CredentialSignInAuthentication) captured.get();
-            assertThat(authentication.getEmail()).isEqualTo("tester@example.com");
-            assertThat(authentication.getCredentials()).isEqualTo("raw-password");
+            assertThat(authentication.getPrincipal()).isEqualTo(TestSupport.EMAIL);
+            assertThat(authentication.getCredentials()).isEqualTo(TestSupport.RAW_PASSWORD);
             assertThat(authentication.isAuthenticated()).isFalse();
         }
 
