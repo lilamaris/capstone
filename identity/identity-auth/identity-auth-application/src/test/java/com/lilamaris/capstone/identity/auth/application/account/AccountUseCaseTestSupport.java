@@ -7,6 +7,9 @@ import com.lilamaris.capstone.identity.auth.application.shared.exception.Identit
 import com.lilamaris.capstone.identity.auth.domain.account.CredentialAccount;
 import com.lilamaris.capstone.identity.auth.domain.account.FederatedAccount;
 import com.lilamaris.capstone.identity.auth.domain.account.User;
+import com.lilamaris.capstone.identity.auth.domain.role.UserGrantedRole;
+import com.lilamaris.capstone.identity.core.role.CanonicalRole;
+import com.lilamaris.capstone.kernel.core.namespace.SimpleApplicationNamespace;
 import com.lilamaris.capstone.kernel.testsupport.FixedClock;
 import com.lilamaris.capstone.kernel.testsupport.generator.SequenceCounter;
 import com.lilamaris.capstone.kernel.testsupport.generator.UuidGenerator;
@@ -32,6 +35,8 @@ public final class AccountUseCaseTestSupport {
     public static final String NEW_PASSWORD_HASH = "{bcrypt}new-password-hash";
     public static final String REGISTRATION_ID = "google";
     public static final String PROVIDER_USER_ID = "google-user-1";
+    public static final String NAMESPACE_NAME = "identity-auth";
+    public static final CanonicalRole ROLE = CanonicalRole.USER;
 
     private AccountUseCaseTestSupport() {
     }
@@ -52,6 +57,15 @@ public final class AccountUseCaseTestSupport {
 
     public static FederatedAccount federatedAccount() {
         return FederatedAccount.of(user(), REGISTRATION_ID, PROVIDER_USER_ID, NOW);
+    }
+
+    public static UserGrantedRole userGrantedRole() {
+        return UserGrantedRole.of(
+                USER_ID,
+                SimpleApplicationNamespace.of(NAMESPACE_NAME),
+                ROLE,
+                NOW
+        );
     }
 
     public static RegisterCredentialAccountCommand registerCredentialAccountCommand() {

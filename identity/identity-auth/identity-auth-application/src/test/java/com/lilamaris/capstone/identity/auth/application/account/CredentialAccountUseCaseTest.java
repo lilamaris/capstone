@@ -6,6 +6,7 @@ import com.lilamaris.capstone.identity.auth.application.account.port.out.Credent
 import com.lilamaris.capstone.identity.auth.application.account.port.out.UserStore;
 import com.lilamaris.capstone.identity.auth.application.account.service.CredentialAccountService;
 import com.lilamaris.capstone.identity.auth.application.role.internal.InitialUserGrantedRoleProvisioner;
+import com.lilamaris.capstone.identity.auth.application.role.port.out.UserGrantedRoleReader;
 import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationErrorCode;
 import com.lilamaris.capstone.identity.auth.domain.account.CredentialAccount;
 import com.lilamaris.capstone.identity.auth.domain.account.User;
@@ -15,8 +16,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -35,6 +38,9 @@ class CredentialAccountUseCaseTest {
     UserStore userStore;
 
     @Mock
+    UserGrantedRoleReader userGrantedRoleReader;
+
+    @Mock
     PasswordEncoder passwordEncoder;
 
     @Mock
@@ -50,6 +56,7 @@ class CredentialAccountUseCaseTest {
                 reader,
                 store,
                 userStore,
+                userGrantedRoleReader,
                 provisioner,
                 roleProvisioner,
                 passwordEncoder,
@@ -67,12 +74,17 @@ class CredentialAccountUseCaseTest {
             when(passwordEncoder.encode(AccountUseCaseTestSupport.RAW_PASSWORD))
                     .thenReturn(AccountUseCaseTestSupport.PASSWORD_HASH);
             when(userStore.save(any(User.class))).thenReturn(AccountUseCaseTestSupport.savedUser());
+            when(roleProvisioner.grant(AccountUseCaseTestSupport.USER_ID))
+                    .thenReturn(List.of(AccountUseCaseTestSupport.userGrantedRole()));
 
-            service.register(AccountUseCaseTestSupport.registerCredentialAccountCommand());
+            var result = service.register(AccountUseCaseTestSupport.registerCredentialAccountCommand());
 
             verify(userStore).save(any(User.class));
             verify(store).save(any(CredentialAccount.class));
             verify(roleProvisioner).grant(AccountUseCaseTestSupport.USER_ID);
+            assertThat(result.grantedRoles())
+                    .extracting(role -> role.namespace().name())
+                    .containsExactly(AccountUseCaseTestSupport.NAMESPACE_NAME);
         }
 
         @Test
@@ -97,11 +109,17 @@ class CredentialAccountUseCaseTest {
             when(reader.findByEmail(AccountUseCaseTestSupport.EMAIL)).thenReturn(Optional.of(account));
             when(passwordEncoder.matches(AccountUseCaseTestSupport.RAW_PASSWORD, account.getPasswordHash()))
                     .thenReturn(true);
+            when(userGrantedRoleReader.findByUserId(account.getUser().getId()))
+                    .thenReturn(List.of(AccountUseCaseTestSupport.userGrantedRole()));
 
-            service.authenticate(AccountUseCaseTestSupport.authenticateCredentialAccountCommand());
+            var result = service.authenticate(AccountUseCaseTestSupport.authenticateCredentialAccountCommand());
 
             verify(reader).findByEmail(AccountUseCaseTestSupport.EMAIL);
             verify(passwordEncoder).matches(AccountUseCaseTestSupport.RAW_PASSWORD, account.getPasswordHash());
+            verify(userGrantedRoleReader).findByUserId(account.getUser().getId());
+            assertThat(result.grantedRoles())
+                    .extracting(role -> role.namespace().name())
+                    .containsExactly(AccountUseCaseTestSupport.NAMESPACE_NAME);
         }
 
         @Test

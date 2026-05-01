@@ -7,11 +7,13 @@ import com.lilamaris.capstone.identity.auth.application.account.port.in.Register
 import com.lilamaris.capstone.identity.auth.application.account.port.in.command.AuthenticateCredentialAccountCommand;
 import com.lilamaris.capstone.identity.auth.application.account.port.in.command.ChangeCredentialAccountCommand;
 import com.lilamaris.capstone.identity.auth.application.account.port.in.command.RegisterCredentialAccountCommand;
+import com.lilamaris.capstone.identity.auth.application.account.port.in.result.AuthenticationResult;
 import com.lilamaris.capstone.identity.auth.application.account.port.in.result.UserResult;
 import com.lilamaris.capstone.identity.auth.application.account.port.out.CredentialAccountReader;
 import com.lilamaris.capstone.identity.auth.application.account.port.out.CredentialAccountStore;
 import com.lilamaris.capstone.identity.auth.application.account.port.out.UserStore;
 import com.lilamaris.capstone.identity.auth.application.role.internal.InitialUserGrantedRoleProvisioner;
+import com.lilamaris.capstone.identity.auth.application.role.port.out.UserGrantedRoleReader;
 import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationErrorCode;
 import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationException;
 import lombok.RequiredArgsConstructor;
@@ -31,15 +33,16 @@ public class CredentialAccountService implements
     private final CredentialAccountReader reader;
     private final CredentialAccountStore store;
     private final UserStore userStore;
+    private final UserGrantedRoleReader userGrantedRoleReader;
 
     private final UserAccountProvisioner accountProvisioner;
-    private final InitialUserGrantedRoleProvisioner roleProvisioner;
+    private final InitialUserGrantedRoleProvisioner initialUserGrantedRoleProvisioner;
     private final PasswordEncoder passwordEncoder;
     private final Clock clock;
 
     @Override
     @Transactional
-    public UserResult register(RegisterCredentialAccountCommand command) {
+    public AuthenticationResult register(RegisterCredentialAccountCommand command) {
         var exists = reader.existsByEmail(command.email());
         if (exists)
             throw new IdentityAuthApplicationException(IdentityAuthApplicationErrorCode.CREDENTIAL_EMAIL_DUPLICATED);
@@ -54,14 +57,14 @@ public class CredentialAccountService implements
         var savedUser = userStore.save(user);
         store.save(account);
 
-        roleProvisioner.grant(savedUser.getId());
+        var userGrantedRoles = initialUserGrantedRoleProvisioner.grant(savedUser.getId());
 
-        return UserResult.from(user);
+        return AuthenticationResult.from(savedUser, userGrantedRoles);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public UserResult authenticate(AuthenticateCredentialAccountCommand command) {
+    public AuthenticationResult authenticate(AuthenticateCredentialAccountCommand command) {
         var account = reader.findByEmail(command.email())
                 .orElseThrow(() -> new IdentityAuthApplicationException(IdentityAuthApplicationErrorCode.AUTHENTICATION_FAILED));
 
@@ -70,8 +73,9 @@ public class CredentialAccountService implements
             throw new IdentityAuthApplicationException(IdentityAuthApplicationErrorCode.AUTHENTICATION_FAILED);
 
         var user = account.getUser();
+        var userGrantedRoles = userGrantedRoleReader.findByUserId(user.getId());
 
-        return UserResult.from(user);
+        return AuthenticationResult.from(user, userGrantedRoles);
     }
 
     @Override
