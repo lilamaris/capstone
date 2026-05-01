@@ -4,7 +4,6 @@ import com.lilamaris.capstone.identity.auth.application.account.port.in.Register
 import com.lilamaris.capstone.identity.auth.application.account.port.in.result.AuthenticationResult;
 import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationException;
 import com.lilamaris.capstone.identity.auth.security.credential.filter.CredentialSignUpAuthentication;
-import com.lilamaris.capstone.identity.core.role.NamespaceRoleSerializer;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -13,12 +12,9 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
-import java.util.stream.Collectors;
-
 @RequiredArgsConstructor
 public class CredentialSignUpProvider implements AuthenticationProvider {
     private final RegisterCredentialAccountUseCase credentialAccountUseCase;
-    private final NamespaceRoleSerializer namespaceRoleSerializer;
 
     @Override
     public @Nullable Authentication authenticate(@NonNull Authentication authentication) throws AuthenticationException {
@@ -37,11 +33,7 @@ public class CredentialSignUpProvider implements AuthenticationProvider {
             };
         }
 
-        var scopes = authenticationResult.grantedRoles().stream()
-                .map(namespaceRoleSerializer::serialize)
-                .collect(Collectors.toUnmodifiableSet());
-
-        return CredentialTrustedAuthenticate.of(authenticationResult, scopes);
+        return CredentialAuthenticate.of(authenticationResult);
     }
 
     @Override

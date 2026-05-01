@@ -5,7 +5,6 @@ import com.lilamaris.capstone.identity.auth.application.account.port.in.result.A
 import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationErrorCode;
 import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationException;
 import com.lilamaris.capstone.identity.auth.security.credential.filter.CredentialSignInAuthentication;
-import com.lilamaris.capstone.identity.core.role.NamespaceRoleSerializer;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -14,12 +13,9 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
-import java.util.stream.Collectors;
-
 @RequiredArgsConstructor
 public class CredentialSignInProvider implements AuthenticationProvider {
     private final AuthenticateCredentialAccountUseCase credentialAccountUseCase;
-    private final NamespaceRoleSerializer namespaceRoleSerializer;
 
     @Override
     public Authentication authenticate(@NonNull Authentication authentication) throws AuthenticationException {
@@ -37,11 +33,7 @@ public class CredentialSignInProvider implements AuthenticationProvider {
             throw new AuthenticationServiceException("Credential sign in failed.", e);
         }
 
-        var scopes = authenticationResult.grantedRoles().stream()
-                .map(namespaceRoleSerializer::serialize)
-                .collect(Collectors.toUnmodifiableSet());
-
-        return CredentialTrustedAuthenticate.of(authenticationResult, scopes);
+        return CredentialAuthenticate.of(authenticationResult);
     }
 
     @Override

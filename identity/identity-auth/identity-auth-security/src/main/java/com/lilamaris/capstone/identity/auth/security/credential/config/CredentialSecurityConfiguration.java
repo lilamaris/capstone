@@ -87,30 +87,24 @@ public class CredentialSecurityConfiguration {
     }
 
     @Bean
-    CredentialSignInProvider credentialSignInProvider(
-            AuthenticateCredentialAccountUseCase authenticateCredentialAccountUseCase,
-            NamespaceRoleSerializer namespaceRoleSerializer
-    ) {
-        return new CredentialSignInProvider(
-                authenticateCredentialAccountUseCase,
-                namespaceRoleSerializer
-        );
+    CredentialSignInProvider credentialSignInProvider(AuthenticateCredentialAccountUseCase authenticateCredentialAccountUseCase) {
+        return new CredentialSignInProvider(authenticateCredentialAccountUseCase);
     }
 
     @Bean
-    CredentialSignUpProvider credentialSignUpProvider(
-            RegisterCredentialAccountUseCase registerCredentialAccountUseCase,
-            NamespaceRoleSerializer namespaceRoleSerializer
-    ) {
-        return new CredentialSignUpProvider(
-                registerCredentialAccountUseCase,
-                namespaceRoleSerializer
-        );
+    CredentialSignUpProvider credentialSignUpProvider(RegisterCredentialAccountUseCase registerCredentialAccountUseCase) {
+        return new CredentialSignUpProvider(registerCredentialAccountUseCase);
     }
 
     @Bean
-    CredentialAuthenticationSuccessHandler credentialAuthenticationSuccessHandler(TokenResponseProcessor tokenResponseProcessor) {
-        return new CredentialAuthenticationSuccessHandler(tokenResponseProcessor);
+    CredentialAuthenticationSuccessHandler credentialAuthenticationSuccessHandler(
+            TokenResponseProcessor tokenResponseProcessor,
+            NamespaceRoleSerializer namespaceRoleSerializer
+    ) {
+        return new CredentialAuthenticationSuccessHandler(
+                tokenResponseProcessor,
+                namespaceRoleSerializer
+        );
     }
 
     @Bean
