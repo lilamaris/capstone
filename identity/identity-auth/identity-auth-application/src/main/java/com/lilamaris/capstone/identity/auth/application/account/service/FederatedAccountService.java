@@ -7,8 +7,8 @@ import com.lilamaris.capstone.identity.auth.application.account.port.in.ListFede
 import com.lilamaris.capstone.identity.auth.application.account.port.in.UnlinkFederatedAccountUseCase;
 import com.lilamaris.capstone.identity.auth.application.account.port.in.command.AuthenticateFederatedAccountCommand;
 import com.lilamaris.capstone.identity.auth.application.account.port.in.command.LinkFederatedAccountCommand;
-import com.lilamaris.capstone.identity.auth.application.account.port.in.query.ListFederatedAccountQuery;
 import com.lilamaris.capstone.identity.auth.application.account.port.in.command.UnlinkFederatedAccountCommand;
+import com.lilamaris.capstone.identity.auth.application.account.port.in.query.ListFederatedAccountQuery;
 import com.lilamaris.capstone.identity.auth.application.account.port.in.result.FederatedAccountResult;
 import com.lilamaris.capstone.identity.auth.application.account.port.in.result.UserResult;
 import com.lilamaris.capstone.identity.auth.application.account.port.out.FederatedAccountReader;
@@ -17,6 +17,7 @@ import com.lilamaris.capstone.identity.auth.application.account.port.out.UserRea
 import com.lilamaris.capstone.identity.auth.application.account.port.out.UserStore;
 import com.lilamaris.capstone.identity.auth.application.account.port.out.criteria.FederatedProviderLookupCriteria;
 import com.lilamaris.capstone.identity.auth.application.account.port.out.criteria.FederatedUserLookupCriteria;
+import com.lilamaris.capstone.identity.auth.application.role.internal.InitialUserGrantedRoleProvisioner;
 import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationErrorCode;
 import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationException;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,8 @@ public class FederatedAccountService implements
     private final UserReader userReader;
     private final UserStore userStore;
 
-    private final UserAccountProvisioner provisioner;
+    private final UserAccountProvisioner accountProvisioner;
+    private final InitialUserGrantedRoleProvisioner roleProvisioner;
     private final Clock clock;
 
     @Override
@@ -48,7 +50,7 @@ public class FederatedAccountService implements
         ensureNotExistsAccount(command.registrationId(), command.providerUserId());
 
         var now = clock.instant();
-        var provisioned = provisioner.createFederatedUser(
+        var provisioned = accountProvisioner.createFederatedUser(
                 command.providerUserNickname(),
                 command.registrationId(),
                 command.providerUserId(),
@@ -58,8 +60,10 @@ public class FederatedAccountService implements
         var user = provisioned.user();
         var account = provisioned.account();
 
-        userStore.save(user);
+        var savedUser = userStore.save(user);
         store.save(account);
+
+        roleProvisioner.grant(savedUser.getId());
 
         return UserResult.from(user);
     }
@@ -73,7 +77,7 @@ public class FederatedAccountService implements
                 .orElseThrow(() -> new IdentityAuthApplicationException(IdentityAuthApplicationErrorCode.USER_NOT_FOUND));
 
         var now = clock.instant();
-        var provisioned = provisioner.linkFederated(user, command.registrationId(), command.providerUserId(), now);
+        var provisioned = accountProvisioner.linkFederated(user, command.registrationId(), command.providerUserId(), now);
 
         store.save(provisioned.account());
 

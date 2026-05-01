@@ -11,6 +11,7 @@ import com.lilamaris.capstone.identity.auth.application.account.port.in.result.U
 import com.lilamaris.capstone.identity.auth.application.account.port.out.CredentialAccountReader;
 import com.lilamaris.capstone.identity.auth.application.account.port.out.CredentialAccountStore;
 import com.lilamaris.capstone.identity.auth.application.account.port.out.UserStore;
+import com.lilamaris.capstone.identity.auth.application.role.internal.InitialUserGrantedRoleProvisioner;
 import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationErrorCode;
 import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationException;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,8 @@ public class CredentialAccountService implements
     private final CredentialAccountStore store;
     private final UserStore userStore;
 
-    private final UserAccountProvisioner provisioner;
+    private final UserAccountProvisioner accountProvisioner;
+    private final InitialUserGrantedRoleProvisioner roleProvisioner;
     private final PasswordEncoder passwordEncoder;
     private final Clock clock;
 
@@ -44,13 +46,15 @@ public class CredentialAccountService implements
 
         var now = clock.instant();
         var passwordHash = passwordEncoder.encode(command.password());
-        var provisioned = provisioner.createCredentialUser(command.nickname(), command.email(), passwordHash, now);
+        var provisioned = accountProvisioner.createCredentialUser(command.nickname(), command.email(), passwordHash, now);
 
         var user = provisioned.user();
         var account = provisioned.account();
 
-        userStore.save(user);
+        var savedUser = userStore.save(user);
         store.save(account);
+
+        roleProvisioner.grant(savedUser.getId());
 
         return UserResult.from(user);
     }

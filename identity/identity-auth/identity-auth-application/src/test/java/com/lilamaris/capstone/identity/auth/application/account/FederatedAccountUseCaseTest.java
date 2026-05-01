@@ -8,6 +8,7 @@ import com.lilamaris.capstone.identity.auth.application.account.port.out.UserSto
 import com.lilamaris.capstone.identity.auth.application.account.port.out.criteria.FederatedProviderLookupCriteria;
 import com.lilamaris.capstone.identity.auth.application.account.port.out.criteria.FederatedUserLookupCriteria;
 import com.lilamaris.capstone.identity.auth.application.account.service.FederatedAccountService;
+import com.lilamaris.capstone.identity.auth.application.role.internal.InitialUserGrantedRoleProvisioner;
 import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationErrorCode;
 import com.lilamaris.capstone.identity.auth.domain.account.FederatedAccount;
 import com.lilamaris.capstone.identity.auth.domain.account.User;
@@ -39,6 +40,9 @@ class FederatedAccountUseCaseTest {
     @Mock
     UserStore userStore;
 
+    @Mock
+    InitialUserGrantedRoleProvisioner roleProvisioner;
+
     UserAccountProvisioner provisioner = new UserAccountProvisioner();
 
     FederatedAccountService service;
@@ -51,6 +55,7 @@ class FederatedAccountUseCaseTest {
                 userReader,
                 userStore,
                 provisioner,
+                roleProvisioner,
                 AccountUseCaseTestSupport.CLOCK
         );
     }
@@ -61,11 +66,14 @@ class FederatedAccountUseCaseTest {
         @Test
         @DisplayName("사용자와 federated 계정을 저장한다")
         void save_user_and_federated_account() {
+            when(userStore.save(any(User.class))).thenReturn(AccountUseCaseTestSupport.savedUser());
+
             service.authenticate(AccountUseCaseTestSupport.authenticateFederatedAccountCommand());
 
             verify(reader).existsByCriteria(any(FederatedProviderLookupCriteria.class));
             verify(userStore).save(any(User.class));
             verify(store).save(any(FederatedAccount.class));
+            verify(roleProvisioner).grant(AccountUseCaseTestSupport.USER_ID);
         }
 
         @Test

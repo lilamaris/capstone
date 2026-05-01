@@ -5,6 +5,7 @@ import com.lilamaris.capstone.identity.auth.application.account.port.out.Credent
 import com.lilamaris.capstone.identity.auth.application.account.port.out.CredentialAccountStore;
 import com.lilamaris.capstone.identity.auth.application.account.port.out.UserStore;
 import com.lilamaris.capstone.identity.auth.application.account.service.CredentialAccountService;
+import com.lilamaris.capstone.identity.auth.application.role.internal.InitialUserGrantedRoleProvisioner;
 import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationErrorCode;
 import com.lilamaris.capstone.identity.auth.domain.account.CredentialAccount;
 import com.lilamaris.capstone.identity.auth.domain.account.User;
@@ -36,6 +37,9 @@ class CredentialAccountUseCaseTest {
     @Mock
     PasswordEncoder passwordEncoder;
 
+    @Mock
+    InitialUserGrantedRoleProvisioner roleProvisioner;
+
     UserAccountProvisioner provisioner = new UserAccountProvisioner();
 
     CredentialAccountService service;
@@ -47,6 +51,7 @@ class CredentialAccountUseCaseTest {
                 store,
                 userStore,
                 provisioner,
+                roleProvisioner,
                 passwordEncoder,
                 AccountUseCaseTestSupport.CLOCK
         );
@@ -61,11 +66,13 @@ class CredentialAccountUseCaseTest {
             when(reader.existsByEmail(AccountUseCaseTestSupport.EMAIL)).thenReturn(false);
             when(passwordEncoder.encode(AccountUseCaseTestSupport.RAW_PASSWORD))
                     .thenReturn(AccountUseCaseTestSupport.PASSWORD_HASH);
+            when(userStore.save(any(User.class))).thenReturn(AccountUseCaseTestSupport.savedUser());
 
             service.register(AccountUseCaseTestSupport.registerCredentialAccountCommand());
 
             verify(userStore).save(any(User.class));
             verify(store).save(any(CredentialAccount.class));
+            verify(roleProvisioner).grant(AccountUseCaseTestSupport.USER_ID);
         }
 
         @Test
