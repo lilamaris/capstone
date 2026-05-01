@@ -23,7 +23,7 @@ public class ProviderBasedInitialUserGrantedRoleRegistry implements InitialUserG
 
         providers.forEach(provider -> {
             var namespaceRole = provider.provide();
-            var key = namespaceRole.namespace().name();
+            var key = keyOf(namespaceRole.namespace());
             if (initial.putIfAbsent(key, namespaceRole) != null) {
                 throw new IllegalArgumentException("duplicated namespace found: " + key);
             }
@@ -46,7 +46,7 @@ public class ProviderBasedInitialUserGrantedRoleRegistry implements InitialUserG
     public NamespaceRole resolveByNamespace(ApplicationNamespace namespace) {
         Preconditions.requireNonNull(namespace, "namespace");
         return registry.getOrDefault(
-                namespace.name(),
+                keyOf(namespace),
                 SimpleNamespaceRole.of(namespace, fallbackRole)
         );
     }
