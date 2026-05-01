@@ -40,6 +40,12 @@ public final class AccountUseCaseTestSupport {
         return User.of(NICKNAME, NOW);
     }
 
+    public static User savedUser() {
+        var user = user();
+        assignId(user, USER_ID);
+        return user;
+    }
+
     public static CredentialAccount credentialAccount() {
         return CredentialAccount.of(user(), EMAIL, PASSWORD_HASH, NOW);
     }
@@ -88,5 +94,15 @@ public final class AccountUseCaseTestSupport {
                 .isInstanceOfSatisfying(IdentityAuthApplicationException.class, exception ->
                         org.assertj.core.api.Assertions.assertThat(exception.getErrorCode()).isEqualTo(errorCode)
                 );
+    }
+
+    private static void assignId(User user, UUID id) {
+        try {
+            var field = User.class.getDeclaredField("id");
+            field.setAccessible(true);
+            field.set(user, id);
+        } catch (NoSuchFieldException | IllegalAccessException exception) {
+            throw new IllegalStateException(exception);
+        }
     }
 }
