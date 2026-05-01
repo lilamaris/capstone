@@ -27,6 +27,7 @@ include("identity:identity-auth")
 include("identity:identity-auth:identity-contract:")
 include("identity:identity-auth:identity-auth-domain")
 include("identity:identity-auth:identity-auth-application")
+include("identity:identity-auth:identity-auth-webmvc")
 
 include("timeline")
 include("timeline:timeline-domain")
