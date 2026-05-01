@@ -10,6 +10,7 @@ dependencies {
     implementation(project(":identity:identity-auth:identity-auth-domain"))
     implementation(project(":identity:identity-core"))
 
+    implementation(libs.spring.boot.starter.oauth2.client)
     implementation(libs.tools.jackson.databind)
     implementation(libs.springdoc.openapi.starter.webmvc.ui)
 }
