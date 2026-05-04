@@ -1,9 +1,9 @@
-package com.lilamaris.capstone.identity.auth.persistence.account;
+package com.lilamaris.capstone.identity.auth.persistence.account.jpa;
 
 import com.lilamaris.capstone.identity.auth.application.account.port.out.UserReader;
 import com.lilamaris.capstone.identity.auth.application.account.port.out.UserStore;
 import com.lilamaris.capstone.identity.auth.domain.account.User;
-import com.lilamaris.capstone.identity.auth.persistence.account.repository.UserRepository;
+import com.lilamaris.capstone.identity.auth.persistence.account.jpa.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

@@ -1,11 +1,14 @@
-package com.lilamaris.capstone.identity.auth.persistence.account;
+package com.lilamaris.capstone.identity.auth.persistence.account.jpa;
 
 import com.lilamaris.capstone.identity.auth.application.account.port.out.criteria.FederatedProviderLookupCriteria;
 import com.lilamaris.capstone.identity.auth.application.account.port.out.criteria.FederatedUserLookupCriteria;
 import com.lilamaris.capstone.identity.auth.domain.account.FederatedAccount;
 import com.lilamaris.capstone.identity.auth.domain.account.User;
 import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;

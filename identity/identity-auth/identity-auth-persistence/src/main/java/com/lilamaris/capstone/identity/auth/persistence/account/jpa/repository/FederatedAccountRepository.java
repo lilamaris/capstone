@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.identity.auth.persistence.account.repository;
+package com.lilamaris.capstone.identity.auth.persistence.account.jpa.repository;
 
 import com.lilamaris.capstone.identity.auth.domain.account.FederatedAccount;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,11 +1,11 @@
-package com.lilamaris.capstone.identity.auth.persistence.account;
+package com.lilamaris.capstone.identity.auth.persistence.account.jpa;
 
 import com.lilamaris.capstone.identity.auth.application.account.port.out.FederatedAccountReader;
 import com.lilamaris.capstone.identity.auth.application.account.port.out.FederatedAccountStore;
 import com.lilamaris.capstone.identity.auth.application.account.port.out.criteria.FederatedProviderLookupCriteria;
 import com.lilamaris.capstone.identity.auth.application.account.port.out.criteria.FederatedUserLookupCriteria;
 import com.lilamaris.capstone.identity.auth.domain.account.FederatedAccount;
-import com.lilamaris.capstone.identity.auth.persistence.account.repository.FederatedAccountRepository;
+import com.lilamaris.capstone.identity.auth.persistence.account.jpa.repository.FederatedAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
