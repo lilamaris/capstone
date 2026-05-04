@@ -1,9 +1,9 @@
-package com.lilamaris.capstone.identity.auth.persistence.account;
+package com.lilamaris.capstone.identity.auth.persistence.account.jpa;
 
 import com.lilamaris.capstone.identity.auth.application.account.port.out.CredentialAccountReader;
 import com.lilamaris.capstone.identity.auth.application.account.port.out.CredentialAccountStore;
 import com.lilamaris.capstone.identity.auth.domain.account.CredentialAccount;
-import com.lilamaris.capstone.identity.auth.persistence.account.repository.CredentialAccountRepository;
+import com.lilamaris.capstone.identity.auth.persistence.account.jpa.repository.CredentialAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
