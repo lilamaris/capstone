@@ -7,12 +7,7 @@ import java.util.Set;
 @ConfigurationProperties(prefix = "identity.jwks")
 public record JwksFileProperties(
         String activeSignableKid,
-        Set<KeyEntry> keys
+        String keyBaseLocation,
+        Set<String> keys
 ) {
-    public record KeyEntry(
-            String kid,
-            String publicKeyLocation,
-            String privateKeyLocation
-    ) {
-    }
 }
