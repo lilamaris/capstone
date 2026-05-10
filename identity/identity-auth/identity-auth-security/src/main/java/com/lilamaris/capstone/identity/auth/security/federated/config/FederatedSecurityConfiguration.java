@@ -9,13 +9,16 @@ import com.lilamaris.capstone.identity.auth.security.federated.service.CustomOid
 import com.lilamaris.capstone.identity.auth.security.shared.response.ResponseWriter;
 import com.lilamaris.capstone.identity.auth.security.shared.response.TokenResponseProcessor;
 import com.lilamaris.capstone.identity.core.role.NamespaceRoleSerializer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.client.OAuth2LoginConfigurer;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 
 @Configuration
+@ConditionalOnBean(ClientRegistrationRepository.class)
 public class FederatedSecurityConfiguration {
     @Bean
     Customizer<OAuth2LoginConfigurer<HttpSecurity>.UserInfoEndpointConfig> userInfoEndpointConfigCustomizer(
