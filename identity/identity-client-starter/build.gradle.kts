@@ -12,4 +12,7 @@ dependencies {
 
     implementation(libs.spring.security.jose)
     compileOnly(libs.jakarta.servlet.api)
+
+    testImplementation(project(":kernel:kernel-test-support"))
+    testImplementation(libs.jakarta.servlet.api)
 }
