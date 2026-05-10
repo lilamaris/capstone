@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.identity.auth.persistence.jwks.io;
 
 import com.lilamaris.capstone.identity.auth.application.jwks.port.out.JwksReader;
-import com.lilamaris.capstone.identity.auth.domain.jwks.RSASignatureKey;
+import com.lilamaris.capstone.identity.auth.application.jwks.port.out.KeyMaterial;
 import com.lilamaris.capstone.identity.auth.domain.jwks.RSAVerificationKey;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -16,11 +16,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -34,18 +30,6 @@ public class FileBasedKeyStore implements JwksReader {
     private final String activeSignableKid;
     private final String keyBaseLocation;
     private final Map<String, KeyMaterial> keyMap;
-
-    private record KeyMaterial(String kid, RSAPublicKey publicKey, RSAPrivateKey privateKey) {
-        public RSASignatureKey toSignature() {
-            if (privateKey == null)
-                throw new IllegalStateException("signable key does not have a private key. kid=" + kid);
-            return RSASignatureKey.of(kid, privateKey);
-        }
-
-        public RSAVerificationKey toVerification() {
-            return RSAVerificationKey.of(kid, publicKey);
-        }
-    }
 
     public FileBasedKeyStore(
             JwksFileProperties properties,
@@ -69,11 +53,11 @@ public class FileBasedKeyStore implements JwksReader {
     }
 
     @Override
-    public RSASignatureKey findSignableKey() {
-        var keyPair = keyMap.get(activeSignableKid);
-        if (keyPair == null)
+    public KeyMaterial findSignableKey() {
+        var key = keyMap.get(activeSignableKid);
+        if (key == null)
             throw new NoSuchElementException("no active signable key exists. kid=" + activeSignableKid);
-        return keyPair.toSignature();
+        return key;
     }
 
     @Override
