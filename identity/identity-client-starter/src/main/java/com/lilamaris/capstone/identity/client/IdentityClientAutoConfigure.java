@@ -1,0 +1,79 @@
+package com.lilamaris.capstone.identity.client;
+
+import com.lilamaris.capstone.identity.client.jwt.ActorAuthenticationConverter;
+import com.lilamaris.capstone.identity.client.jwt.ActorContextBindingFilter;
+import com.lilamaris.capstone.identity.core.actor.context.ActorContextHolder;
+import com.lilamaris.capstone.identity.core.actor.context.ThreadLocalActorContextHolder;
+import com.lilamaris.capstone.identity.core.role.*;
+import com.lilamaris.capstone.kernel.core.namespace.RunningNamespaceContext;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+
+import java.util.List;
+
+@AutoConfiguration
+@ConditionalOnProperty(
+        prefix = "identity.client",
+        name = "enabled",
+        havingValue = "true",
+        matchIfMissing = true
+)
+@EnableConfigurationProperties(IdentityClientProperties.class)
+public class IdentityClientAutoConfigure {
+    @Bean
+    @ConditionalOnMissingBean(JwtDecoder.class)
+    JwtDecoder jwtDecoder(IdentityClientProperties properties) {
+        return NimbusJwtDecoder.withJwkSetUri(properties.jwksUri().toString()).build();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    ActorAuthenticationConverter actorAuthenticationConverter(
+            NamespaceRoleDeserializer namespaceRoleDeserializer,
+            RoleCapabilityResolver roleCapabilityResolver,
+            RunningNamespaceContext runningNamespaceContext
+    ) {
+        return new ActorAuthenticationConverter(namespaceRoleDeserializer, runningNamespaceContext, roleCapabilityResolver);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(ActorContextBindingFilter.class)
+    @ConditionalOnClass({
+            jakarta.servlet.Filter.class,
+            org.springframework.security.core.context.SecurityContextHolder.class,
+            org.springframework.web.filter.OncePerRequestFilter.class
+    })
+    ActorContextBindingFilter actorContextBindingFilter(ActorContextHolder actorContextHolder) {
+        return new ActorContextBindingFilter(actorContextHolder);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(ActorContextHolder.class)
+    ThreadLocalActorContextHolder actorContextHolder() {
+        return new ThreadLocalActorContextHolder();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(RoleCapabilityResolver.class)
+    InMemoryRoleCapabilityRegistry inMemoryRoleCapabilityRegistry(List<RoleCapabilities> roleCapabilities) {
+        return new InMemoryRoleCapabilityRegistry(roleCapabilities);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(NamespaceRoleSerializer.class)
+    SeparatorBasedNamespaceRoleSerializer separatorBasedNamespaceRoleSerializer() {
+        return new SeparatorBasedNamespaceRoleSerializer();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(NamespaceRoleDeserializer.class)
+    SeparatorBasedNamespaceRoleDeserializer separatorBasedNamespaceRoleDeserializer() {
+        return new SeparatorBasedNamespaceRoleDeserializer();
+    }
+}
