@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+!/usr/bin/env bash
 set -euo pipefail
 
 KID="${1:-key-$(date +%Y%m%d-%H%M%S)}"
