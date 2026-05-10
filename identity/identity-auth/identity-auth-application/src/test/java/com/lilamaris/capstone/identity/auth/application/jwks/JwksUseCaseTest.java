@@ -1,7 +1,7 @@
 package com.lilamaris.capstone.identity.auth.application.jwks;
 
-import com.lilamaris.capstone.identity.auth.application.jwks.contract.TokenIssuerMetadata;
 import com.lilamaris.capstone.identity.auth.application.jwks.port.out.JwksReader;
+import com.lilamaris.capstone.identity.auth.application.jwks.properties.IssueJwtProperties;
 import com.lilamaris.capstone.identity.auth.application.jwks.service.JoseIssueJwtUseCase;
 import com.lilamaris.capstone.identity.auth.application.jwks.service.JwksService;
 import com.lilamaris.capstone.identity.auth.application.jwks.service.RandomIssueOpaqueTokenUseCase;
@@ -72,7 +72,7 @@ class JwksUseCaseTest {
         void setUp() {
             service = new JoseIssueJwtUseCase(
                     jwtEncoder,
-                    new TokenIssuerMetadata(ISSUER, EXPIRATION),
+                    new IssueJwtProperties(ISSUER, EXPIRATION),
                     CLOCK
             );
         }

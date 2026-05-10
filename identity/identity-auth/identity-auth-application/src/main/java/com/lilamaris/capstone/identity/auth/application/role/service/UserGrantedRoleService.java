@@ -11,7 +11,7 @@ import com.lilamaris.capstone.identity.auth.application.role.port.in.result.User
 import com.lilamaris.capstone.identity.auth.application.role.port.out.UserGrantedRoleReader;
 import com.lilamaris.capstone.identity.auth.application.role.port.out.UserGrantedRoleStore;
 import com.lilamaris.capstone.identity.auth.application.role.port.out.criteria.UserGrantRoleLookupCriteria;
-import com.lilamaris.capstone.identity.auth.application.shared.config.IdentityAuthCapability;
+import com.lilamaris.capstone.identity.auth.application.shared.IdentityAuthCapability;
 import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationErrorCode;
 import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationException;
 import com.lilamaris.capstone.identity.auth.domain.role.UserGrantedRole;

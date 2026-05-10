@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.identity.auth.application.shared.config;
+package com.lilamaris.capstone.identity.auth.application.shared;
 
 import com.lilamaris.capstone.identity.core.actor.Capability;
 import lombok.RequiredArgsConstructor;

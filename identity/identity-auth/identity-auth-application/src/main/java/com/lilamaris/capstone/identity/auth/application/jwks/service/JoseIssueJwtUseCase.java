@@ -1,25 +1,23 @@
 package com.lilamaris.capstone.identity.auth.application.jwks.service;
 
-import com.lilamaris.capstone.identity.auth.application.jwks.contract.TokenIssuerMetadata;
 import com.lilamaris.capstone.identity.auth.application.jwks.port.in.IssueJwtUseCase;
+import com.lilamaris.capstone.identity.auth.application.jwks.properties.IssueJwtProperties;
 import com.lilamaris.capstone.kernel.core.condition.Preconditions;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.stereotype.Service;
 
 import java.time.Clock;
 import java.util.Set;
 
+@Service
+@RequiredArgsConstructor
 public class JoseIssueJwtUseCase implements IssueJwtUseCase {
     private final JwtEncoder jwtEncoder;
-    private final TokenIssuerMetadata metadata;
+    private final IssueJwtProperties metadata;
     private final Clock clock;
-
-    public JoseIssueJwtUseCase(JwtEncoder jwtEncoder, TokenIssuerMetadata metadata, Clock clock) {
-        this.jwtEncoder = Preconditions.requireNonNull(jwtEncoder, "jwtEncoder");
-        this.metadata = Preconditions.requireNonNull(metadata, "metadata");
-        this.clock = Preconditions.requireNonNull(clock, "clock");
-    }
 
     @Override
     public String issue(String subject, Set<String> scopes) {

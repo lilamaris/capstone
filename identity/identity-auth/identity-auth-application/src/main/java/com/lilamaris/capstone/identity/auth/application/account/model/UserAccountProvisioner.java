@@ -5,9 +5,11 @@ import com.lilamaris.capstone.identity.auth.domain.account.FederatedAccount;
 import com.lilamaris.capstone.identity.auth.domain.account.User;
 import com.lilamaris.capstone.kernel.core.condition.Preconditions;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 
+@Component
 @RequiredArgsConstructor
 public class UserAccountProvisioner {
 
