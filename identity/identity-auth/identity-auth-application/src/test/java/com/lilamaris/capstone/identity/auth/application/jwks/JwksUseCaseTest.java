@@ -22,19 +22,13 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Clock;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.random.RandomGenerator;
 
 import static com.lilamaris.capstone.kernel.testsupport.assertion.DomainAssertions.assertThatDomainThrownBy;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -58,6 +52,16 @@ class JwksUseCaseTest {
 
     @Mock
     RSAPublicKey publicKey;
+
+    private static Jwt jwt() {
+        return new Jwt(
+                TOKEN_VALUE,
+                CLOCK.instant(),
+                CLOCK.instant().plus(EXPIRATION),
+                Map.of("alg", "RS256"),
+                Map.of("sub", SUBJECT)
+        );
+    }
 
     @Nested
     @DisplayName("JWT 발급")
@@ -169,15 +173,5 @@ class JwksUseCaseTest {
             assertThat(result).isSameAs(keys);
             verify(reader).findVerifiableKeys();
         }
-    }
-
-    private static Jwt jwt() {
-        return new Jwt(
-                TOKEN_VALUE,
-                CLOCK.instant(),
-                CLOCK.instant().plus(EXPIRATION),
-                Map.of("alg", "RS256"),
-                Map.of("sub", SUBJECT)
-        );
     }
 }
