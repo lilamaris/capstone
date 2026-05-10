@@ -27,8 +27,12 @@ import java.util.stream.Collectors;
 @Repository
 public class FileBasedKeyStore implements JwksReader {
     private static final byte[] KEY_PAIR_CHECK_PAYLOAD = "jwks-key-pair-check".getBytes(StandardCharsets.UTF_8);
+    private static final String DEFAULT_KEY_BASE_LOCATION = "classpath:keys/";
+    private static final String PUBLIC_KEY_FILENAME = "public.pem";
+    private static final String PRIVATE_KEY_FILENAME = "private.pem";
 
     private final String activeSignableKid;
+    private final String keyBaseLocation;
     private final Map<String, KeyMaterial> keyMap;
 
     private record KeyMaterial(String kid, RSAPublicKey publicKey, RSAPrivateKey privateKey) {
@@ -52,9 +56,10 @@ public class FileBasedKeyStore implements JwksReader {
         validateConfigured(properties);
 
         this.activeSignableKid = properties.activeSignableKid();
+        this.keyBaseLocation = keyBaseLocation(properties);
 
         this.keyMap = properties.keys().stream()
-                .map(entry -> loadKey(entry.kid(), entry.publicKeyLocation(), entry.privateKeyLocation(), resourceLoader))
+                .map(kid -> loadKey(kid, resourceLoader))
                 .collect(Collectors.toUnmodifiableMap(
                         KeyMaterial::kid,
                         Function.identity()
@@ -85,10 +90,8 @@ public class FileBasedKeyStore implements JwksReader {
             throw new IllegalStateException("identity.jwks.keys is not configured");
 
         properties.keys().forEach(entry -> {
-            if (!StringUtils.hasText(entry.kid()))
+            if (!StringUtils.hasText(entry))
                 throw new IllegalStateException("identity.jwks.keys[].kid is not configured");
-            if (!StringUtils.hasText(entry.publicKeyLocation()))
-                throw new IllegalStateException("identity.jwks.keys[].public-key-location is not configured. kid=" + entry.kid());
         });
     }
 
@@ -100,24 +103,36 @@ public class FileBasedKeyStore implements JwksReader {
             throw new IllegalStateException("active signable key must have a private key. kid=" + activeSignableKid);
     }
 
-    private KeyMaterial loadKey(String kid, String publicKeyLocation, String privateKeyLocation, ResourceLoader resourceLoader) {
+    private KeyMaterial loadKey(String kid, ResourceLoader resourceLoader) {
         RSAPublicKey publicKey;
         RSAPrivateKey privateKey = null;
+        var publicKeyLocation = keyLocation(kid, PUBLIC_KEY_FILENAME);
+        var privateKeyLocation = keyLocation(kid, PRIVATE_KEY_FILENAME);
 
         try {
             var publicKeyResource = resourceLoader.getResource(publicKeyLocation);
             publicKey = readPublicKey(publicKeyResource);
 
-            if (StringUtils.hasText(privateKeyLocation)) {
-                var privateKeyResource = resourceLoader.getResource(privateKeyLocation);
+            var privateKeyResource = resourceLoader.getResource(privateKeyLocation);
+            if (privateKeyResource.exists()) {
                 privateKey = readPrivateKey(privateKeyResource);
                 validateKeyPair(kid, publicKey, privateKey);
             }
         } catch (Exception e) {
-            throw new IllegalStateException("Failed to load key. publicKey location: %s, privateKey location: %s".formatted(publicKeyLocation, privateKeyLocation), e);
+            throw new IllegalStateException("Failed to load key. kid=%s, publicKey location=%s, privateKey location=%s".formatted(kid, publicKeyLocation, privateKeyLocation), e);
         }
 
         return new KeyMaterial(kid, publicKey, privateKey);
+    }
+
+    private String keyLocation(String kid, String filename) {
+        return keyBaseLocation + kid + "/" + filename;
+    }
+
+    private String keyBaseLocation(JwksFileProperties properties) {
+        var configuredLocation = properties.keyBaseLocation();
+        var location = StringUtils.hasText(configuredLocation) ? configuredLocation : DEFAULT_KEY_BASE_LOCATION;
+        return location.endsWith("/") ? location : location + "/";
     }
 
     private void validateKeyPair(String kid, RSAPublicKey publicKey, RSAPrivateKey privateKey) throws GeneralSecurityException {

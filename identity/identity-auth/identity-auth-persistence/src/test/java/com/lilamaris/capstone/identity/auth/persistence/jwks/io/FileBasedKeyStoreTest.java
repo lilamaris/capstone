@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class FileBasedKeyStoreTest {
     @TempDir
     Path tempDir;
+    private final DefaultResourceLoader resourceLoader = new TestKeyResourceLoader();
 
     @Test
     @DisplayName("active 키는 서명 가능하고 public-only 키도 검증 목록에 포함한다")
@@ -30,8 +33,8 @@ class FileBasedKeyStoreTest {
         var rotated = writeKeyFiles("rotated", generateRsaKeyPair(), false);
 
         var keyStore = new FileBasedKeyStore(
-                properties("active", Set.of(active.entry(), rotated.entry())),
-                new DefaultResourceLoader()
+                properties("active", "classpath:keys/", Set.of(active.kid(), rotated.kid())),
+                resourceLoader
         );
 
         assertThat(keyStore.findSignableKey().kid()).isEqualTo("active");
@@ -41,13 +44,39 @@ class FileBasedKeyStoreTest {
     }
 
     @Test
+    @DisplayName("key base location이 없으면 기본 classpath:keys/를 사용한다")
+    void use_default_key_base_location() throws Exception {
+        var active = writeKeyFiles("active", generateRsaKeyPair(), true);
+
+        var keyStore = new FileBasedKeyStore(
+                properties("active", null, Set.of(active.kid())),
+                resourceLoader
+        );
+
+        assertThat(keyStore.findSignableKey().kid()).isEqualTo("active");
+    }
+
+    @Test
+    @DisplayName("key base location 끝에 슬래시가 없어도 키를 읽는다")
+    void normalize_key_base_location() throws Exception {
+        var active = writeKeyFiles("active", generateRsaKeyPair(), true);
+
+        var keyStore = new FileBasedKeyStore(
+                properties("active", "classpath:keys", Set.of(active.kid())),
+                resourceLoader
+        );
+
+        assertThat(keyStore.findSignableKey().kid()).isEqualTo("active");
+    }
+
+    @Test
     @DisplayName("active 키에 private key가 없으면 생성 시점에 실패한다")
     void fail_when_active_key_has_no_private_key() throws Exception {
         var active = writeKeyFiles("active", generateRsaKeyPair(), false);
 
         assertThatThrownBy(() -> new FileBasedKeyStore(
-                properties("active", Set.of(active.entry())),
-                new DefaultResourceLoader()
+                properties("active", "classpath:keys/", Set.of(active.kid())),
+                resourceLoader
         ))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("active signable key must have a private key");
@@ -58,13 +87,12 @@ class FileBasedKeyStoreTest {
     void fail_when_public_key_does_not_match_private_key() throws Exception {
         var publicKeyPair = generateRsaKeyPair();
         var privateKeyPair = generateRsaKeyPair();
-        var publicKey = writePublicKey("active", publicKeyPair);
-        var privateKey = writePrivateKey("active", privateKeyPair);
-        var entry = new JwksFileProperties.KeyEntry("active", location(publicKey), location(privateKey));
+        writePublicKey("active", publicKeyPair);
+        writePrivateKey("active", privateKeyPair);
 
         assertThatThrownBy(() -> new FileBasedKeyStore(
-                properties("active", Set.of(entry)),
-                new DefaultResourceLoader()
+                properties("active", "classpath:keys/", Set.of("active")),
+                resourceLoader
         ))
                 .isInstanceOf(IllegalStateException.class)
                 .hasRootCauseMessage("public key does not match private key. kid=active");
@@ -76,37 +104,34 @@ class FileBasedKeyStoreTest {
         var rotated = writeKeyFiles("rotated", generateRsaKeyPair(), false);
 
         assertThatThrownBy(() -> new FileBasedKeyStore(
-                properties("active", Set.of(rotated.entry())),
-                new DefaultResourceLoader()
+                properties("active", "classpath:keys/", Set.of(rotated.kid())),
+                resourceLoader
         ))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessageContaining("no active signable key exists. kid=active");
     }
 
-    private JwksFileProperties properties(String activeSignableKid, Set<JwksFileProperties.KeyEntry> entries) {
-        return new JwksFileProperties(activeSignableKid, entries);
+    private JwksFileProperties properties(String activeSignableKid, String keyBaseLocation, Set<String> keys) {
+        return new JwksFileProperties(activeSignableKid, keyBaseLocation, keys);
     }
 
     private KeyFiles writeKeyFiles(String kid, KeyPair keyPair, boolean includePrivateKey) throws Exception {
-        var publicKey = writePublicKey(kid, keyPair);
-        var privateKey = includePrivateKey ? writePrivateKey(kid, keyPair) : null;
-        return new KeyFiles(
-                new JwksFileProperties.KeyEntry(
-                        kid,
-                        location(publicKey),
-                        privateKey == null ? null : location(privateKey)
-                )
-        );
+        writePublicKey(kid, keyPair);
+        if (includePrivateKey)
+            writePrivateKey(kid, keyPair);
+        return new KeyFiles(kid);
     }
 
     private Path writePublicKey(String kid, KeyPair keyPair) throws Exception {
-        var path = tempDir.resolve(kid + "-public.pem");
+        var keyDir = Files.createDirectories(tempDir.resolve("keys").resolve(kid));
+        var path = keyDir.resolve("public.pem");
         Files.writeString(path, pem("PUBLIC KEY", keyPair.getPublic().getEncoded()));
         return path;
     }
 
     private Path writePrivateKey(String kid, KeyPair keyPair) throws Exception {
-        var path = tempDir.resolve(kid + "-private.pem");
+        var keyDir = Files.createDirectories(tempDir.resolve("keys").resolve(kid));
+        var path = keyDir.resolve("private.pem");
         Files.writeString(path, pem("PRIVATE KEY", keyPair.getPrivate().getEncoded()));
         return path;
     }
@@ -122,10 +147,17 @@ class FileBasedKeyStoreTest {
         return "-----BEGIN " + label + "-----\n" + body + "\n-----END " + label + "-----\n";
     }
 
-    private String location(Path path) {
-        return path.toUri().toString();
+    private class TestKeyResourceLoader extends DefaultResourceLoader {
+        @Override
+        public Resource getResource(String location) {
+            if (location.startsWith("classpath:keys/")) {
+                var relativePath = location.substring("classpath:".length());
+                return new FileSystemResource(tempDir.resolve(relativePath));
+            }
+            return super.getResource(location);
+        }
     }
 
-    private record KeyFiles(JwksFileProperties.KeyEntry entry) {
+    private record KeyFiles(String kid) {
     }
 }
