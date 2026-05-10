@@ -1,0 +1,10 @@
+identity:
+  jwt:
+    issuer: "capstone"
+    expiration: "PT1H"
+  jwks:
+    activeSignableKid: "key-20260510-095005"
+    keyBaseLocation: "classpath:keys/"
+    keys:
+      - "key-20260510-094925"
+      - "key-20260510-095005"
