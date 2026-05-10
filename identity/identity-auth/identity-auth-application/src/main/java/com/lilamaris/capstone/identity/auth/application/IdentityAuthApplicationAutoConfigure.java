@@ -13,9 +13,11 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -27,7 +29,6 @@ import java.util.ServiceLoader;
 import java.util.random.RandomGenerator;
 
 @AutoConfiguration
-@EnableConfigurationProperties(IssueJwtProperties.class)
 public class IdentityAuthApplicationAutoConfigure {
 
     @Bean
@@ -49,18 +50,6 @@ public class IdentityAuthApplicationAutoConfigure {
     }
 
     @Bean
-    @ConditionalOnMissingBean(JwtEncoder.class)
-    JwtEncoder jwtEncoder(JwksReader jwksReader) {
-        var signableKey = jwksReader.findSignableKey();
-        var rsaKey = new RSAKey.Builder(signableKey.publicKey())
-                .privateKey(signableKey.privateKey())
-                .keyID(signableKey.kid())
-                .build();
-        JWKSource<SecurityContext> source = (selector, context) -> selector.select(new JWKSet(rsaKey));
-        return new NimbusJwtEncoder(source);
-    }
-
-    @Bean
     @ConditionalOnMissingBean(InitialUserGrantedRoleRegistry.class)
     InitialUserGrantedRoleRegistry initialUserGrantedRoleRegistry() {
         var providers = ServiceLoader.load(InitialUserGrantedRoleProvider.class).stream()
@@ -74,5 +63,22 @@ public class IdentityAuthApplicationAutoConfigure {
     @ConditionalOnMissingBean(RandomGenerator.class)
     RandomGenerator randomGenerator() {
         return new SecureRandom();
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnBean(JwksReader.class)
+    @EnableConfigurationProperties(IssueJwtProperties.class)
+    static class JwtConfiguration {
+        @Bean
+        @ConditionalOnMissingBean(JwtEncoder.class)
+        JwtEncoder jwtEncoder(JwksReader jwksReader) {
+            var signableKey = jwksReader.findSignableKey();
+            var rsaKey = new RSAKey.Builder(signableKey.publicKey())
+                    .privateKey(signableKey.privateKey())
+                    .keyID(signableKey.kid())
+                    .build();
+            JWKSource<SecurityContext> source = (selector, context) -> selector.select(new JWKSet(rsaKey));
+            return new NimbusJwtEncoder(source);
+        }
     }
 }
