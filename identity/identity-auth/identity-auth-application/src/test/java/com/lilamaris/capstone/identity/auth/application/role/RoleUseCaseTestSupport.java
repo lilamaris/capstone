@@ -3,7 +3,7 @@ package com.lilamaris.capstone.identity.auth.application.role;
 import com.lilamaris.capstone.identity.auth.application.role.port.in.command.GrantRoleCommand;
 import com.lilamaris.capstone.identity.auth.application.role.port.in.command.RevokeRoleCommand;
 import com.lilamaris.capstone.identity.auth.application.role.port.in.query.ListUserGrantedRoleQuery;
-import com.lilamaris.capstone.identity.auth.application.shared.config.IdentityAuthCapability;
+import com.lilamaris.capstone.identity.auth.application.shared.IdentityAuthCapability;
 import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationErrorCode;
 import com.lilamaris.capstone.identity.auth.application.shared.exception.IdentityAuthApplicationException;
 import com.lilamaris.capstone.identity.auth.domain.role.UserGrantedRole;
