@@ -23,6 +23,7 @@ include("kernel:kernel-test-support")
 
 include("identity")
 include("identity:identity-core")
+include("identity:identity-client-starter")
 include("identity:identity-auth")
 include("identity:identity-auth:identity-contract:")
 include("identity:identity-auth:identity-auth-domain")
