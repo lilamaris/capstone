@@ -34,7 +34,7 @@ public class CredentialSecurityConfiguration {
     @Order(2)
     SecurityFilterChain credentialAuthenticationSecurityFilterChain(
             HttpSecurity httpSecurity,
-            CorsConfigurationSource corsConfigurationSource,
+            @Qualifier("corsConfigurationSource") CorsConfigurationSource corsConfigurationSource,
             JsonCredentialSignInProcessingFilter jsonCredentialSignInProcessingFilter,
             JsonCredentialSignUpProcessingFilter jsonCredentialSignUpProcessingFilter
     ) {
