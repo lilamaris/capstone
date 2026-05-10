@@ -7,10 +7,10 @@ group = "com.lilamaris.capstone"
 version = "0.0.1-SNAPSHOT"
 
 dependencies {
-    implementation(project(":identity:identity-auth:identity-auth-domain"))
+    implementation(project(":identity:identity-server:identity-server-domain"))
 
     implementation(project(":identity:identity-core"))
-    implementation(project(":identity:identity-auth:identity-contract"))
+    implementation(project(":identity:identity-server:identity-contract"))
 
     implementation(project(":kernel:kernel-core"))
 
