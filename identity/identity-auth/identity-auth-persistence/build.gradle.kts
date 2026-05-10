@@ -1,5 +1,6 @@
 plugins {
     id("capstone.spring.persistence")
+    id("capstone.spring.autoconfigure")
 }
 
 group = "com.lilamaris.capstone"
