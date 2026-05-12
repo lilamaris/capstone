@@ -13,10 +13,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("TemporalRange 계약 테스트")
-public abstract class AbstractTemporalRangeTest<T extends TemporalRange> {
+public abstract class AbstractTemporalRangeTest<T extends TemporalRange> extends AbstractRangeComparableTest<T> {
 
     Clock clock = FixedClock.getFixed();
-    TemporalRange range;
 
     public abstract T create(Instant startAt, Instant endAt);
 
@@ -36,28 +35,6 @@ public abstract class AbstractTemporalRangeTest<T extends TemporalRange> {
     }
 
     @Test
-    @DisplayName("시작 시간 이상, 종료 시간 이하는 포함한다")
-    void contains_within_range() {
-        assertThat(range.contains(create(START_AT, END_AT))).isTrue();
-        assertThat(range.contains(create(START_AT, BEFORE_END_AT))).isTrue();
-        assertThat(range.contains(create(AFTER_START_AT, END_AT))).isTrue();
-
-        assertThat(range.containsBy(create(START_AT, END_AT))).isTrue();
-        assertThat(range.containsBy(create(START_AT, AFTER_END_AT))).isTrue();
-        assertThat(range.containsBy(create(BEFORE_START_AT, END_AT))).isTrue();
-    }
-
-    @Test
-    @DisplayName("시작 시간 이전, 종료 시간 이후는 포함하지 않는다")
-    void does_not_contain_outside_range() {
-        assertThat(range.contains(create(BEFORE_START_AT, START_AT))).isFalse();
-        assertThat(range.contains(create(END_AT, AFTER_END_AT))).isFalse();
-
-        assertThat(range.containsBy(create(BEFORE_START_AT, START_AT))).isFalse();
-        assertThat(range.containsBy(create(END_AT, AFTER_END_AT))).isFalse();
-    }
-
-    @Test
     @DisplayName("Instant 포함 여부는 시작 경계는 포함하고, 종료 경계는 포함하지 않는다")
     void contains_instant_start_boundary_but_not_end_boundary() {
         assertThat(range.contains(START_AT)).isTrue();
@@ -66,53 +43,38 @@ public abstract class AbstractTemporalRangeTest<T extends TemporalRange> {
         assertThat(range.contains(AFTER_END_AT)).isFalse();
     }
 
-    @Test
-    @DisplayName("두 구간이 겹치면 True")
-    void overlap_range() {
-        assertThat(range.overlaps(create(BEFORE_END_AT, AFTER_END_AT))).isTrue();
-        assertThat(range.overlaps(create(BEFORE_START_AT, AFTER_START_AT))).isTrue();
+    @Override
+    protected T createSameRange() {
+        return create(START_AT, END_AT);
     }
 
-    @Test
-    @DisplayName("두 구간이 겹치지 않으면 False")
-    void not_overlap_range() {
-        assertThat(range.overlaps(create(BEFORE_START_AT, START_AT))).isFalse();
-        assertThat(range.overlaps(create(END_AT, AFTER_END_AT))).isFalse();
+    @Override
+    protected T createContainedRange() {
+        return create(AFTER_START_AT, BEFORE_END_AT);
     }
 
-    @Test
-    @DisplayName("시작 시간과 종료 시간이 같으면 같은 구간")
-    void same_range() {
-        TemporalRange other = new TemporalRange() {
-            @Override
-            public Instant startAt() {
-                return range.startAt();
-            }
-
-            @Override
-            public Instant endAt() {
-                return range.endAt();
-            }
-        };
-
-        assertThat(range.isSame(other)).isTrue();
+    @Override
+    protected T createContainingRange() {
+        return create(BEFORE_START_AT, AFTER_END_AT);
     }
 
-    @Test
-    @DisplayName("시작 시간과 종료 시간이 다르면 다른 구간")
-    void not_same_range() {
-        TemporalRange other = new TemporalRange() {
-            @Override
-            public Instant startAt() {
-                return BEFORE_START_AT;
-            }
+    @Override
+    protected T createBeforeRange() {
+        return create(BEFORE_START_AT, START_AT);
+    }
 
-            @Override
-            public Instant endAt() {
-                return AFTER_END_AT;
-            }
-        };
+    @Override
+    protected T createAfterRange() {
+        return create(END_AT, AFTER_END_AT);
+    }
 
-        assertThat(range.isSame(other)).isFalse();
+    @Override
+    protected T createOverlapsBeforeRange() {
+        return create(BEFORE_START_AT, AFTER_START_AT);
+    }
+
+    @Override
+    protected T createOverlapsAfterRange() {
+        return create(BEFORE_END_AT, AFTER_END_AT);
     }
 }
