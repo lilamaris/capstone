@@ -4,7 +4,7 @@ import com.lilamaris.capstone.academiccatalog.application.shared.exception.Acade
 import com.lilamaris.capstone.academiccatalog.application.timeline.port.in.UpdateTimelineMetadataUseCase;
 import com.lilamaris.capstone.academiccatalog.application.timeline.port.out.TimelineReader;
 import com.lilamaris.capstone.academiccatalog.application.timeline.port.out.TimelineStore;
-import com.lilamaris.capstone.academiccatalog.application.timeline.port.service.TimelineCommandService;
+import com.lilamaris.capstone.academiccatalog.application.timeline.service.TimelineCommandService;
 import com.lilamaris.capstone.academiccatalog.domain.timeline.Timeline;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,9 +16,7 @@ import java.util.Optional;
 import static com.lilamaris.capstone.kernel.testsupport.assertion.ApplicationAssertions.assertThatApplicationThrownBy;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @Tag("unit")
 @DisplayName("UpdateTimelineMetadataUseCase 테스트")

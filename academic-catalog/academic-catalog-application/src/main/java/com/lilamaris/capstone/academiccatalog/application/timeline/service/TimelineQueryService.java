@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.academiccatalog.application.timeline.port.service;
+package com.lilamaris.capstone.academiccatalog.application.timeline.service;
 
 import com.lilamaris.capstone.academiccatalog.application.shared.exception.AcademicCatalogApplicationErrorCode;
 import com.lilamaris.capstone.academiccatalog.application.shared.exception.AcademicCatalogApplicationException;

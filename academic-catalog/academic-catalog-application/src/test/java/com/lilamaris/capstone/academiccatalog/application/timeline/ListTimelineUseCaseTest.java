@@ -5,8 +5,8 @@ import com.lilamaris.capstone.academiccatalog.application.timeline.port.in.resul
 import com.lilamaris.capstone.academiccatalog.application.timeline.port.out.TimelineReader;
 import com.lilamaris.capstone.academiccatalog.application.timeline.port.out.TimelineStore;
 import com.lilamaris.capstone.academiccatalog.application.timeline.port.out.criteria.TimelineSearchCriteria;
+import com.lilamaris.capstone.academiccatalog.application.timeline.service.TimelineQueryService;
 import com.lilamaris.capstone.academiccatalog.domain.timeline.Timeline;
-import com.lilamaris.capstone.academiccatalog.application.timeline.port.service.TimelineQueryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
