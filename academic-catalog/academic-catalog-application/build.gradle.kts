@@ -6,5 +6,6 @@ group = "com.lilamaris.capstone"
 version = "0.0.1-SNAPSHOT"
 
 dependencies {
+    implementation(project(":kernel:kernel-core"))
     implementation(project(":academic-catalog:academic-catalog-domain"))
 }
