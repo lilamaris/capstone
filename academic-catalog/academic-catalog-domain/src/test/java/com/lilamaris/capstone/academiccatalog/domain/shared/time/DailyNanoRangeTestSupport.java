@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.academiccatalog.domain.shared;
+package com.lilamaris.capstone.academiccatalog.domain.shared.time;
 
 import java.time.Duration;
 import java.time.LocalTime;

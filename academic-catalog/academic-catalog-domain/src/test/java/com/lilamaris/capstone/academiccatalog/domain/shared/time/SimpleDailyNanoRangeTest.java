@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.academiccatalog.domain.shared;
+package com.lilamaris.capstone.academiccatalog.domain.shared.time;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.time.LocalTime;
 
-import static com.lilamaris.capstone.academiccatalog.domain.shared.DailyNanoRangeTestSupport.*;
+import static com.lilamaris.capstone.academiccatalog.domain.shared.time.DailyNanoRangeTestSupport.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
