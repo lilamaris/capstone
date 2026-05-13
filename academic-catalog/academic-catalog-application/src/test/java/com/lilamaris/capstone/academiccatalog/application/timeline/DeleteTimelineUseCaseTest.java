@@ -4,7 +4,7 @@ import com.lilamaris.capstone.academiccatalog.application.shared.exception.Acade
 import com.lilamaris.capstone.academiccatalog.application.timeline.port.in.DeleteTimelineUseCase;
 import com.lilamaris.capstone.academiccatalog.application.timeline.port.out.TimelineReader;
 import com.lilamaris.capstone.academiccatalog.application.timeline.port.out.TimelineStore;
-import com.lilamaris.capstone.academiccatalog.application.timeline.port.service.TimelineCommandService;
+import com.lilamaris.capstone.academiccatalog.application.timeline.service.TimelineCommandService;
 import com.lilamaris.capstone.academiccatalog.domain.timeline.Timeline;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
