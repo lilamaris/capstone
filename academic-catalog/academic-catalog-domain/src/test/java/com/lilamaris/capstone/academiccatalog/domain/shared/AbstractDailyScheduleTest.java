@@ -259,4 +259,70 @@ public abstract class AbstractDailyScheduleTest<T extends DailySchedule> {
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("zoneId must not be null.");
     }
+
+    @Test
+    @DisplayName("하나 이상의 구간이 대상 구간과 겹치면 true")
+    void return_true_when_any_range_overlaps_target_range() {
+        var ranges = create(List.of(
+                range("09:00", "12:00"),
+                range("13:00", "18:00")
+        ));
+
+        assertThat(ranges.overlaps(range("12:00", DailyNanoRange.DAY_NANOS))).isTrue();
+    }
+
+    @Test
+    @DisplayName("어떤 구간도 대상 구간과 겹치지 않으면 false")
+    void return_false_when_no_range_overlaps_target_range() {
+        var ranges = create(List.of(
+                range("09:00", "12:00"),
+                range("13:00", "18:00")
+        ));
+
+        assertThat(ranges.overlaps(range("12:00", "13:00"))).isFalse();
+    }
+
+    @Test
+    @DisplayName("하나 이상의 구간이 다른 DailyNanoRange와 겹치면 true")
+    void return_true_when_any_range_overlaps_other_ranges() {
+        var ranges = create(List.of(
+                range("09:00", "12:00"),
+                range("13:00", "18:00")
+        ));
+
+        var other = create(List.of(
+                range("12:00", DailyNanoRange.DAY_NANOS)
+        ));
+
+        assertThat(ranges.overlaps(other)).isTrue();
+    }
+
+    @Test
+    @DisplayName("어떤 구간도 다른 DailyNanoRange와 겹치지 않으면 false")
+    void return_false_when_no_range_overlaps_other_ranges() {
+        var ranges = create(List.of(
+                range("09:00", "12:00"),
+                range("13:00", "18:00")
+        ));
+
+        var other = create(List.of(
+                range("12:00", "13:00")
+        ));
+
+        assertThat(ranges.overlaps(other)).isFalse();
+    }
+
+    @Test
+    @DisplayName("겹침 여부 조회 인자가 null이면 예외")
+    void throw_exception_when_overlaps_argument_is_null() {
+        var ranges = create(List.of(
+                range("09:00", "12:00"),
+                range("13:00", "18:00")
+        ));
+
+        assertThatThrownBy(() -> ranges.overlaps((DailyNanoRange) null))
+                .isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> ranges.overlaps((DailyNanoRange) null))
+                .isInstanceOf(NullPointerException.class);
+    }
 }

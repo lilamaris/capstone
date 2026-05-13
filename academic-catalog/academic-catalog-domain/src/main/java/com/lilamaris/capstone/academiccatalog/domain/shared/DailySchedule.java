@@ -104,4 +104,19 @@ public interface DailySchedule {
 
         return true;
     }
+
+    default boolean overlaps(DailyNanoRange other) {
+        Preconditions.requireNonNull(other, "other");
+
+        return ranges().stream()
+                .anyMatch(segment -> segment.overlaps(other));
+    }
+
+    default boolean overlaps(DailySchedule other) {
+        Preconditions.requireNonNull(other, "other");
+
+        return ranges().stream()
+                .anyMatch(left -> other.ranges().stream()
+                        .anyMatch(left::overlaps));
+    }
 }
