@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.academiccatalog.domain.shared;
+package com.lilamaris.capstone.academiccatalog.domain.shared.time;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.time.Instant;
 
-import static com.lilamaris.capstone.academiccatalog.domain.shared.TemporalRangeTestSupport.END_AT;
-import static com.lilamaris.capstone.academiccatalog.domain.shared.TemporalRangeTestSupport.START_AT;
+import static com.lilamaris.capstone.academiccatalog.domain.shared.time.TemporalRangeTestSupport.END_AT;
+import static com.lilamaris.capstone.academiccatalog.domain.shared.time.TemporalRangeTestSupport.START_AT;
 import static com.lilamaris.capstone.kernel.testsupport.assertion.DomainAssertions.assertThatDomainThrownBy;
 import static org.assertj.core.api.Assertions.assertThat;
 

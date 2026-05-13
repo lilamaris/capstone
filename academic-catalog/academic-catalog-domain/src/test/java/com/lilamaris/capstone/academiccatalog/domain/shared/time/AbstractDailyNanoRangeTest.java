@@ -1,13 +1,15 @@
-package com.lilamaris.capstone.academiccatalog.domain.shared;
+package com.lilamaris.capstone.academiccatalog.domain.shared.time;
 
-import com.lilamaris.capstone.kernel.testsupport.FixedClock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.time.*;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalTime;
+import java.time.ZoneId;
 
-import static com.lilamaris.capstone.academiccatalog.domain.shared.DailyNanoRangeTestSupport.*;
+import static com.lilamaris.capstone.academiccatalog.domain.shared.time.DailyNanoRangeTestSupport.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

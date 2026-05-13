@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.academiccatalog.domain.timeline;
 
-import com.lilamaris.capstone.academiccatalog.domain.shared.TemporalRange;
+import com.lilamaris.capstone.academiccatalog.domain.shared.time.TemporalRange;
 import com.lilamaris.capstone.kernel.core.condition.Preconditions;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

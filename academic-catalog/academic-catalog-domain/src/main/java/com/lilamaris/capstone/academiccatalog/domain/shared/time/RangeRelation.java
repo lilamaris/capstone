@@ -1,4 +1,4 @@
-package com.lilamaris.capstone.academiccatalog.domain.shared;
+package com.lilamaris.capstone.academiccatalog.domain.shared.time;
 
 public enum RangeRelation {
     SAME,

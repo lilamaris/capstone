@@ -1,11 +1,11 @@
-package com.lilamaris.capstone.academiccatalog.domain.shared;
+package com.lilamaris.capstone.academiccatalog.domain.shared.time;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static com.lilamaris.capstone.academiccatalog.domain.shared.DailyScheduleTestSupport.range;
+import static com.lilamaris.capstone.academiccatalog.domain.shared.time.DailyScheduleTestSupport.range;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
