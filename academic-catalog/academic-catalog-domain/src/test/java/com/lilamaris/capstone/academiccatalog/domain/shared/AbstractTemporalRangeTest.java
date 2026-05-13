@@ -1,11 +1,9 @@
 package com.lilamaris.capstone.academiccatalog.domain.shared;
 
-import com.lilamaris.capstone.kernel.testsupport.FixedClock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.time.Clock;
 import java.time.Instant;
 
 import static com.lilamaris.capstone.academiccatalog.domain.shared.TemporalRangeTestSupport.*;
@@ -14,8 +12,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("TemporalRange 계약 테스트")
 public abstract class AbstractTemporalRangeTest<T extends TemporalRange> extends AbstractRangeComparableTest<T> {
-
-    Clock clock = FixedClock.getFixed();
 
     public abstract T create(Instant startAt, Instant endAt);
 

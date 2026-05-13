@@ -14,8 +14,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @DisplayName("DailyNanoRange 계약 테스트")
 public abstract class AbstractDailyNanoRangeTest<T extends DailyNanoRange> extends AbstractRangeComparableTest<T> {
 
-    Clock clock = FixedClock.getFixed();
-
     public abstract T create(long startNanoOfDay, long endNanoOfDay);
 
     @BeforeEach
