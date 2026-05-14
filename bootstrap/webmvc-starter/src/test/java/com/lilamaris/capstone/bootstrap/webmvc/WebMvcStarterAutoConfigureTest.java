@@ -106,7 +106,7 @@ class WebMvcStarterAutoConfigureTest {
 
                 assertThat(problem.getStatus()).isEqualTo(500);
                 assertThat(problem.getTitle()).isEqualTo("ILLEGAL_STATE");
-                assertThat(problem.getDetail()).isEqualTo("서버 상태가 올바르지 않습니다.");
+                assertThat(problem.getDetail()).isEqualTo("요청 처리 중 오류가 발생했습니다.");
                 assertThat(problem.getProperties()).containsEntry("code", "ILLEGAL_STATE");
             });
         }
@@ -121,7 +121,7 @@ class WebMvcStarterAutoConfigureTest {
 
                 assertThat(problem.getStatus()).isEqualTo(500);
                 assertThat(problem.getTitle()).isEqualTo("INTERNAL_SERVER_ERROR");
-                assertThat(problem.getDetail()).isEqualTo("예상하지 못한 오류가 발생했습니다.");
+                assertThat(problem.getDetail()).isEqualTo("알 수 없는 오류가 발생했습니다.");
                 assertThat(problem.getProperties()).containsEntry("code", "INTERNAL_SERVER_ERROR");
             });
         }
