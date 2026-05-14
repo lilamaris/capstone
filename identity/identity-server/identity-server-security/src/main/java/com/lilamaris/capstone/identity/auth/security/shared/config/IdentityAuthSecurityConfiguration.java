@@ -2,54 +2,53 @@ package com.lilamaris.capstone.identity.auth.security.shared.config;
 
 import com.lilamaris.capstone.identity.auth.application.jwks.port.in.IssueJwtUseCase;
 import com.lilamaris.capstone.identity.auth.application.jwks.port.in.IssueOpaqueTokenUseCase;
+import com.lilamaris.capstone.identity.auth.application.jwks.port.out.JwksReader;
+import com.lilamaris.capstone.identity.auth.contract.IdentityAuthNamespace;
 import com.lilamaris.capstone.identity.auth.security.shared.response.ResponseWriter;
 import com.lilamaris.capstone.identity.auth.security.shared.response.TokenResponseProcessor;
 import com.lilamaris.capstone.identity.core.role.SeparatorBasedNamespaceRoleSerializer;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import com.lilamaris.capstone.kernel.core.namespace.RunningNamespaceContext;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.KeyUse;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.proc.SecurityContext;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import tools.jackson.databind.ObjectMapper;
 
 @Configuration
-@EnableWebSecurity
-@EnableMethodSecurity
-@EnableConfigurationProperties(IdentityAuthSecurityProperties.class)
 public class IdentityAuthSecurityConfiguration {
-
-    public static void withDefaultFilter(
-            HttpSecurity httpSecurity,
-            CorsConfigurationSource corsConfigurationSource
-    ) {
-        httpSecurity
-                .csrf(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource));
+    @Bean
+    @ConditionalOnMissingBean(RunningNamespaceContext.class)
+    RunningNamespaceContext runningNamespaceContext() {
+        return () -> IdentityAuthNamespace.NAMESPACE;
     }
 
     @Bean
-    CorsConfigurationSource corsConfigurationSource(
-            IdentityAuthSecurityProperties properties
-    ) {
-        var configuration = new CorsConfiguration();
+    @ConditionalOnBean(JwksReader.class)
+    @ConditionalOnMissingBean(JwtDecoder.class)
+    JwtDecoder jwtDecoder(JwksReader jwksReader) {
+        JWKSource<SecurityContext> source = (selector, context) -> {
+            var keys = jwksReader.findVerifiableKeys().stream()
+                    .map(key -> new RSAKey.Builder(key.getPublicKey())
+                            .keyID(key.kid())
+                            .keyUse(KeyUse.SIGNATURE)
+                            .algorithm(JWSAlgorithm.RS256)
+                            .build())
+                    .map(JWK.class::cast)
+                    .toList();
 
-        configuration.setAllowedOrigins(properties.allowedOrigins());
-        configuration.setAllowedMethods(properties.allowedMethods());
-        configuration.setAllowedHeaders(properties.allowedHeaders());
-        configuration.setAllowCredentials(properties.allowCredentials());
-        configuration.setExposedHeaders(properties.exposedHeaders());
+            return selector.select(new JWKSet(keys));
+        };
 
-        var source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-
-        return source;
+        return NimbusJwtDecoder.withJwkSource(source).build();
     }
 
     @Bean

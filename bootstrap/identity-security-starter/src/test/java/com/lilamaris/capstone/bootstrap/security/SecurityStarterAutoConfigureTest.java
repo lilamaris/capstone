@@ -34,6 +34,9 @@ class SecurityStarterAutoConfigureTest {
             .withPropertyValues("identity.client.jwks-uri=https://identity.example.test/.well-known/jwks.json")
             .withBean(RunningNamespaceContext.class, () -> () -> SimpleApplicationNamespace.of("timeline"));
 
+    private final WebApplicationContextRunner securityOnlyContextRunner = new WebApplicationContextRunner()
+            .withConfiguration(AutoConfigurations.of(SecurityStarterAutoConfigure.class));
+
     @Nested
     @DisplayName("자동 설정 테스트")
     class AutoConfigureTest {
@@ -51,6 +54,21 @@ class SecurityStarterAutoConfigureTest {
                 assertThat(context).hasBean("actorContextBindingFilterCustomizer");
                 assertThat(context).hasBean("jwtResourceServerCustomizer");
                 assertThat(context).hasBean("permitAllRequestsCustomizer");
+            });
+        }
+
+        @Test
+        @DisplayName("identity client bean이 없어도 기본 security chain을 등록한다")
+        void register_default_security_filter_chain_without_identity_client_beans() {
+            securityOnlyContextRunner.run(context -> {
+                assertThat(context).hasSingleBean(SecurityFilterChain.class);
+                assertThat(context).hasSingleBean(CorsConfigurationSource.class);
+                assertThat(context).hasBean("authorizeHttpRequestsCustomizer");
+                assertThat(context).hasBean("oAuth2ResourceServerCustomizer");
+                assertThat(context).hasBean("permitAllRequestsCustomizer");
+                assertThat(context).doesNotHaveBean(OAuth2ResourceServerCustomizer.class);
+                assertThat(context).doesNotHaveBean("jwtResourceServerCustomizer");
+                assertThat(context).doesNotHaveBean("actorContextBindingFilterCustomizer");
             });
         }
 

@@ -1,5 +1,7 @@
 package com.lilamaris.capstone.identity.auth.security.federated.config;
 
+import com.lilamaris.capstone.bootstrap.security.customizer.AuthorizeHttpRequestCustomizer;
+import com.lilamaris.capstone.bootstrap.security.customizer.HttpSecurityCustomizer;
 import com.lilamaris.capstone.identity.auth.application.account.port.in.AuthenticateFederatedAccountUseCase;
 import com.lilamaris.capstone.identity.auth.security.federated.handler.FederatedAuthenticationFailureHandler;
 import com.lilamaris.capstone.identity.auth.security.federated.handler.FederatedAuthenticationSuccessHandler;
@@ -12,6 +14,8 @@ import com.lilamaris.capstone.identity.core.role.NamespaceRoleSerializer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.client.OAuth2LoginConfigurer;
@@ -20,6 +24,21 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 @Configuration
 @ConditionalOnBean(ClientRegistrationRepository.class)
 public class FederatedSecurityConfiguration {
+    @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    AuthorizeHttpRequestCustomizer federatedAuthenticationAuthorizeHttpRequestCustomizer() {
+        return auth -> auth
+                .requestMatchers("/oauth2/**", "/login/oauth2/**")
+                .permitAll();
+    }
+
+    @Bean
+    HttpSecurityCustomizer oAuth2LoginHttpSecurityCustomizer(
+            Customizer<OAuth2LoginConfigurer<HttpSecurity>> oAuth2LoginConfigurerCustomizer
+    ) {
+        return http -> http.oauth2Login(oAuth2LoginConfigurerCustomizer);
+    }
+
     @Bean
     Customizer<OAuth2LoginConfigurer<HttpSecurity>.UserInfoEndpointConfig> userInfoEndpointConfigCustomizer(
             CustomOidcUserService oidcUserService,
