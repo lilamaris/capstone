@@ -22,6 +22,7 @@ include("kernel:kernel-core")
 include("kernel:kernel-test-support")
 
 include("bootstrap")
+include("bootstrap:identity-application-starter")
 include("bootstrap:identity-security-starter")
 
 include("identity")
