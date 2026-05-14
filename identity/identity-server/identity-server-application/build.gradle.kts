@@ -7,6 +7,8 @@ group = "com.lilamaris.capstone"
 version = "0.0.1-SNAPSHOT"
 
 dependencies {
+    implementation(project(":bootstrap:identity-application-starter"))
+
     implementation(project(":identity:identity-server:identity-server-domain"))
 
     implementation(project(":identity:identity-core"))
