@@ -29,19 +29,8 @@ import java.util.ServiceLoader;
 import java.util.random.RandomGenerator;
 
 @AutoConfiguration
+@EnableConfigurationProperties(IssueJwtProperties.class)
 public class IdentityAuthApplicationAutoConfigure {
-
-    @Bean
-    @ConditionalOnMissingBean(Clock.class)
-    Clock clock() {
-        return Clock.systemUTC();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean(ActorContextHolder.class)
-    ActorContextHolder actorContextHolder() {
-        return new ThreadLocalActorContextHolder();
-    }
 
     @Bean
     @ConditionalOnMissingBean(PasswordEncoder.class)
@@ -65,20 +54,16 @@ public class IdentityAuthApplicationAutoConfigure {
         return new SecureRandom();
     }
 
-    @Configuration(proxyBeanMethods = false)
+    @Bean
     @ConditionalOnBean(JwksReader.class)
-    @EnableConfigurationProperties(IssueJwtProperties.class)
-    static class JwtConfiguration {
-        @Bean
-        @ConditionalOnMissingBean(JwtEncoder.class)
-        JwtEncoder jwtEncoder(JwksReader jwksReader) {
-            var signableKey = jwksReader.findSignableKey();
-            var rsaKey = new RSAKey.Builder(signableKey.publicKey())
-                    .privateKey(signableKey.privateKey())
-                    .keyID(signableKey.kid())
-                    .build();
-            JWKSource<SecurityContext> source = (selector, context) -> selector.select(new JWKSet(rsaKey));
-            return new NimbusJwtEncoder(source);
-        }
+    @ConditionalOnMissingBean(JwtEncoder.class)
+    JwtEncoder jwtEncoder(JwksReader jwksReader) {
+        var signableKey = jwksReader.findSignableKey();
+        var rsaKey = new RSAKey.Builder(signableKey.publicKey())
+                .privateKey(signableKey.privateKey())
+                .keyID(signableKey.kid())
+                .build();
+        JWKSource<SecurityContext> source = (selector, context) -> selector.select(new JWKSet(rsaKey));
+        return new NimbusJwtEncoder(source);
     }
 }
