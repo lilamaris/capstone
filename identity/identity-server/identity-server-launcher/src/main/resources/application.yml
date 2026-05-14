@@ -6,8 +6,8 @@ identity:
     issuer: "capstone"
     expiration: "PT1H"
   jwks:
-    activeSignableKid: "key-20260510-095005"
+    activeSignableKid: "key-20260514-133746"
     keyBaseLocation: "classpath:keys/"
     keys:
-      - "key-20260510-094925"
-      - "key-20260510-095005"
+      - "key-20260514-133746"
+      - "key-20260514-133748"

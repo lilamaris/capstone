@@ -4,6 +4,7 @@ import com.lilamaris.capstone.bootstrap.security.customizer.AuthorizeHttpRequest
 import com.lilamaris.capstone.bootstrap.security.customizer.HttpSecurityCustomizer;
 import com.lilamaris.capstone.bootstrap.security.customizer.OAuth2ResourceServerCustomizer;
 import com.lilamaris.capstone.identity.client.IdentityClientAutoConfigure;
+import com.lilamaris.capstone.identity.client.jwt.ActorAuthenticationConverter;
 import com.lilamaris.capstone.identity.client.jwt.ActorContextBindingFilter;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -123,12 +124,18 @@ public class SecurityStarterAutoConfigure {
     @Bean("oAuth2ResourceServerCustomizer")
     @ConditionalOnMissingBean(name = "oAuth2ResourceServerCustomizer")
     HttpSecurityCustomizer oAuth2ResourceServerCustomizer(List<OAuth2ResourceServerCustomizer> oAuth2ResourceServerCustomizers) {
-        return http -> http.oauth2ResourceServer(oauth2 -> {
+        return http -> {
             var customizers = new ArrayList<>(oAuth2ResourceServerCustomizers);
             AnnotationAwareOrderComparator.sort(customizers);
 
-            for (var customizer : customizers) customizer.customize(oauth2);
-        });
+            if (customizers.isEmpty()) {
+                return;
+            }
+
+            http.oauth2ResourceServer(oauth2 -> {
+                for (var customizer : customizers) customizer.customize(oauth2);
+            });
+        };
     }
 
     @Bean
@@ -172,6 +179,7 @@ public class SecurityStarterAutoConfigure {
     }
 
     @Bean("jwtResourceServerCustomizer")
+    @ConditionalOnBean({JwtDecoder.class, ActorAuthenticationConverter.class})
     @ConditionalOnMissingBean(name = "jwtResourceServerCustomizer")
     OAuth2ResourceServerCustomizer jwtResourceServerCustomizer(
             JwtDecoder jwtDecoder,
