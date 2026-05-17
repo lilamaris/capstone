@@ -1,5 +1,6 @@
 package com.lilamaris.capstone.academiccatalog.domain.timeline;
 
+import com.lilamaris.capstone.academiccatalog.domain.shared.time.EmbeddableTemporalRange;
 import com.lilamaris.capstone.academiccatalog.domain.shared.time.TemporalRange;
 import com.lilamaris.capstone.kernel.core.condition.Preconditions;
 import jakarta.persistence.*;
@@ -28,19 +29,19 @@ public class TimeSlot {
             @AttributeOverride(name = "startAt", column = @Column(name = "tx_start_at", nullable = false)),
             @AttributeOverride(name = "endAt", column = @Column(name = "tx_end_at", nullable = false))
     })
-    private TemporalRange txRange;
+    private EmbeddableTemporalRange txRange;
 
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "startAt", column = @Column(name = "op_start_at", nullable = false)),
             @AttributeOverride(name = "endAt", column = @Column(name = "op_end_at", nullable = false))
     })
-    private TemporalRange opRange;
+    private EmbeddableTemporalRange opRange;
 
     @Column(name = "description", nullable = false)
     private String description;
 
-    private TimeSlot(Timeline timeline, TemporalRange txRange, TemporalRange opRange, String description) {
+    private TimeSlot(Timeline timeline, EmbeddableTemporalRange txRange, EmbeddableTemporalRange opRange, String description) {
         this.timeline = Preconditions.requireNonNull(timeline, "timeline");
         this.txRange = Preconditions.requireNonNull(txRange, "txRange");
         this.opRange = Preconditions.requireNonNull(opRange, "opRange");
@@ -48,7 +49,12 @@ public class TimeSlot {
     }
 
     public static TimeSlot of(Timeline timeline, TemporalRange txRange, TemporalRange opRange, String description) {
-        return new TimeSlot(timeline, txRange, opRange, description);
+        return new TimeSlot(
+                timeline,
+                EmbeddableTemporalRange.from(Preconditions.requireNonNull(txRange, "txRange")),
+                EmbeddableTemporalRange.from(Preconditions.requireNonNull(opRange, "opRange")),
+                description
+        );
     }
 
     public void updateTimeline(Timeline timeline) {
@@ -56,11 +62,11 @@ public class TimeSlot {
     }
 
     public void updateTxRange(TemporalRange txRange) {
-        this.txRange = Preconditions.requireNonNull(txRange, "txRange");
+        this.txRange = EmbeddableTemporalRange.from(Preconditions.requireNonNull(txRange, "txRange"));
     }
 
     public void updateOpRange(TemporalRange opRange) {
-        this.opRange = Preconditions.requireNonNull(opRange, "opRange");
+        this.opRange = EmbeddableTemporalRange.from(Preconditions.requireNonNull(opRange, "opRange"));
     }
 
     public void updateDescription(String description) {
