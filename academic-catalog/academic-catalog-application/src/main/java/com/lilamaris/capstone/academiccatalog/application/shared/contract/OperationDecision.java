@@ -1,6 +1,6 @@
 package com.lilamaris.capstone.academiccatalog.application.shared.contract;
 
-public enum ProcessDecision {
+public enum OperationDecision {
     ACCEPTED,
     REJECTED
 }
