@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@DisplayName("RangeComparable 계약 테스트")
 public abstract class AbstractRangeComparableTest<T extends RangeComparable<? super T>> {
 
     protected T range;
@@ -19,7 +18,11 @@ public abstract class AbstractRangeComparableTest<T extends RangeComparable<? su
 
     protected abstract T createBeforeRange();
 
+    protected abstract T createImmediatelyBeforeRange();
+
     protected abstract T createAfterRange();
+
+    protected abstract T createImmediatelyAfterRange();
 
     protected abstract T createOverlapsBeforeRange();
 
@@ -45,6 +48,18 @@ public abstract class AbstractRangeComparableTest<T extends RangeComparable<? su
     }
 
     @Test
+    @DisplayName("다른 구간 바로 앞에 이어지는지 확인할 수 있다")
+    void immediately_before_range() {
+        assertThat(range.immediatelyBefore(createImmediatelyBeforeRange())).isTrue();
+
+        assertThat(range.immediatelyBefore(createAfterRange())).isFalse();
+        assertThat(range.immediatelyBefore(createBeforeRange())).isFalse();
+        assertThat(range.immediatelyBefore(createSameRange())).isFalse();
+
+        assertThat(range.relationTo(createImmediatelyBeforeRange())).isEqualTo(RangeRelation.IMMEDIATELY_BEFORE);
+    }
+
+    @Test
     @DisplayName("종료 지점이 더 뒤서는지 확인할 수 있다")
     void ends_after_range() {
         assertThat(range.endsAfter(createBeforeRange())).isTrue();
@@ -52,6 +67,18 @@ public abstract class AbstractRangeComparableTest<T extends RangeComparable<? su
 
         assertThat(range.endsAfter(createAfterRange())).isFalse();
         assertThat(range.endsAfter(createOverlapsAfterRange())).isFalse();
+    }
+
+    @Test
+    @DisplayName("다른 구간 바로 뒤에 이어지는지 확인할 수 있다")
+    void immediately_after_range() {
+        assertThat(range.immediatelyAfter(createImmediatelyAfterRange())).isTrue();
+
+        assertThat(range.immediatelyAfter(createAfterRange())).isFalse();
+        assertThat(range.immediatelyAfter(createBeforeRange())).isFalse();
+        assertThat(range.immediatelyAfter(createSameRange())).isFalse();
+
+        assertThat(range.relationTo(createImmediatelyAfterRange())).isEqualTo(RangeRelation.IMMEDIATELY_AFTER);
     }
 
     @Test

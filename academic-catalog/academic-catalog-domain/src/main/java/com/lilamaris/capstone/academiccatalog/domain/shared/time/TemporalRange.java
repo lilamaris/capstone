@@ -21,10 +21,10 @@ public interface TemporalRange extends RangeComparable<TemporalRange> {
         return Duration.between(startAt(), endAt());
     }
 
-    default boolean contains(Instant at) {
-        Preconditions.requireNonNull(at, "at");
+    default boolean contains(Instant other) {
+        Preconditions.requireNonNull(other, "other");
 
-        return !at.isBefore(startAt()) && at.isBefore(endAt());
+        return !other.isBefore(startAt()) && other.isBefore(endAt());
     }
 
     @Override
@@ -42,10 +42,24 @@ public interface TemporalRange extends RangeComparable<TemporalRange> {
     }
 
     @Override
+    default boolean immediatelyBefore(TemporalRange other) {
+        Preconditions.requireNonNull(other, "other");
+
+        return endAt().equals(other.startAt());
+    }
+
+    @Override
     default boolean endsAfter(TemporalRange other) {
         Preconditions.requireNonNull(other, "other");
 
         return endAt().isAfter(other.endAt());
+    }
+
+    @Override
+    default boolean immediatelyAfter(TemporalRange other) {
+        Preconditions.requireNonNull(other, "other");
+
+        return startAt().equals(other.endAt());
     }
 
     @Override

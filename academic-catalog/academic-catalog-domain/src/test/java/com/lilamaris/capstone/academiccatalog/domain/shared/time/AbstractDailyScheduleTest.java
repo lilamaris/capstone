@@ -12,7 +12,6 @@ import static com.lilamaris.capstone.academiccatalog.domain.shared.time.DailySch
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@DisplayName("DailySchedule 계약 테스트")
 public abstract class AbstractDailyScheduleTest<T extends DailySchedule> {
 
     protected abstract T create(List<DailyNanoRange> ranges);

@@ -13,7 +13,6 @@ import static com.lilamaris.capstone.academiccatalog.domain.shared.time.DailyNan
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@DisplayName("DailyNanoRange 계약 테스트")
 public abstract class AbstractDailyNanoRangeTest<T extends DailyNanoRange> extends AbstractRangeComparableTest<T> {
 
     public abstract T create(long startNanoOfDay, long endNanoOfDay);
@@ -149,12 +148,26 @@ public abstract class AbstractDailyNanoRangeTest<T extends DailyNanoRange> exten
 
     @Override
     protected T createBeforeRange() {
-        return create(BEFORE_START_NANO_OF_DAY, START_NANO_OF_DAY);
+        var duration = Duration.ofHours(1).toNanos();
+
+        return create(BEFORE_START_NANO_OF_DAY - duration, BEFORE_START_NANO_OF_DAY);
+    }
+
+    @Override
+    protected T createImmediatelyBeforeRange() {
+        return create(END_NANO_OF_DAY, AFTER_END_NANO_OF_DAY);
     }
 
     @Override
     protected T createAfterRange() {
-        return create(END_NANO_OF_DAY, AFTER_END_NANO_OF_DAY);
+        var duration = Duration.ofHours(1).toNanos();
+
+        return create(AFTER_END_NANO_OF_DAY, AFTER_END_NANO_OF_DAY + duration);
+    }
+
+    @Override
+    protected T createImmediatelyAfterRange() {
+        return create(BEFORE_START_NANO_OF_DAY, START_NANO_OF_DAY);
     }
 
     @Override
