@@ -3,12 +3,11 @@ package com.lilamaris.capstone.academiccatalog.domain.shared.time;
 
 import com.lilamaris.capstone.kernel.core.condition.Preconditions;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.*;
 
-public interface DailyNanoRange extends RangeComparable<DailyNanoRange> {
+public interface DailyNanoRange extends
+        RangeComparable<DailyNanoRange>,
+        RangePointComparable<LocalTime> {
     long DAY_NANOS = 24L * 60 * 60 * 1_000_000_000L;
 
     static void validate(long startNanoOfDay, long endNanoOfDay) {
@@ -106,5 +105,40 @@ public interface DailyNanoRange extends RangeComparable<DailyNanoRange> {
         Preconditions.requireNonNull(other, "other");
 
         return startNanoOfDay() < other.endNanoOfDay() && other.startNanoOfDay() < endNanoOfDay();
+    }
+
+    @Override
+    default boolean isBeforePoint(LocalTime other) {
+        Preconditions.requireNonNull(other, "other");
+
+        return endNanoOfDay() < other.toNanoOfDay();
+    }
+
+    @Override
+    default boolean endAt(LocalTime other) {
+        Preconditions.requireNonNull(other, "other");
+
+        return endNanoOfDay() == other.toNanoOfDay();
+    }
+
+    @Override
+    default boolean containsPoint(LocalTime other) {
+        Preconditions.requireNonNull(other, "other");
+
+        return contains(other.toNanoOfDay());
+    }
+
+    @Override
+    default boolean startAt(LocalTime other) {
+        Preconditions.requireNonNull(other, "other");
+
+        return startNanoOfDay() == other.toNanoOfDay();
+    }
+
+    @Override
+    default boolean isAfterPoint(LocalTime other) {
+        Preconditions.requireNonNull(other, "other");
+
+        return startNanoOfDay() > other.toNanoOfDay();
     }
 }

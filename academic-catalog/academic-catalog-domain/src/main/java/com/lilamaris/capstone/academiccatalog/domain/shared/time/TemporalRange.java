@@ -5,7 +5,9 @@ import com.lilamaris.capstone.kernel.core.condition.Preconditions;
 import java.time.Duration;
 import java.time.Instant;
 
-public interface TemporalRange extends RangeComparable<TemporalRange> {
+public interface TemporalRange extends
+        RangeComparable<TemporalRange>,
+        RangePointComparable<Instant> {
     static void validate(Instant startAt, Instant endAt) {
         Preconditions.requireNonNull(startAt, "startAt");
         Preconditions.requireNonNull(endAt, "endAt");
@@ -19,12 +21,6 @@ public interface TemporalRange extends RangeComparable<TemporalRange> {
 
     default Duration duration() {
         return Duration.between(startAt(), endAt());
-    }
-
-    default boolean contains(Instant other) {
-        Preconditions.requireNonNull(other, "other");
-
-        return !other.isBefore(startAt()) && other.isBefore(endAt());
     }
 
     @Override
@@ -81,5 +77,40 @@ public interface TemporalRange extends RangeComparable<TemporalRange> {
         Preconditions.requireNonNull(other, "other");
 
         return startAt().isBefore(other.endAt()) && other.startAt().isBefore(endAt());
+    }
+
+    @Override
+    default boolean isBeforePoint(Instant other) {
+        Preconditions.requireNonNull(other, "other");
+
+        return endAt().isBefore(other);
+    }
+
+    @Override
+    default boolean endAt(Instant other) {
+        Preconditions.requireNonNull(other, "other");
+
+        return endAt().equals(other);
+    }
+
+    @Override
+    default boolean containsPoint(Instant other) {
+        Preconditions.requireNonNull(other, "other");
+
+        return !other.isBefore(startAt()) && other.isBefore(endAt());
+    };
+
+    @Override
+    default boolean startAt(Instant other) {
+        Preconditions.requireNonNull(other, "other");
+
+        return startAt().equals(other);
+    }
+
+    @Override
+    default boolean isAfterPoint(Instant other) {
+        Preconditions.requireNonNull(other, "other");
+
+        return startAt().isAfter(other);
     }
 }

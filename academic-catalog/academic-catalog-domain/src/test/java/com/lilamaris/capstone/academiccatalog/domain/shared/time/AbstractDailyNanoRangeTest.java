@@ -13,7 +13,7 @@ import static com.lilamaris.capstone.academiccatalog.domain.shared.time.DailyNan
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public abstract class AbstractDailyNanoRangeTest<T extends DailyNanoRange> extends AbstractRangeComparableTest<T> {
+public abstract class AbstractDailyNanoRangeTest<T extends DailyNanoRange> extends AbstractRangePointComparableTest<T, LocalTime> {
 
     public abstract T create(long startNanoOfDay, long endNanoOfDay);
 
@@ -178,6 +178,31 @@ public abstract class AbstractDailyNanoRangeTest<T extends DailyNanoRange> exten
     @Override
     protected T createOverlapsAfterRange() {
         return create(BEFORE_END_NANO_OF_DAY, AFTER_END_NANO_OF_DAY);
+    }
+
+    @Override
+    protected LocalTime createBeforePoint() {
+        return LocalTime.ofNanoOfDay(BEFORE_START_NANO_OF_DAY);
+    }
+
+    @Override
+    protected LocalTime createSameAsStartPoint() {
+        return LocalTime.ofNanoOfDay(START_NANO_OF_DAY);
+    }
+
+    @Override
+    protected LocalTime createContainedPoint() {
+        return LocalTime.ofNanoOfDay(AFTER_START_NANO_OF_DAY);
+    }
+
+    @Override
+    protected LocalTime createSameAsEndPoint() {
+        return LocalTime.ofNanoOfDay(END_NANO_OF_DAY);
+    }
+
+    @Override
+    protected LocalTime createAfterPoint() {
+        return LocalTime.ofNanoOfDay(AFTER_END_NANO_OF_DAY);
     }
 
 }

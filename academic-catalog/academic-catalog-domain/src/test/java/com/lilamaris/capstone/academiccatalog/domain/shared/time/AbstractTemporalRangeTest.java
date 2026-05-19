@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public abstract class AbstractTemporalRangeTest<T extends TemporalRange> extends AbstractRangeComparableTest<T> {
+public abstract class AbstractTemporalRangeTest<T extends TemporalRange> extends AbstractRangePointComparableTest<T, Instant> {
 
     public abstract T create(Instant startAt, Instant endAt);
 
@@ -70,16 +70,16 @@ public abstract class AbstractTemporalRangeTest<T extends TemporalRange> extends
     @Test
     @DisplayName("Instant 포함 여부는 시작 경계는 포함하고, 종료 경계는 포함하지 않는다")
     void contains_instant_start_boundary_but_not_end_boundary() {
-        assertThat(range.contains(START_AT)).isTrue();
-        assertThat(range.contains(END_AT)).isFalse();
-        assertThat(range.contains(BEFORE_START_AT)).isFalse();
-        assertThat(range.contains(AFTER_END_AT)).isFalse();
+        assertThat(range.containsPoint(START_AT)).isTrue();
+        assertThat(range.containsPoint(END_AT)).isFalse();
+        assertThat(range.containsPoint(BEFORE_START_AT)).isFalse();
+        assertThat(range.containsPoint(AFTER_END_AT)).isFalse();
     }
 
     @Test
     @DisplayName("Instant가 null이면 포함 여부 확인 시 예외")
     void throw_exception_when_instant_is_null() {
-        assertThatDomainThrownBy(() -> range.contains((Instant) null))
+        assertThatDomainThrownBy(() -> range.containsPoint((Instant) null))
                 .hasNonNullMessageFor("other");
     }
 
@@ -126,5 +126,30 @@ public abstract class AbstractTemporalRangeTest<T extends TemporalRange> extends
     @Override
     protected T createOverlapsAfterRange() {
         return create(BEFORE_END_AT, AFTER_END_AT);
+    }
+
+    @Override
+    protected Instant createBeforePoint() {
+        return BEFORE_START_AT;
+    }
+
+    @Override
+    protected Instant createSameAsStartPoint() {
+        return START_AT;
+    }
+
+    @Override
+    protected Instant createContainedPoint() {
+        return AFTER_START_AT;
+    }
+
+    @Override
+    protected Instant createSameAsEndPoint() {
+        return END_AT;
+    }
+
+    @Override
+    protected Instant createAfterPoint() {
+        return AFTER_END_AT;
     }
 }
