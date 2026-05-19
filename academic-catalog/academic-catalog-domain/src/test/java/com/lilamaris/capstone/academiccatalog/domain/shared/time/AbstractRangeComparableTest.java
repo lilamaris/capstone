@@ -125,8 +125,8 @@ public abstract class AbstractRangeComparableTest<T extends RangeComparable<? su
     void relation_to_range() {
         assertThat(range.relationTo(createBeforeRange())).isEqualTo(RangeRelation.AFTER);
         assertThat(range.relationTo(createAfterRange())).isEqualTo(RangeRelation.BEFORE);
-        assertThat(range.relationTo(createOverlapsBeforeRange())).isEqualTo(RangeRelation.OVERLAPS_AFTER);
-        assertThat(range.relationTo(createOverlapsAfterRange())).isEqualTo(RangeRelation.OVERLAPS_BEFORE);
+        assertThat(range.relationTo(createOverlapsBeforeRange())).isEqualTo(RangeRelation.OVERLAPS);
+        assertThat(range.relationTo(createOverlapsAfterRange())).isEqualTo(RangeRelation.OVERLAPS);
     }
 
     @Test

@@ -24,10 +24,7 @@ public interface RangeComparable<T> {
 
         if (containsBy(other)) return RangeRelation.CONTAINED_BY;
 
-        if (overlaps(other)) {
-            if (startsBefore(other)) return RangeRelation.OVERLAPS_BEFORE;
-            else return RangeRelation.OVERLAPS_AFTER;
-        }
+        if (overlaps(other)) return RangeRelation.OVERLAPS;
 
         if (startsBefore(other)) {
             if (immediatelyBefore(other)) return RangeRelation.IMMEDIATELY_BEFORE;

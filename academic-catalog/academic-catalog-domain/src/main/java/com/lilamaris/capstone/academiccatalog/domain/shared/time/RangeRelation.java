@@ -8,8 +8,7 @@ public enum RangeRelation {
     AFTER,
     IMMEDIATELY_BEFORE,
     IMMEDIATELY_AFTER,
-    OVERLAPS_AFTER,
-    OVERLAPS_BEFORE;
+    OVERLAPS;
 
     public boolean isSame() {
         return this == SAME;
@@ -39,11 +38,7 @@ public enum RangeRelation {
         return this == IMMEDIATELY_AFTER;
     }
 
-    public boolean isOverlapAfter() {
-        return this == OVERLAPS_AFTER;
-    }
-
-    public boolean isOverlapBefore() {
-        return this == OVERLAPS_BEFORE;
+    public boolean isOverlaps() {
+        return this == OVERLAPS;
     }
 }
