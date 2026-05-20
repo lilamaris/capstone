@@ -6,26 +6,26 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.time.Instant;
 
-import static com.lilamaris.capstone.academiccatalog.domain.shared.time.TemporalRangeTestSupport.END_AT;
-import static com.lilamaris.capstone.academiccatalog.domain.shared.time.TemporalRangeTestSupport.START_AT;
+import static com.lilamaris.capstone.academiccatalog.domain.shared.time.InstantRangeTestSupport.END_AT;
+import static com.lilamaris.capstone.academiccatalog.domain.shared.time.InstantRangeTestSupport.START_AT;
 import static com.lilamaris.capstone.kernel.testsupport.assertion.DomainAssertions.assertThatDomainThrownBy;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class EmbeddableTemporalRangeTest extends AbstractTemporalRangeTest<EmbeddableTemporalRange> {
+public class EmbeddableInstantRangeTest extends AbstractInstantRangeTest<EmbeddableInstantRange> {
     @Override
-    public EmbeddableTemporalRange create(Instant startAt, Instant endAt) {
-        return EmbeddableTemporalRange.of(startAt, endAt);
+    public EmbeddableInstantRange create(Instant startAt, Instant endAt) {
+        return EmbeddableInstantRange.of(startAt, endAt);
     }
 
     @Test
-    @DisplayName("TemporalRange로부터 복사할 수 있다")
+    @DisplayName("InstantRange로부터 복사할 수 있다")
     void copy_from_temporal_range() {
-        var range = EmbeddableTemporalRange.from(create(START_AT, END_AT));
+        var range = EmbeddableInstantRange.from(create(START_AT, END_AT));
 
-        assertThat(range.startAt()).isEqualTo(START_AT);
-        assertThat(range.endAt()).isEqualTo(END_AT);
+        assertThat(range.start()).isEqualTo(START_AT);
+        assertThat(range.end()).isEqualTo(END_AT);
 
-        assertThatDomainThrownBy(() -> EmbeddableTemporalRange.from(null))
+        assertThatDomainThrownBy(() -> EmbeddableInstantRange.from(null))
                 .hasNonNullMessageFor("range");
     }
 
@@ -37,8 +37,8 @@ public class EmbeddableTemporalRangeTest extends AbstractTemporalRangeTest<Embed
 
         range.updateStartAt(newStartAt);
 
-        assertThat(range.startAt()).isEqualTo(newStartAt);
-        assertThat(range.endAt()).isEqualTo(END_AT);
+        assertThat(range.start()).isEqualTo(newStartAt);
+        assertThat(range.end()).isEqualTo(END_AT);
     }
 
     @Test
@@ -49,8 +49,8 @@ public class EmbeddableTemporalRangeTest extends AbstractTemporalRangeTest<Embed
 
         range.updateEndAt(newEndAt);
 
-        assertThat(range.startAt()).isEqualTo(START_AT);
-        assertThat(range.endAt()).isEqualTo(newEndAt);
+        assertThat(range.start()).isEqualTo(START_AT);
+        assertThat(range.end()).isEqualTo(newEndAt);
     }
 
     @Test
@@ -60,8 +60,8 @@ public class EmbeddableTemporalRangeTest extends AbstractTemporalRangeTest<Embed
 
         range.extendStartAt(Duration.ofSeconds(-1));
 
-        assertThat(range.startAt()).isEqualTo(START_AT.minusSeconds(1));
-        assertThat(range.endAt()).isEqualTo(END_AT);
+        assertThat(range.start()).isEqualTo(START_AT.minusSeconds(1));
+        assertThat(range.end()).isEqualTo(END_AT);
     }
 
     @Test
@@ -71,8 +71,8 @@ public class EmbeddableTemporalRangeTest extends AbstractTemporalRangeTest<Embed
 
         range.extendEndAt(Duration.ofSeconds(1));
 
-        assertThat(range.startAt()).isEqualTo(START_AT);
-        assertThat(range.endAt()).isEqualTo(END_AT.plusSeconds(1));
+        assertThat(range.start()).isEqualTo(START_AT);
+        assertThat(range.end()).isEqualTo(END_AT.plusSeconds(1));
     }
 
     @Test
@@ -82,7 +82,7 @@ public class EmbeddableTemporalRangeTest extends AbstractTemporalRangeTest<Embed
 
         range.adjustOffset(Duration.ofSeconds(1));
 
-        assertThat(range.startAt()).isEqualTo(START_AT.plusSeconds(1));
-        assertThat(range.endAt()).isEqualTo(END_AT.plusSeconds(1));
+        assertThat(range.start()).isEqualTo(START_AT.plusSeconds(1));
+        assertThat(range.end()).isEqualTo(END_AT.plusSeconds(1));
     }
 }

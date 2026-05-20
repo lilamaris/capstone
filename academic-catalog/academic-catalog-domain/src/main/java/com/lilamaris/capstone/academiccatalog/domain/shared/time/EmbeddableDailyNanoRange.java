@@ -38,16 +38,16 @@ public class EmbeddableDailyNanoRange implements DailyNanoRange {
     public static EmbeddableDailyNanoRange from(DailyNanoRange range) {
         Preconditions.requireNonNull(range, "range");
 
-        return of(range.startNanoOfDay(), range.endNanoOfDay());
+        return of(range.start(), range.end());
     }
 
     @Override
-    public long startNanoOfDay() {
+    public Long start() {
         return startNanoOfDay;
     }
 
     @Override
-    public long endNanoOfDay() {
+    public Long end() {
         return endNanoOfDay;
     }
 

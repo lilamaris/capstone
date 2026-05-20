@@ -11,25 +11,25 @@ import java.time.Instant;
 
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class EmbeddableTemporalRange implements TemporalRange {
+public class EmbeddableInstantRange implements InstantRange {
     @Column(name = "start_at", nullable = false)
     private Instant startAt;
 
     @Column(name = "end_at", nullable = false)
     private Instant endAt;
 
-    private EmbeddableTemporalRange(Instant startAt, Instant endAt) {
-        TemporalRange.validate(startAt, endAt);
+    private EmbeddableInstantRange(Instant startAt, Instant endAt) {
+        InstantRange.validate(startAt, endAt);
 
         this.startAt = startAt;
         this.endAt = endAt;
     }
 
-    public static EmbeddableTemporalRange of(Instant startAt, Instant endAt) {
-        return new EmbeddableTemporalRange(startAt, endAt);
+    public static EmbeddableInstantRange of(Instant startAt, Instant endAt) {
+        return new EmbeddableInstantRange(startAt, endAt);
     }
 
-    public static EmbeddableTemporalRange of(Instant startAt, Duration duration) {
+    public static EmbeddableInstantRange of(Instant startAt, Duration duration) {
         Preconditions.requireNonNull(startAt, "startAt");
         Preconditions.requirePositive(duration, "duration");
 
@@ -37,19 +37,19 @@ public class EmbeddableTemporalRange implements TemporalRange {
         return of(startAt, endAt);
     }
 
-    public static EmbeddableTemporalRange from(TemporalRange range) {
+    public static EmbeddableInstantRange from(InstantRange range) {
         Preconditions.requireNonNull(range, "range");
 
-        return of(range.startAt(), range.endAt());
+        return of(range.start(), range.end());
     }
 
     @Override
-    public Instant startAt() {
+    public Instant start() {
         return startAt;
     }
 
     @Override
-    public Instant endAt() {
+    public Instant end() {
         return endAt;
     }
 
@@ -80,9 +80,7 @@ public class EmbeddableTemporalRange implements TemporalRange {
     }
 
     private void apply(Instant startAt, Instant endAt) {
-        Preconditions.requireNonNull(startAt, "startAt");
-        Preconditions.requireNonNull(endAt, "endAt");
-        TemporalRange.validate(startAt, endAt);
+        InstantRange.validate(startAt, endAt);
 
         this.startAt = startAt;
         this.endAt = endAt;

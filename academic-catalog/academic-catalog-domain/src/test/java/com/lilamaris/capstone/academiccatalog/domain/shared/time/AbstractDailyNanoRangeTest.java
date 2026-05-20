@@ -13,7 +13,7 @@ import static com.lilamaris.capstone.academiccatalog.domain.shared.time.DailyNan
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public abstract class AbstractDailyNanoRangeTest<T extends DailyNanoRange> extends AbstractRangePointComparableTest<T, LocalTime> {
+public abstract class AbstractDailyNanoRangeTest<T extends DailyNanoRange> extends AbstractRangePointComparableTest<T, Long> {
 
     public abstract T create(long startNanoOfDay, long endNanoOfDay);
 
@@ -25,8 +25,8 @@ public abstract class AbstractDailyNanoRangeTest<T extends DailyNanoRange> exten
     @Test
     @DisplayName("시작 나노와 종료 나노로 하루 내 시간 구간을 생성할 수 있다")
     void create_with_start_and_end_nano_of_day() {
-        assertThat(range.startNanoOfDay()).isEqualTo(START_NANO_OF_DAY);
-        assertThat(range.endNanoOfDay()).isEqualTo(END_NANO_OF_DAY);
+        assertThat(range.start()).isEqualTo(START_NANO_OF_DAY);
+        assertThat(range.end()).isEqualTo(END_NANO_OF_DAY);
         assertThat(range.startAt()).isEqualTo(START_AT);
         assertThat(range.duration()).isEqualTo(DURATION);
     }
@@ -36,8 +36,8 @@ public abstract class AbstractDailyNanoRangeTest<T extends DailyNanoRange> exten
     void create_whole_day_range() {
         var wholeDay = create(0L, DailyNanoRange.DAY_NANOS);
 
-        assertThat(wholeDay.startNanoOfDay()).isZero();
-        assertThat(wholeDay.endNanoOfDay()).isEqualTo(DailyNanoRange.DAY_NANOS);
+        assertThat(wholeDay.start()).isZero();
+        assertThat(wholeDay.end()).isEqualTo(DailyNanoRange.DAY_NANOS);
         assertThat(wholeDay.duration()).isEqualTo(Duration.ofDays(1));
     }
 
@@ -46,11 +46,11 @@ public abstract class AbstractDailyNanoRangeTest<T extends DailyNanoRange> exten
     void throw_exception_when_start_nano_of_day_is_after_end_nano_of_day() {
         assertThatThrownBy(() -> create(START_NANO_OF_DAY, START_NANO_OF_DAY))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("startNanoOfDay must be before endNanoOfDay.");
+                .hasMessage("start must be before end.");
 
         assertThatThrownBy(() -> create(END_NANO_OF_DAY, START_NANO_OF_DAY))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("startNanoOfDay must be before endNanoOfDay.");
+                .hasMessage("start must be before end.");
     }
 
     @Test
@@ -60,18 +60,14 @@ public abstract class AbstractDailyNanoRangeTest<T extends DailyNanoRange> exten
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("startNanoOfDay must be between 0 and 86399999999999.");
 
-        assertThatThrownBy(() -> create(DailyNanoRange.DAY_NANOS, DailyNanoRange.DAY_NANOS))
+        assertThatThrownBy(() -> create(DailyNanoRange.DAY_NANOS, DailyNanoRange.DAY_NANOS + 1))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("startNanoOfDay must be between 0 and 86399999999999.");
     }
 
     @Test
-    @DisplayName("종료 나노가 하루 범위를 벗어나면 예외")
+    @DisplayName("종료 나노가 하루 끝을 넘으면 예외")
     void throw_exception_when_end_nano_of_day_is_out_of_day() {
-        assertThatThrownBy(() -> create(START_NANO_OF_DAY, 0L))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("endNanoOfDay must be between 1 and 86400000000000.");
-
         assertThatThrownBy(() -> create(START_NANO_OF_DAY, DailyNanoRange.DAY_NANOS + 1))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("endNanoOfDay must be between 1 and 86400000000000.");
@@ -88,15 +84,10 @@ public abstract class AbstractDailyNanoRangeTest<T extends DailyNanoRange> exten
     }
 
     @Test
-    @DisplayName("nanoOfDay가 하루 범위를 벗어나면 예외")
-    void throw_exception_when_nano_of_day_is_out_of_day() {
-        assertThatThrownBy(() -> range.contains(-1L))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("nanoOfDay must be between 0 and 86399999999999.");
-
-        assertThatThrownBy(() -> range.contains(DailyNanoRange.DAY_NANOS))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("nanoOfDay must be between 0 and 86399999999999.");
+    @DisplayName("nanoOfDay가 구간 밖이면 포함하지 않는다")
+    void return_false_when_nano_of_day_is_out_of_range() {
+        assertThat(range.contains(-1L)).isFalse();
+        assertThat(range.contains(DailyNanoRange.DAY_NANOS)).isFalse();
     }
 
     @Test
@@ -181,28 +172,28 @@ public abstract class AbstractDailyNanoRangeTest<T extends DailyNanoRange> exten
     }
 
     @Override
-    protected LocalTime createBeforePoint() {
-        return LocalTime.ofNanoOfDay(BEFORE_START_NANO_OF_DAY);
+    protected Long createBeforePoint() {
+        return BEFORE_START_NANO_OF_DAY;
     }
 
     @Override
-    protected LocalTime createSameAsStartPoint() {
-        return LocalTime.ofNanoOfDay(START_NANO_OF_DAY);
+    protected Long createSameAsStartPoint() {
+        return START_NANO_OF_DAY;
     }
 
     @Override
-    protected LocalTime createContainedPoint() {
-        return LocalTime.ofNanoOfDay(AFTER_START_NANO_OF_DAY);
+    protected Long createContainedPoint() {
+        return AFTER_START_NANO_OF_DAY;
     }
 
     @Override
-    protected LocalTime createSameAsEndPoint() {
-        return LocalTime.ofNanoOfDay(END_NANO_OF_DAY);
+    protected Long createSameAsEndPoint() {
+        return END_NANO_OF_DAY;
     }
 
     @Override
-    protected LocalTime createAfterPoint() {
-        return LocalTime.ofNanoOfDay(AFTER_END_NANO_OF_DAY);
+    protected Long createAfterPoint() {
+        return AFTER_END_NANO_OF_DAY;
     }
 
 }

@@ -6,7 +6,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 
-public class TemporalRangeTestSupport {
+public class InstantRangeTestSupport {
     private static final Clock clock = FixedClock.getFixed();
 
     public static Instant START_AT = clock.instant();

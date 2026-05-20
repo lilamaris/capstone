@@ -26,7 +26,7 @@ public abstract class AbstractDailyScheduleTest<T extends DailySchedule> {
         ));
 
         assertThat(schedule.ranges())
-                .extracting(DailyNanoRange::startNanoOfDay)
+                .extracting(DailyNanoRange::start)
                 .containsExactly(
                         nanoOf("09:00"),
                         nanoOf("13:00"),
@@ -62,6 +62,17 @@ public abstract class AbstractDailyScheduleTest<T extends DailySchedule> {
     }
 
     @Test
+    @DisplayName("DailyNanoRange 목록에 포함 관계의 구간이 있으면 예외")
+    void throw_exception_when_ranges_intersect_by_containment() {
+        assertThatThrownBy(() -> create(List.of(
+                range("09:00", "18:00"),
+                range("10:00", "12:00")
+        )))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("ranges must not overlap.");
+    }
+
+    @Test
     @DisplayName("DailyNanoRange 목록에 인접한 구간이 있으면 허용한다")
     void allow_adjacent_ranges() {
         var schedule = create(List.of(
@@ -80,8 +91,8 @@ public abstract class AbstractDailyScheduleTest<T extends DailySchedule> {
 
         mutable.updateStartNanoOfDay(nanoOf("10:00"));
 
-        assertThat(schedule.ranges().getFirst().startNanoOfDay()).isEqualTo(nanoOf("09:00"));
-        assertThat(schedule.ranges().getFirst().endNanoOfDay()).isEqualTo(nanoOf("12:00"));
+        assertThat(schedule.ranges().getFirst().start()).isEqualTo(nanoOf("09:00"));
+        assertThat(schedule.ranges().getFirst().end()).isEqualTo(nanoOf("12:00"));
     }
 
     @Test
@@ -170,88 +181,88 @@ public abstract class AbstractDailyScheduleTest<T extends DailySchedule> {
     }
 
     @Test
-    @DisplayName("TemporalRange가 하루 안에서 DailySchedule에 포함되면 포함한다")
+    @DisplayName("InstantRange가 하루 안에서 DailySchedule에 포함되면 포함한다")
     void contains_temporal_range_within_day() {
         var schedule = create(List.of(range("09:00", "18:00")));
 
-        assertThat(schedule.contains(withinDayTemporalRange(), SEOUL)).isTrue();
+        assertThat(schedule.contains(withinDayInstantRange(), SEOUL)).isTrue();
     }
 
     @Test
-    @DisplayName("TemporalRange가 자정을 넘어도 날짜별 구간이 모두 포함되면 포함한다")
+    @DisplayName("InstantRange가 자정을 넘어도 날짜별 구간이 모두 포함되면 포함한다")
     void contains_temporal_range_crossing_midnight() {
         var schedule = create(List.of(
                 range("00:00", "02:00"),
                 range("22:00", DailyNanoRange.DAY_NANOS)
         ));
 
-        assertThat(schedule.contains(crossingMidnightTemporalRange(), SEOUL)).isTrue();
+        assertThat(schedule.contains(crossingMidnightInstantRange(), SEOUL)).isTrue();
     }
 
     @Test
-    @DisplayName("TemporalRange가 자정을 넘을 때 날짜별 구간 중 하나라도 비어있으면 포함하지 않는다")
+    @DisplayName("InstantRange가 자정을 넘을 때 날짜별 구간 중 하나라도 비어있으면 포함하지 않는다")
     void does_not_contain_temporal_range_crossing_midnight_when_gap_exists() {
         var schedule = create(List.of(range("22:00", DailyNanoRange.DAY_NANOS)));
 
-        assertThat(schedule.contains(crossingMidnightTemporalRange(), SEOUL)).isFalse();
+        assertThat(schedule.contains(crossingMidnightInstantRange(), SEOUL)).isFalse();
     }
 
     @Test
-    @DisplayName("TemporalRange가 24시간 이상이어도 하루 전체 스케줄이면 포함한다")
+    @DisplayName("InstantRange가 24시간 이상이어도 하루 전체 스케줄이면 포함한다")
     void contains_temporal_range_longer_than_day_when_always() {
         var schedule = create(List.of(range("00:00", DailyNanoRange.DAY_NANOS)));
 
-        assertThat(schedule.contains(longerThanDayTemporalRange(), UTC)).isTrue();
+        assertThat(schedule.contains(longerThanDayInstantRange(), UTC)).isTrue();
     }
 
     @Test
-    @DisplayName("TemporalRange가 24시간 이상이면 각 날짜별 구간을 모두 검사한다")
+    @DisplayName("InstantRange가 24시간 이상이면 각 날짜별 구간을 모두 검사한다")
     void contains_temporal_range_longer_than_day_checks_every_daily_chunk() {
         var schedule = create(List.of(
                 range("00:00", "12:00"),
                 range("13:00", DailyNanoRange.DAY_NANOS)
         ));
 
-        assertThat(schedule.contains(longChunkCheckedTemporalRange(), UTC)).isFalse();
+        assertThat(schedule.contains(longChunkCheckedInstantRange(), UTC)).isFalse();
     }
 
     @Test
-    @DisplayName("TemporalRange가 정확히 자정에 끝나면 종료 경계를 하루 끝으로 취급한다")
+    @DisplayName("InstantRange가 정확히 자정에 끝나면 종료 경계를 하루 끝으로 취급한다")
     void contains_temporal_range_ending_at_midnight() {
         var schedule = create(List.of(range("22:00", DailyNanoRange.DAY_NANOS)));
 
-        assertThat(schedule.contains(endingAtMidnightTemporalRange(), SEOUL)).isTrue();
+        assertThat(schedule.contains(endingAtMidnightInstantRange(), SEOUL)).isTrue();
     }
 
     @Test
-    @DisplayName("TemporalRange가 여러 날짜에 걸치면 모든 날짜별 조각을 검사한다")
+    @DisplayName("InstantRange가 여러 날짜에 걸치면 모든 날짜별 조각을 검사한다")
     void contains_temporal_range_checks_all_daily_chunks() {
         var schedule = create(List.of(
                 range("00:00", "02:00"),
                 range("22:00", DailyNanoRange.DAY_NANOS)
         ));
 
-        assertThat(schedule.contains(multiDayChunkTemporalRange(), UTC)).isFalse();
+        assertThat(schedule.contains(multiDayChunkInstantRange(), UTC)).isFalse();
     }
 
     @Test
-    @DisplayName("TemporalRange 포함 여부를 DST 전환일에도 local date boundary 기준으로 확인한다")
+    @DisplayName("InstantRange 포함 여부를 DST 전환일에도 local date boundary 기준으로 확인한다")
     void contains_temporal_range_on_dst_transition_day() {
         var schedule = create(List.of(range("00:00", DailyNanoRange.DAY_NANOS)));
 
-        assertThat(schedule.contains(dstTransitionTemporalRange(), NEW_YORK)).isTrue();
+        assertThat(schedule.contains(dstTransitionInstantRange(), NEW_YORK)).isTrue();
     }
 
     @Test
-    @DisplayName("TemporalRange 포함 여부 검증 대상이 null이면 예외")
+    @DisplayName("InstantRange 포함 여부 검증 대상이 null이면 예외")
     void throw_exception_when_temporal_range_or_zone_id_is_null() {
         var schedule = create(List.of(range("00:00", DailyNanoRange.DAY_NANOS)));
-        var range = SimpleTemporalRange.of(
+        var range = SimpleInstantRange.of(
                 Instant.parse("2026-01-01T00:00:00Z"),
                 Instant.parse("2026-01-01T01:00:00Z")
         );
 
-        assertThatThrownBy(() -> schedule.contains((TemporalRange) null, UTC))
+        assertThatThrownBy(() -> schedule.contains((InstantRange) null, UTC))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("other must not be null.");
         assertThatThrownBy(() -> schedule.contains(range, null))
@@ -260,14 +271,14 @@ public abstract class AbstractDailyScheduleTest<T extends DailySchedule> {
     }
 
     @Test
-    @DisplayName("하나 이상의 구간이 대상 구간과 겹치면 true")
+    @DisplayName("하나 이상의 구간이 대상 구간과 부분적으로 겹치면 true")
     void return_true_when_any_range_overlaps_target_range() {
         var ranges = create(List.of(
                 range("09:00", "12:00"),
                 range("13:00", "18:00")
         ));
 
-        assertThat(ranges.overlaps(range("12:00", DailyNanoRange.DAY_NANOS))).isTrue();
+        assertThat(ranges.overlaps(range("11:00", "14:00"))).isTrue();
     }
 
     @Test
@@ -282,7 +293,7 @@ public abstract class AbstractDailyScheduleTest<T extends DailySchedule> {
     }
 
     @Test
-    @DisplayName("하나 이상의 구간이 다른 DailyNanoRange와 겹치면 true")
+    @DisplayName("하나 이상의 구간이 다른 DailySchedule과 부분적으로 겹치면 true")
     void return_true_when_any_range_overlaps_other_ranges() {
         var ranges = create(List.of(
                 range("09:00", "12:00"),
@@ -290,7 +301,7 @@ public abstract class AbstractDailyScheduleTest<T extends DailySchedule> {
         ));
 
         var other = create(List.of(
-                range("12:00", DailyNanoRange.DAY_NANOS)
+                range("11:00", "14:00")
         ));
 
         assertThat(ranges.overlaps(other)).isTrue();
@@ -321,7 +332,7 @@ public abstract class AbstractDailyScheduleTest<T extends DailySchedule> {
 
         assertThatThrownBy(() -> ranges.overlaps((DailyNanoRange) null))
                 .isInstanceOf(NullPointerException.class);
-        assertThatThrownBy(() -> ranges.overlaps((DailyNanoRange) null))
+        assertThatThrownBy(() -> ranges.overlaps((DailySchedule) null))
                 .isInstanceOf(NullPointerException.class);
     }
 }

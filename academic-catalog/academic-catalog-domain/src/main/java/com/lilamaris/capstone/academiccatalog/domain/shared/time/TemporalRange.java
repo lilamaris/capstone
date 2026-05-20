@@ -3,114 +3,19 @@ package com.lilamaris.capstone.academiccatalog.domain.shared.time;
 import com.lilamaris.capstone.kernel.core.condition.Preconditions;
 
 import java.time.Duration;
-import java.time.Instant;
 
-public interface TemporalRange extends
-        RangeComparable<TemporalRange>,
-        RangePointComparable<Instant> {
-    static void validate(Instant startAt, Instant endAt) {
-        Preconditions.requireNonNull(startAt, "startAt");
-        Preconditions.requireNonNull(endAt, "endAt");
+public interface TemporalRange<BASE extends Comparable<? super BASE>> {
+    BASE start();
 
-        if (!startAt.isBefore(endAt)) throw new IllegalArgumentException("startAt must be before endAt.");
+    BASE end();
+
+    static <BASE extends Comparable<BASE>> void validate(BASE start, BASE end) {
+        Preconditions.requireNonNull(start, "start");
+        Preconditions.requireNonNull(end, "end");
+
+        if (end.compareTo(start) <= 0)
+            throw new IllegalArgumentException("start must be before end.");
     }
 
-    Instant startAt();
-
-    Instant endAt();
-
-    default Duration duration() {
-        return Duration.between(startAt(), endAt());
-    }
-
-    @Override
-    default boolean isSame(TemporalRange other) {
-        Preconditions.requireNonNull(other, "other");
-
-        return startAt().equals(other.startAt()) && endAt().equals(other.endAt());
-    }
-
-    @Override
-    default boolean startsBefore(TemporalRange other) {
-        Preconditions.requireNonNull(other, "other");
-
-        return startAt().isBefore(other.startAt());
-    }
-
-    @Override
-    default boolean immediatelyBefore(TemporalRange other) {
-        Preconditions.requireNonNull(other, "other");
-
-        return endAt().equals(other.startAt());
-    }
-
-    @Override
-    default boolean endsAfter(TemporalRange other) {
-        Preconditions.requireNonNull(other, "other");
-
-        return endAt().isAfter(other.endAt());
-    }
-
-    @Override
-    default boolean immediatelyAfter(TemporalRange other) {
-        Preconditions.requireNonNull(other, "other");
-
-        return startAt().equals(other.endAt());
-    }
-
-    @Override
-    default boolean contains(TemporalRange other) {
-        Preconditions.requireNonNull(other, "other");
-
-        return !startAt().isAfter(other.startAt()) && !endAt().isBefore(other.endAt());
-    }
-
-    @Override
-    default boolean containsBy(TemporalRange other) {
-        Preconditions.requireNonNull(other, "other");
-
-        return !startAt().isBefore(other.startAt()) && !endAt().isAfter(other.endAt());
-    }
-
-    @Override
-    default boolean overlaps(TemporalRange other) {
-        Preconditions.requireNonNull(other, "other");
-
-        return startAt().isBefore(other.endAt()) && other.startAt().isBefore(endAt());
-    }
-
-    @Override
-    default boolean isBeforePoint(Instant other) {
-        Preconditions.requireNonNull(other, "other");
-
-        return endAt().isBefore(other);
-    }
-
-    @Override
-    default boolean endAt(Instant other) {
-        Preconditions.requireNonNull(other, "other");
-
-        return endAt().equals(other);
-    }
-
-    @Override
-    default boolean containsPoint(Instant other) {
-        Preconditions.requireNonNull(other, "other");
-
-        return !other.isBefore(startAt()) && other.isBefore(endAt());
-    };
-
-    @Override
-    default boolean startAt(Instant other) {
-        Preconditions.requireNonNull(other, "other");
-
-        return startAt().equals(other);
-    }
-
-    @Override
-    default boolean isAfterPoint(Instant other) {
-        Preconditions.requireNonNull(other, "other");
-
-        return startAt().isAfter(other);
-    }
+    Duration duration();
 }

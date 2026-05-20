@@ -7,9 +7,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public abstract class AbstractRangePointComparableTest<
-        T extends RangeComparable<? super T> & RangePointComparable<? super P>,
-        P
-        > extends AbstractRangeComparableTest<T> {
+        T extends RangeComparable<? super T, P>,
+        P extends Comparable<? super P>
+        > extends AbstractRangeComparableTest<T, P> {
 
     protected abstract P createBeforePoint();
 
@@ -24,21 +24,21 @@ public abstract class AbstractRangePointComparableTest<
     @Test
     @DisplayName("시점보다 앞서는지 확인할 수 있다")
     void before_point() {
-        assertThat(range.isBeforePoint(createAfterPoint())).isTrue();
+        assertThat(range.isBefore(createAfterPoint())).isTrue();
 
-        assertThat(range.isBeforePoint(createSameAsEndPoint())).isFalse();
-        assertThat(range.isBeforePoint(createContainedPoint())).isFalse();
-        assertThat(range.isBeforePoint(createBeforePoint())).isFalse();
+        assertThat(range.isBefore(createSameAsEndPoint())).isFalse();
+        assertThat(range.isBefore(createContainedPoint())).isFalse();
+        assertThat(range.isBefore(createBeforePoint())).isFalse();
     }
 
     @Test
     @DisplayName("시작 시점과 같은지 확인할 수 있다")
     void same_as_start_point() {
-        assertThat(range.startAt(createSameAsStartPoint())).isTrue();
+        assertThat(range.isStartsAt(createSameAsStartPoint())).isTrue();
 
-        assertThat(range.startAt(createContainedPoint())).isFalse();
-        assertThat(range.startAt(createSameAsEndPoint())).isFalse();
-        assertThat(range.startAt(createBeforePoint())).isFalse();
+        assertThat(range.isStartsAt(createContainedPoint())).isFalse();
+        assertThat(range.isStartsAt(createSameAsEndPoint())).isFalse();
+        assertThat(range.isStartsAt(createBeforePoint())).isFalse();
 
         assertThat(range.relationToPoint(createSameAsStartPoint())).isEqualTo(RangePointRelation.SAME_AS_START);
     }
@@ -46,12 +46,12 @@ public abstract class AbstractRangePointComparableTest<
     @Test
     @DisplayName("시점을 포함하는지 확인할 수 있다")
     void contains_point() {
-        assertThat(range.containsPoint(createSameAsStartPoint())).isTrue();
-        assertThat(range.containsPoint(createContainedPoint())).isTrue();
+        assertThat(range.contains(createSameAsStartPoint())).isTrue();
+        assertThat(range.contains(createContainedPoint())).isTrue();
 
-        assertThat(range.containsPoint(createSameAsEndPoint())).isFalse();
-        assertThat(range.containsPoint(createBeforePoint())).isFalse();
-        assertThat(range.containsPoint(createAfterPoint())).isFalse();
+        assertThat(range.contains(createSameAsEndPoint())).isFalse();
+        assertThat(range.contains(createBeforePoint())).isFalse();
+        assertThat(range.contains(createAfterPoint())).isFalse();
 
         assertThat(range.relationToPoint(createContainedPoint())).isEqualTo(RangePointRelation.CONTAINS);
     }
@@ -59,11 +59,11 @@ public abstract class AbstractRangePointComparableTest<
     @Test
     @DisplayName("종료 시점과 같은지 확인할 수 있다")
     void same_as_end_point() {
-        assertThat(range.endAt(createSameAsEndPoint())).isTrue();
+        assertThat(range.isEndsAt(createSameAsEndPoint())).isTrue();
 
-        assertThat(range.endAt(createContainedPoint())).isFalse();
-        assertThat(range.endAt(createSameAsStartPoint())).isFalse();
-        assertThat(range.endAt(createAfterPoint())).isFalse();
+        assertThat(range.isEndsAt(createContainedPoint())).isFalse();
+        assertThat(range.isEndsAt(createSameAsStartPoint())).isFalse();
+        assertThat(range.isEndsAt(createAfterPoint())).isFalse();
 
         assertThat(range.relationToPoint(createSameAsEndPoint())).isEqualTo(RangePointRelation.SAME_AS_END);
     }
@@ -71,11 +71,11 @@ public abstract class AbstractRangePointComparableTest<
     @Test
     @DisplayName("시점보다 뒤서는지 확인할 수 있다")
     void after_point() {
-        assertThat(range.isAfterPoint(createBeforePoint())).isTrue();
+        assertThat(range.isAfter(createBeforePoint())).isTrue();
 
-        assertThat(range.isAfterPoint(createSameAsStartPoint())).isFalse();
-        assertThat(range.isAfterPoint(createContainedPoint())).isFalse();
-        assertThat(range.isAfterPoint(createAfterPoint())).isFalse();
+        assertThat(range.isAfter(createSameAsStartPoint())).isFalse();
+        assertThat(range.isAfter(createContainedPoint())).isFalse();
+        assertThat(range.isAfter(createAfterPoint())).isFalse();
     }
 
     @Test

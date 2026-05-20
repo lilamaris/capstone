@@ -21,50 +21,50 @@ public class DailyScheduleTestSupport {
         return SimpleDailyNanoRange.of(nanoOf(startAt), endNanoOfDay);
     }
 
-    public static TemporalRange withinDayTemporalRange() {
-        return SimpleTemporalRange.of(
+    public static InstantRange withinDayInstantRange() {
+        return SimpleInstantRange.of(
                 Instant.parse("2026-01-01T01:00:00Z"),
                 Instant.parse("2026-01-01T08:00:00Z")
         );
     }
 
-    public static TemporalRange crossingMidnightTemporalRange() {
-        return SimpleTemporalRange.of(
+    public static InstantRange crossingMidnightInstantRange() {
+        return SimpleInstantRange.of(
                 Instant.parse("2026-01-01T13:30:00Z"),
                 Instant.parse("2026-01-01T16:30:00Z")
         );
     }
 
-    public static TemporalRange longerThanDayTemporalRange() {
-        return SimpleTemporalRange.of(
+    public static InstantRange longerThanDayInstantRange() {
+        return SimpleInstantRange.of(
                 Instant.parse("2026-01-01T00:00:00Z"),
                 Instant.parse("2026-01-03T06:00:00Z")
         );
     }
 
-    public static TemporalRange longChunkCheckedTemporalRange() {
-        return SimpleTemporalRange.of(
+    public static InstantRange longChunkCheckedInstantRange() {
+        return SimpleInstantRange.of(
                 Instant.parse("2026-01-01T10:00:00Z"),
                 Instant.parse("2026-01-02T02:00:00Z")
         );
     }
 
-    public static TemporalRange endingAtMidnightTemporalRange() {
-        return SimpleTemporalRange.of(
+    public static InstantRange endingAtMidnightInstantRange() {
+        return SimpleInstantRange.of(
                 Instant.parse("2026-01-01T13:00:00Z"),
                 Instant.parse("2026-01-01T15:00:00Z")
         );
     }
 
-    public static TemporalRange multiDayChunkTemporalRange() {
-        return SimpleTemporalRange.of(
+    public static InstantRange multiDayChunkInstantRange() {
+        return SimpleInstantRange.of(
                 Instant.parse("2026-01-01T23:00:00Z"),
                 Instant.parse("2026-01-03T01:00:00Z")
         );
     }
 
-    public static TemporalRange dstTransitionTemporalRange() {
-        return SimpleTemporalRange.of(
+    public static InstantRange dstTransitionInstantRange() {
+        return SimpleInstantRange.of(
                 Instant.parse("2026-03-08T05:00:00Z"),
                 Instant.parse("2026-03-09T04:00:00Z")
         );

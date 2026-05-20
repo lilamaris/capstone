@@ -20,8 +20,8 @@ public interface DailySchedule {
                 .map(range -> Preconditions.requireNonNull(range, "range"))
                 .<DailyNanoRange>map(SimpleDailyNanoRange::from)
                 .sorted(Comparator
-                        .comparing(DailyNanoRange::startNanoOfDay)
-                        .thenComparing(DailyNanoRange::endNanoOfDay)
+                        .comparing(DailyNanoRange::start)
+                        .thenComparing(DailyNanoRange::end)
                 )
                 .toList();
 
@@ -29,7 +29,7 @@ public interface DailySchedule {
             var previous = sorted.get(i - 1);
             var current = sorted.get(i);
 
-            if (current.overlaps(previous)) {
+            if (current.intersects(previous)) {
                 throw new IllegalArgumentException("ranges must not overlap. previous=" + previous + ", current=" + current);
             }
         }
@@ -59,15 +59,15 @@ public interface DailySchedule {
     default boolean contains(DailyNanoRange other) {
         Preconditions.requireNonNull(other, "other");
 
-        var cursor = other.startNanoOfDay();
+        var cursor = other.start();
 
         for (var range : ranges()) {
-            if (range.endNanoOfDay() <= cursor) continue;
-            if (range.startNanoOfDay() > cursor) return false;
+            if (range.end() <= cursor) continue;
+            if (range.start() > cursor) return false;
 
-            cursor = Math.max(cursor, range.endNanoOfDay());
+            cursor = Math.max(cursor, range.end());
 
-            if (cursor >= other.endNanoOfDay()) return true;
+            if (cursor >= other.end()) return true;
         }
 
         return false;
@@ -77,12 +77,12 @@ public interface DailySchedule {
         return contains(SimpleDailyNanoRange.of(0, DailyNanoRange.DAY_NANOS));
     }
 
-    default boolean contains(TemporalRange other, ZoneId zoneId) {
+    default boolean contains(InstantRange other, ZoneId zoneId) {
         Preconditions.requireNonNull(other, "other");
         Preconditions.requireNonNull(zoneId, "zoneId");
 
-        var cursor = other.startAt().atZone(zoneId);
-        var endZdt = other.endAt().atZone(zoneId);
+        var cursor = other.start().atZone(zoneId);
+        var endZdt = other.end().atZone(zoneId);
 
         while (cursor.isBefore(endZdt)) {
             var nextMidnight = cursor.toLocalDate().plusDays(1).atStartOfDay(zoneId);

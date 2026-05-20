@@ -21,8 +21,8 @@ public class EmbeddableDailyNanoRangeTest extends AbstractDailyNanoRangeTest<Emb
     void create_with_start_nano_of_day_and_duration() {
         var range = EmbeddableDailyNanoRange.of(START_NANO_OF_DAY, DURATION);
 
-        assertThat(range.startNanoOfDay()).isEqualTo(START_NANO_OF_DAY);
-        assertThat(range.endNanoOfDay()).isEqualTo(END_NANO_OF_DAY);
+        assertThat(range.start()).isEqualTo(START_NANO_OF_DAY);
+        assertThat(range.end()).isEqualTo(END_NANO_OF_DAY);
     }
 
     @Test
@@ -42,8 +42,8 @@ public class EmbeddableDailyNanoRangeTest extends AbstractDailyNanoRangeTest<Emb
     void copy_from_daily_nano_range() {
         var range = EmbeddableDailyNanoRange.from(create(START_NANO_OF_DAY, END_NANO_OF_DAY));
 
-        assertThat(range.startNanoOfDay()).isEqualTo(START_NANO_OF_DAY);
-        assertThat(range.endNanoOfDay()).isEqualTo(END_NANO_OF_DAY);
+        assertThat(range.start()).isEqualTo(START_NANO_OF_DAY);
+        assertThat(range.end()).isEqualTo(END_NANO_OF_DAY);
 
         assertThatThrownBy(() -> EmbeddableDailyNanoRange.from(null))
                 .isInstanceOf(NullPointerException.class)
@@ -57,8 +57,8 @@ public class EmbeddableDailyNanoRangeTest extends AbstractDailyNanoRangeTest<Emb
 
         range.updateStartNanoOfDay(START_NANO_OF_DAY + Duration.ofHours(1).toNanos());
 
-        assertThat(range.startNanoOfDay()).isEqualTo(START_NANO_OF_DAY + Duration.ofHours(1).toNanos());
-        assertThat(range.endNanoOfDay()).isEqualTo(END_NANO_OF_DAY);
+        assertThat(range.start()).isEqualTo(START_NANO_OF_DAY + Duration.ofHours(1).toNanos());
+        assertThat(range.end()).isEqualTo(END_NANO_OF_DAY);
     }
 
     @Test
@@ -68,8 +68,8 @@ public class EmbeddableDailyNanoRangeTest extends AbstractDailyNanoRangeTest<Emb
 
         range.updateEndNanoOfDay(END_NANO_OF_DAY - Duration.ofHours(1).toNanos());
 
-        assertThat(range.startNanoOfDay()).isEqualTo(START_NANO_OF_DAY);
-        assertThat(range.endNanoOfDay()).isEqualTo(END_NANO_OF_DAY - Duration.ofHours(1).toNanos());
+        assertThat(range.start()).isEqualTo(START_NANO_OF_DAY);
+        assertThat(range.end()).isEqualTo(END_NANO_OF_DAY - Duration.ofHours(1).toNanos());
     }
 
     @Test
@@ -79,8 +79,8 @@ public class EmbeddableDailyNanoRangeTest extends AbstractDailyNanoRangeTest<Emb
 
         range.extendStartNanoOfDay(Duration.ofHours(-1));
 
-        assertThat(range.startNanoOfDay()).isEqualTo(START_NANO_OF_DAY - Duration.ofHours(1).toNanos());
-        assertThat(range.endNanoOfDay()).isEqualTo(END_NANO_OF_DAY);
+        assertThat(range.start()).isEqualTo(START_NANO_OF_DAY - Duration.ofHours(1).toNanos());
+        assertThat(range.end()).isEqualTo(END_NANO_OF_DAY);
     }
 
     @Test
@@ -90,8 +90,8 @@ public class EmbeddableDailyNanoRangeTest extends AbstractDailyNanoRangeTest<Emb
 
         range.extendEndNanoOfDay(Duration.ofHours(1));
 
-        assertThat(range.startNanoOfDay()).isEqualTo(START_NANO_OF_DAY);
-        assertThat(range.endNanoOfDay()).isEqualTo(END_NANO_OF_DAY + Duration.ofHours(1).toNanos());
+        assertThat(range.start()).isEqualTo(START_NANO_OF_DAY);
+        assertThat(range.end()).isEqualTo(END_NANO_OF_DAY + Duration.ofHours(1).toNanos());
     }
 
     @Test
@@ -101,7 +101,7 @@ public class EmbeddableDailyNanoRangeTest extends AbstractDailyNanoRangeTest<Emb
 
         range.adjustOffset(Duration.ofHours(1));
 
-        assertThat(range.startNanoOfDay()).isEqualTo(START_NANO_OF_DAY + Duration.ofHours(1).toNanos());
-        assertThat(range.endNanoOfDay()).isEqualTo(END_NANO_OF_DAY + Duration.ofHours(1).toNanos());
+        assertThat(range.start()).isEqualTo(START_NANO_OF_DAY + Duration.ofHours(1).toNanos());
+        assertThat(range.end()).isEqualTo(END_NANO_OF_DAY + Duration.ofHours(1).toNanos());
     }
 }

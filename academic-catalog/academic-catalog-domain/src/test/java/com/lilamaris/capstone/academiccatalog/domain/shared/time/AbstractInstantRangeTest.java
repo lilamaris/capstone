@@ -12,21 +12,21 @@ import java.time.Instant;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static com.lilamaris.capstone.academiccatalog.domain.shared.time.TemporalRangeTestSupport.*;
+import static com.lilamaris.capstone.academiccatalog.domain.shared.time.InstantRangeTestSupport.*;
 import static com.lilamaris.capstone.kernel.testsupport.assertion.DomainAssertions.assertThatDomainThrownBy;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public abstract class AbstractTemporalRangeTest<T extends TemporalRange> extends AbstractRangePointComparableTest<T, Instant> {
+public abstract class AbstractInstantRangeTest<T extends InstantRange> extends AbstractRangePointComparableTest<T, Instant> {
 
     public abstract T create(Instant startAt, Instant endAt);
 
     Stream<Arguments> nullArgumentCases() {
         return Stream.of(
-                arguments("startAt = null", (Supplier<T>) () -> create(null, END_AT), "startAt"),
-                arguments("endAt = null", (Supplier<T>) () -> create(START_AT, null), "endAt")
+                arguments("start = null", (Supplier<T>) () -> create(null, END_AT), "start"),
+                arguments("end = null", (Supplier<T>) () -> create(START_AT, null), "end")
         );
     }
 
@@ -50,36 +50,36 @@ public abstract class AbstractTemporalRangeTest<T extends TemporalRange> extends
     @Test
     @DisplayName("시작 시간과 종료 시간으로 시간 구간을 생성할 수 있다")
     void create_with_start_at_and_end_at() {
-        assertThat(range.startAt()).isEqualTo(START_AT);
-        assertThat(range.endAt()).isEqualTo(END_AT);
+        assertThat(range.start()).isEqualTo(START_AT);
+        assertThat(range.end()).isEqualTo(END_AT);
         assertThat(range.duration()).isEqualTo(DURATION);
     }
 
     @Test
     @DisplayName("시작 시간이 종료 시간보다 같거나 이후면 예외")
-    void throw_exception_when_startAt_is_after_endAt() {
+    void throw_exception_when_startAt_is_after_end() {
         assertThatThrownBy(() -> create(START_AT, START_AT))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("startAt must be before endAt.");
+                .hasMessage("start must be before end.");
 
         assertThatThrownBy(() -> create(START_AT, BEFORE_START_AT))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("startAt must be before endAt.");
+                .hasMessage("start must be before end.");
     }
 
     @Test
     @DisplayName("Instant 포함 여부는 시작 경계는 포함하고, 종료 경계는 포함하지 않는다")
     void contains_instant_start_boundary_but_not_end_boundary() {
-        assertThat(range.containsPoint(START_AT)).isTrue();
-        assertThat(range.containsPoint(END_AT)).isFalse();
-        assertThat(range.containsPoint(BEFORE_START_AT)).isFalse();
-        assertThat(range.containsPoint(AFTER_END_AT)).isFalse();
+        assertThat(range.contains(START_AT)).isTrue();
+        assertThat(range.contains(END_AT)).isFalse();
+        assertThat(range.contains(BEFORE_START_AT)).isFalse();
+        assertThat(range.contains(AFTER_END_AT)).isFalse();
     }
 
     @Test
     @DisplayName("Instant가 null이면 포함 여부 확인 시 예외")
     void throw_exception_when_instant_is_null() {
-        assertThatDomainThrownBy(() -> range.containsPoint((Instant) null))
+        assertThatDomainThrownBy(() -> range.contains((Instant) null))
                 .hasNonNullMessageFor("other");
     }
 

@@ -6,11 +6,11 @@ import java.time.Duration;
 import java.time.LocalTime;
 
 public record SimpleDailyNanoRange(
-        long startNanoOfDay,
-        long endNanoOfDay
+        Long start,
+        Long end
 ) implements DailyNanoRange {
     public SimpleDailyNanoRange {
-        DailyNanoRange.validate(startNanoOfDay, endNanoOfDay);
+        DailyNanoRange.validate(start, end);
     }
 
     public static SimpleDailyNanoRange of(long startNanoOfDay, long endNanoOfDay) {
@@ -34,6 +34,6 @@ public record SimpleDailyNanoRange(
     public static SimpleDailyNanoRange from(DailyNanoRange range) {
         Preconditions.requireNonNull(range, "range");
 
-        return of(range.startNanoOfDay(), range.endNanoOfDay());
+        return of(range.start(), range.end());
     }
 }

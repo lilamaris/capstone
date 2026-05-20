@@ -22,8 +22,8 @@ public class SimpleDailyNanoRangeTest extends AbstractDailyNanoRangeTest<SimpleD
     void create_with_start_nano_of_day_and_duration() {
         var range = SimpleDailyNanoRange.of(START_NANO_OF_DAY, DURATION);
 
-        assertThat(range.startNanoOfDay()).isEqualTo(START_NANO_OF_DAY);
-        assertThat(range.endNanoOfDay()).isEqualTo(END_NANO_OF_DAY);
+        assertThat(range.start()).isEqualTo(START_NANO_OF_DAY);
+        assertThat(range.end()).isEqualTo(END_NANO_OF_DAY);
     }
 
     @Test
@@ -31,8 +31,8 @@ public class SimpleDailyNanoRangeTest extends AbstractDailyNanoRangeTest<SimpleD
     void create_with_start_at_and_duration() {
         var range = SimpleDailyNanoRange.of(LocalTime.ofNanoOfDay(START_NANO_OF_DAY), DURATION);
 
-        assertThat(range.startNanoOfDay()).isEqualTo(START_NANO_OF_DAY);
-        assertThat(range.endNanoOfDay()).isEqualTo(END_NANO_OF_DAY);
+        assertThat(range.start()).isEqualTo(START_NANO_OF_DAY);
+        assertThat(range.end()).isEqualTo(END_NANO_OF_DAY);
     }
 
     @Test
@@ -52,8 +52,8 @@ public class SimpleDailyNanoRangeTest extends AbstractDailyNanoRangeTest<SimpleD
     void copy_from_daily_nano_range() {
         var range = SimpleDailyNanoRange.from(create(START_NANO_OF_DAY, END_NANO_OF_DAY));
 
-        assertThat(range.startNanoOfDay()).isEqualTo(START_NANO_OF_DAY);
-        assertThat(range.endNanoOfDay()).isEqualTo(END_NANO_OF_DAY);
+        assertThat(range.start()).isEqualTo(START_NANO_OF_DAY);
+        assertThat(range.end()).isEqualTo(END_NANO_OF_DAY);
 
         assertThatThrownBy(() -> SimpleDailyNanoRange.from(null))
                 .isInstanceOf(NullPointerException.class)

@@ -25,7 +25,7 @@ class SimpleDailyScheduleTest extends AbstractDailyScheduleTest<SimpleDailySched
         )));
 
         assertThat(schedule.ranges())
-                .extracting(DailyNanoRange::startNanoOfDay)
+                .extracting(DailyNanoRange::start)
                 .containsExactly(
                         DailyScheduleTestSupport.nanoOf("09:00"),
                         DailyScheduleTestSupport.nanoOf("13:00")
